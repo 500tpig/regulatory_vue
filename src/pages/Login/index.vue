@@ -5,21 +5,55 @@
         <form class="form" id="b-form" method="" action="">
           <h2 class="form_title title">登录</h2>
           <!-- <div class="form__icons"><img class="form__icon" src="img/3.svg"></div><span class="form__span">or use your email account</span> -->
-          <q-input
-            rounded
-            standout
-            bottom-slots
-            v-model="text"
-            label="Label"
-            counter
-          >
-            <template v-slot:prepend>
-              <q-icon name="icon-user" />
-            </template>
-          </q-input>
-          <input class="form__input" type="text" placeholder="UserName" />
-          <input class="form__input" type="password" placeholder="Password" />
-          <button class="form__button button submit">登录</button>
+          <div class="form__input">
+            <q-input
+              style="font-size:16px"
+              rounded
+              standout="bg-primary text-white"
+              bottom-slots
+              label="UserName"
+              clearable
+              clear-icon="close"
+              v-model="user.username"
+              ref="login_username"
+              :rules="[val => (val && val.length > 0) || '请输入用户名']"
+            >
+              <template v-slot:prepend>
+                <q-icon name="icon-user" />
+              </template>
+            </q-input>
+          </div>
+          <div class="form__input">
+            <q-input
+              style="font-size:16px"
+              rounded
+              standout="bg-primary text-white"
+              bottom-slots
+              label="Password"
+              :type="isPwd ? 'password' : 'text'"
+              v-model="user.password"
+              ref="login_password"
+              :rules="[val => (val && val.length > 0) || '请输入密码']"
+            >
+              <template v-slot:prepend>
+                <q-icon name="icon-password" />
+              </template>
+              <template v-slot:append>
+                <q-icon
+                  :name="isPwd ? 'visibility_off' : 'visibility'"
+                  class="cursor-pointer"
+                  @click="isPwd = !isPwd"
+                />
+              </template>
+            </q-input>
+          </div>
+          <q-btn
+            class="form__button button submit"
+            :loading="loading1"
+            color="secondary"
+            @click="simulateProgress(1)"
+            label="登录"
+          />
         </form>
       </div>
       <div class="container b-container" id="b-container">
@@ -27,10 +61,67 @@
           <h2 class="form_title title">注册</h2>
           <!-- <div class="form__icons"><img class="form__icon" src="img/1.svg" alt=""><img class="form__icon" src="img/2.svg"></div> -->
           <!-- <span class="form__span">or use email for registration</span> -->
-
-          <input class="form__input" type="text" placeholder="UserName" />
-          <input class="form__input" type="text" placeholder="Email" />
-          <input class="form__input" type="password" placeholder="Password" />
+          <div class="form__input">
+            <q-input
+              style="font-size:16px"
+              rounded
+              standout="bg-primary text-white"
+              bottom-slots
+              label="UserName"
+              clearable
+              clear-icon="close"
+              v-model="register.username"
+              ref="register_username"
+              :rules="[val => (val && val.length > 0) || '请输入用户名']"
+            >
+              <template v-slot:prepend>
+                <q-icon name="icon-user" />
+              </template>
+            </q-input>
+          </div>
+          <div class="form__input">
+            <q-input
+              style="font-size:16px"
+              rounded
+              standout="bg-primary text-white"
+              bottom-slots
+              label="Email"
+              clearable
+              clear-icon="close"
+              v-model="register.email"
+              type="email"
+              ref="register_email"
+              :rules="[val => (val && val.length > 0) || '请输入邮箱']"
+            >
+              <template v-slot:prepend>
+                <q-icon name="icon-emailFilled" />
+              </template>
+            </q-input>
+          </div>
+          <div class="form__input">
+            <q-input
+              style="font-size:16px"
+              rounded
+              standout="bg-primary text-white"
+              bottom-slots
+              label="Password"
+              :type="isPwd ? 'password' : 'text'"
+              v-model="register.password"
+              ref="register_password"
+              :rules="[val => (val && val.length > 0) || '请输入密码']"
+            >
+              <template v-slot:prepend>
+                <q-icon name="icon-password" />
+              </template>
+              <template v-slot:append>
+                <q-icon
+                  :name="isPwd ? 'visibility_off' : 'visibility'"
+                  class="cursor-pointer"
+                  @click="isPwd = !isPwd"
+                />
+              </template>
+            </q-input>
+          </div>
           <button class="form__button button submit">注册</button>
         </form>
       </div>
@@ -42,14 +133,28 @@
           <p class="switch__description description">
             Enter your personal details and start journey with us
           </p>
-          <button class="switch__button button switch-btn">注册</button>
+          <q-btn
+            @click="onReset"
+            class="switch__button button switch-btn"
+            :ripple="{ center: true }"
+            color="accent"
+            label="注册"
+            no-caps
+          />
         </div>
         <div class="switch__container is-hidden" id="switch-c2">
           <h2 class="switch__title">已有账号？</h2>
           <p class="switch__description description">
             To keep connected with us please login with your personal info
           </p>
-          <button class="switch__button button switch-btn">登录</button>
+          <q-btn
+            @click="onReset"
+            class="switch__button button switch-btn"
+            :ripple="{ center: true }"
+            color="accent"
+            label="登录"
+            no-caps
+          />
         </div>
       </div>
     </div>
@@ -60,12 +165,53 @@
 export default {
   data() {
     return {
+      loading1: false,
       text: "",
+      isPwd: true,
       user: {
         username: "",
-        password: ""
+        password: "",
+        email: ""
+      },
+      register: {
+        username: "",
+        password: "",
+        email: ""
       }
     };
+  },
+  methods: {
+    simulateProgress(number) {
+      this.$refs.login_username.validate();
+      this.$refs.login_password.validate();
+
+      if (
+        this.$refs.login_username.hasError ||
+        this.$refs.login_password.hasError
+      ) {
+        this.formHasError = true;
+      } else if (this.accept !== true) {
+        this.$q.notify({
+          color: "negative",
+          message: "You need to accept the license and terms first"
+        });
+      } else {
+        // we set loading state
+        this[`loading${number}`] = true;
+        // simulate a delay
+        setTimeout(() => {
+          // we're done, we reset loading state
+          this[`loading${number}`] = false;
+        }, 3000);
+      }
+    },
+    onReset() {
+      this.user.username = null;
+      this.user.password = null;
+
+      this.$refs.login_username.resetValidation();
+      this.$refs.login_password.resetValidation();
+    }
   },
   mounted() {
     const switchCtn = document.querySelector("#switch-cnt");
@@ -176,8 +322,12 @@ export default {
   transition: 0.15s;
   cursor: pointer;
 }
-
 .form__input {
+  width: 350px;
+  margin: 14px 0;
+  font-size: 16px;
+}
+/* .form__input {
   width: 350px;
   height: 40px;
   margin: 10px 0;
@@ -191,7 +341,7 @@ export default {
   transition: 0.25s ease;
   border-radius: 8px;
   box-shadow: inset 2px 2px 4px #d1d9e6, inset -2px -2px 4px #f9f9f9;
-}
+} */
 
 .form__input:focus {
   box-shadow: inset 4px 4px 4px #d1d9e6, inset -4px -4px 4px #f9f9f9;

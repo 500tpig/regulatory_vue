@@ -1,13 +1,6 @@
 <template>
-  <q-layout
-    view="hHh lpR fFf"
-    class="bg-grey-1"
-  >
-    <q-header
-      elevated
-      class="bg-white text-grey-8"
-      height-hint="64"
-    >
+  <q-layout view="hHh lpR fFf" class="bg-grey-1">
+    <q-header elevated class="bg-white text-grey-8" height-hint="64">
       <q-toolbar class="GNL__toolbar">
         <q-btn
           flat
@@ -24,7 +17,9 @@
           shrink
           class="row items-center no-wrap"
         >
-          <img src="https://cdn.quasar.dev/img/layout-gallery/logo-google.svg">
+          <img
+            src="https://cdn.quasar.dev/img/layout-gallery/logo-google.svg"
+          />
           <span class="q-ml-sm">News</span>
         </q-toolbar-title>
 
@@ -39,10 +34,7 @@
           placeholder="Search for topics, locations & sources"
         >
           <template v-slot:prepend>
-            <q-icon
-              v-if="search === ''"
-              name="search"
-            />
+            <q-icon v-if="search === ''" name="search" />
             <q-icon
               v-else
               name="clear"
@@ -51,21 +43,9 @@
             />
           </template>
           <template v-slot:append>
-            <q-btn
-              flat
-              dense
-              round
-              aria-label="Menu"
-              icon="arrow_drop_down"
-            >
-              <q-menu
-                anchor="bottom right"
-                self="top right"
-              >
-                <div
-                  class="q-pa-md"
-                  style="width: 400px"
-                >
+            <q-btn flat dense round aria-label="Menu" icon="arrow_drop_down">
+              <q-menu anchor="bottom right" self="top right">
+                <div class="q-pa-md" style="width: 400px">
                   <div class="text-body2 text-grey q-mb-md">
                     Narrow your search results
                   </div>
@@ -75,40 +55,28 @@
                       Exact phrase
                     </div>
                     <div class="col-9 q-pl-md">
-                      <q-input
-                        dense
-                        v-model="exactPhrase"
-                      />
+                      <q-input dense v-model="exactPhrase" />
                     </div>
 
                     <div class="col-3 text-subtitle2 text-grey">
                       Has words
                     </div>
                     <div class="col-9 q-pl-md">
-                      <q-input
-                        dense
-                        v-model="hasWords"
-                      />
+                      <q-input dense v-model="hasWords" />
                     </div>
 
                     <div class="col-3 text-subtitle2 text-grey">
                       Exclude words
                     </div>
                     <div class="col-9 q-pl-md">
-                      <q-input
-                        dense
-                        v-model="excludeWords"
-                      />
+                      <q-input dense v-model="excludeWords" />
                     </div>
 
                     <div class="col-3 text-subtitle2 text-grey">
                       Website
                     </div>
                     <div class="col-9 q-pl-md">
-                      <q-input
-                        dense
-                        v-model="byWebsite"
-                      />
+                      <q-input dense v-model="byWebsite" />
                     </div>
 
                     <div class="col-12 q-pt-lg row justify-end">
@@ -154,28 +122,15 @@
           >
             <q-tooltip>Google Apps</q-tooltip>
           </q-btn>
-          <q-btn
-            round
-            dense
-            flat
-            color="grey-8"
-            icon="notifications"
-          >
-            <q-badge
-              color="red"
-              text-color="white"
-              floating
-            >
+          <q-btn round dense flat color="grey-8" icon="notifications">
+            <q-badge color="red" text-color="white" floating>
               2
             </q-badge>
             <q-tooltip>Notifications</q-tooltip>
           </q-btn>
-          <q-btn
-            round
-            flat
-          >
+          <q-btn round flat>
             <q-avatar size="26px">
-              <img src="https://cdn.quasar.dev/img/boy-avatar.png">
+              <img src="https://cdn.quasar.dev/img/boy-avatar.png" />
             </q-avatar>
             <q-tooltip>Account</q-tooltip>
           </q-btn>
@@ -191,10 +146,7 @@
       :width="280"
     >
       <q-scroll-area class="fit">
-        <q-list
-          padding
-          class="text-grey-8"
-        >
+        <q-list padding class="text-grey-8">
           <q-item
             class="GNL__drawer-item"
             v-ripple
@@ -210,10 +162,7 @@
             </q-item-section>
           </q-item>
 
-          <q-separator
-            inset
-            class="q-my-sm"
-          />
+          <q-separator inset class="q-my-sm" />
 
           <q-item
             class="GNL__drawer-item"
@@ -230,10 +179,7 @@
             </q-item-section>
           </q-item>
 
-          <q-separator
-            inset
-            class="q-my-sm"
-          />
+          <q-separator inset class="q-my-sm" />
 
           <q-item
             class="GNL__drawer-item"
@@ -243,11 +189,9 @@
             clickable
           >
             <q-item-section>
-              <q-item-label>{{ link.text }}
-                <q-icon
-                  v-if="link.icon"
-                  :name="link.icon"
-                />
+              <q-item-label
+                >{{ link.text }}
+                <q-icon v-if="link.icon" :name="link.icon" />
               </q-item-label>
             </q-item-section>
           </q-item>
@@ -258,19 +202,22 @@
                 class="GNL__drawer-footer-link"
                 href="javascript:void(0)"
                 aria-label="Privacy"
-              >Privacy</a>
+                >Privacy</a
+              >
               <span> · </span>
               <a
                 class="GNL__drawer-footer-link"
                 href="javascript:void(0)"
                 aria-label="Terms"
-              >Terms</a>
+                >Terms</a
+              >
               <span> · </span>
               <a
                 class="GNL__drawer-footer-link"
                 href="javascript:void(0)"
                 aria-label="About"
-              >About Google</a>
+                >About Google</a
+              >
             </div>
           </div>
         </q-list>
@@ -284,61 +231,61 @@
 </template>
 
 <script>
-import { fasGlobeAmericas, fasFlask } from '@quasar/extras/fontawesome-v5'
+import { fasGlobeAmericas, fasFlask } from "@quasar/extras/fontawesome-v5";
 export default {
-  name: 'GoogleNewsLayout',
-  data () {
+  name: "GoogleNewsLayout",
+  data() {
     return {
       leftDrawerOpen: false,
-      search: '',
+      search: "",
       showAdvanced: false,
       showDateOptions: false,
-      exactPhrase: '',
-      hasWords: '',
-      excludeWords: '',
-      byWebsite: '',
-      byDate: 'Any time',
+      exactPhrase: "",
+      hasWords: "",
+      excludeWords: "",
+      byWebsite: "",
+      byDate: "Any time",
       links1: [
-        { icon: 'web', text: 'Top stories' },
-        { icon: 'person', text: 'For you' },
-        { icon: 'star_border', text: 'Favourites' },
-        { icon: 'search', text: 'Saved searches' }
+        { icon: "web", text: "Top stories" },
+        { icon: "person", text: "For you" },
+        { icon: "star_border", text: "Favourites" },
+        { icon: "search", text: "Saved searches" }
       ],
       links2: [
-        { icon: 'flag', text: 'Canada' },
-        { icon: fasGlobeAmericas, text: 'World' },
-        { icon: 'place', text: 'Local' },
-        { icon: 'domain', text: 'Business' },
-        { icon: 'memory', text: 'Technology' },
-        { icon: 'local_movies', text: 'Entertainment' },
-        { icon: 'directions_bike', text: 'Sports' },
-        { icon: fasFlask, text: 'Science' },
-        { icon: 'fitness_center', text: 'Health ' }
+        { icon: "flag", text: "Canada" },
+        { icon: fasGlobeAmericas, text: "World" },
+        { icon: "place", text: "Local" },
+        { icon: "domain", text: "Business" },
+        { icon: "memory", text: "Technology" },
+        { icon: "local_movies", text: "Entertainment" },
+        { icon: "directions_bike", text: "Sports" },
+        { icon: fasFlask, text: "Science" },
+        { icon: "fitness_center", text: "Health " }
       ],
       links3: [
-        { icon: '', text: 'Language & region' },
-        { icon: '', text: 'Settings' },
-        { icon: 'open_in_new', text: 'Get the Android app' },
-        { icon: 'open_in_new', text: 'Get the iOS app' },
-        { icon: '', text: 'Send feedback' },
-        { icon: 'open_in_new', text: 'Help' }
+        { icon: "", text: "Language & region" },
+        { icon: "", text: "Settings" },
+        { icon: "open_in_new", text: "Get the Android app" },
+        { icon: "open_in_new", text: "Get the iOS app" },
+        { icon: "", text: "Send feedback" },
+        { icon: "open_in_new", text: "Help" }
       ]
-    }
+    };
   },
   methods: {
-    onClear () {
-      this.exactPhrase = ''
-      this.hasWords = ''
-      this.excludeWords = ''
-      this.byWebsite = ''
-      this.byDate = 'Any time'
+    onClear() {
+      this.exactPhrase = "";
+      this.hasWords = "";
+      this.excludeWords = "";
+      this.byWebsite = "";
+      this.byDate = "Any time";
     },
-    changeDate (option) {
-      this.byDate = option
-      this.showDateOptions = false
+    changeDate(option) {
+      this.byDate = option;
+      this.showDateOptions = false;
     }
   }
-}
+};
 </script>
 
 <style lang="sass">
