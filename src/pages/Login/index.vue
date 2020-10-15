@@ -14,10 +14,7 @@
             counter
           >
             <template v-slot:prepend>
-              <i class="fa fa-user" aria-hidden="true"></i>
-            </template>
-            <template v-slot:append>
-              <q-icon name="close" @click="text = ''" class="cursor-pointer" />
+              <q-icon name="icon-user" />
             </template>
           </q-input>
           <input class="form__input" type="text" placeholder="UserName" />
