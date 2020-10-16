@@ -168,9 +168,7 @@
 </template>
 
 <script>
-import dragVerify from "vue-drag-verify";
 export default {
-  components: { dragVerify },
   data() {
     return {
       submitting: false,
@@ -223,18 +221,14 @@ export default {
         this.$refs.login_password.hasError
       ) {
         this.formHasError = true;
-      } else if (this.accept !== true) {
-        that.$q.notify({
-          color: "negative",
-          message: "You need to accept the license and terms first"
-        });
       } else {
+        console.log(11);
         let form = {
           userName: this.user.username,
           password: this.user.password
         };
         this.$http
-          .post(form)
+          .post("/user/login", form)
           .then(res => {
             console.log(res);
           })

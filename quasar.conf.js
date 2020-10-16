@@ -105,7 +105,16 @@ cfg.module.rules.push({
       // directives: [],
 
       // Quasar plugins
-      plugins: []
+      plugins: ["Notify","Dialog", "LocalStorage","LoadingBar"],
+      config: {
+        notify:{
+          color:"positive",
+          icon:"check",
+          position:"top",
+          timeout:1500,
+          actions:[{icon:"close",color:"white"}]
+        }
+      }
     },
 
     // animations: 'all', // --- includes all animations
