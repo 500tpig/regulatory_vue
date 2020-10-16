@@ -1,6 +1,7 @@
 <template>
   <div class="Login">
     <div class="main">
+      <!-- 登录 -->
       <div class="container a-container" id="a-container">
         <form class="form" id="b-form" method="" action="">
           <h2 class="form_title title">登录</h2>
@@ -49,13 +50,15 @@
           </div>
           <q-btn
             class="form__button button submit"
-            :loading="loading1"
+            :loading="submitting"
             color="secondary"
             @click="simulateProgress(1)"
             label="登录"
           />
         </form>
       </div>
+      <!-- 登录 -->
+      <!-- 注册 -->
       <div class="container b-container" id="b-container">
         <form class="form" id="a-form" method="" action="">
           <h2 class="form_title title">注册</h2>
@@ -125,6 +128,8 @@
           <button class="form__button button submit">注册</button>
         </form>
       </div>
+      <!-- 注册 -->
+      <!-- 切换按钮 -->
       <div class="switch" id="switch-cnt">
         <div class="switch__circle"></div>
         <div class="switch__circle switch__circle--t"></div>
@@ -157,31 +162,59 @@
           />
         </div>
       </div>
+      <!-- 切换按钮 -->
     </div>
   </div>
 </template>
 
 <script>
+import dragVerify from "vue-drag-verify";
 export default {
+  components: { dragVerify },
   data() {
     return {
-      loading1: false,
-      text: "",
+      submitting: false,
       isPwd: true,
+      isPassing: true,
       user: {
-        username: "",
-        password: "",
+        username: "admin",
+        password: "admin",
         email: ""
       },
       register: {
         username: "",
         password: "",
         email: ""
+      },
+      verify: {
+        // 滑块验证码
+        width: 350,
+        height: 45,
+        text: "请拖动滑块进行验证",
+        successText: "验证成功",
+        // 以下内容是为drag-verify添加样式
+        background: "#cccccc",
+        progressBarBg: "#F2C037",
+        completedBg: "#21BA45",
+        handlerBg: "#fff",
+        textSize: "18px",
+        isCircle: "true",
+        handlerIcon: "icon-tick",
+        successIcon: "icon-tick"
       }
     };
   },
   methods: {
+    passcallback(e) {
+      if (this.$refs.Verify.isPassing == true) {
+        this.is_success = true;
+        this.isPassing = false;
+        // this.$refs.Verify.isPassing = false; //如果登录失败
+      }
+    },
     simulateProgress(number) {
+      this.submitting = true;
+      let that = this;
       this.$refs.login_username.validate();
       this.$refs.login_password.validate();
 
@@ -191,23 +224,38 @@ export default {
       ) {
         this.formHasError = true;
       } else if (this.accept !== true) {
-        this.$q.notify({
+        that.$q.notify({
           color: "negative",
           message: "You need to accept the license and terms first"
         });
       } else {
+        let form = {
+          userName: this.user.username,
+          password: this.user.password
+        };
+        this.$http
+          .post(form)
+          .then(res => {
+            console.log(res);
+          })
+          .catch(err => {
+            console.log(err);
+          });
         // we set loading state
         this[`loading${number}`] = true;
         // simulate a delay
         setTimeout(() => {
           // we're done, we reset loading state
           this[`loading${number}`] = false;
+          this.submitting = false;
         }, 3000);
       }
     },
     onReset() {
-      this.user.username = null;
-      this.user.password = null;
+      setTimeout(() => {
+        this.user.username = null;
+        this.user.password = null;
+      }, 1500);
 
       this.$refs.login_username.resetValidation();
       this.$refs.login_password.resetValidation();
@@ -385,7 +433,7 @@ export default {
   width: 180px;
   height: 50px;
   border-radius: 25px;
-  margin-top: 50px;
+  margin-top: 10px;
   font-weight: 700;
   font-size: 14px;
   letter-spacing: 1.15px;
