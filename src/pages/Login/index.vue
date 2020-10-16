@@ -1,174 +1,190 @@
 <template>
-  <div class="Login">
-    <div class="main">
-      <!-- 登录 -->
-      <div class="container a-container" id="a-container">
-        <form class="form" id="b-form" method="" action="">
-          <h2 class="form_title title">登录</h2>
-          <!-- <div class="form__icons"><img class="form__icon" src="img/3.svg"></div><span class="form__span">or use your email account</span> -->
-          <div class="form__input">
-            <q-input
-              style="font-size:16px"
-              rounded
-              standout="bg-primary text-white"
-              bottom-slots
-              label="UserName"
-              clearable
-              clear-icon="close"
-              v-model="user.username"
-              ref="login_username"
-              :rules="[val => (val && val.length > 0) || '请输入用户名']"
-            >
-              <template v-slot:prepend>
-                <q-icon name="icon-user" />
-              </template>
-            </q-input>
-          </div>
-          <div class="form__input">
-            <q-input
-              style="font-size:16px"
-              rounded
-              standout="bg-primary text-white"
-              bottom-slots
-              label="Password"
-              :type="isPwd ? 'password' : 'text'"
-              v-model="user.password"
-              ref="login_password"
-              :rules="[val => (val && val.length > 0) || '请输入密码']"
-            >
-              <template v-slot:prepend>
-                <q-icon name="icon-password" />
-              </template>
-              <template v-slot:append>
-                <q-icon
-                  :name="isPwd ? 'visibility_off' : 'visibility'"
-                  class="cursor-pointer"
-                  @click="isPwd = !isPwd"
-                />
-              </template>
-            </q-input>
-          </div>
-          <q-btn
-            class="form__button button submit"
-            :loading="submitting"
-            color="secondary"
-            @click="simulateProgress(1)"
-            label="登录"
-          />
-        </form>
-      </div>
-      <!-- 登录 -->
-      <!-- 注册 -->
-      <div class="container b-container" id="b-container">
-        <form class="form" id="a-form" method="" action="">
-          <h2 class="form_title title">注册</h2>
-          <!-- <div class="form__icons"><img class="form__icon" src="img/1.svg" alt=""><img class="form__icon" src="img/2.svg"></div> -->
-          <!-- <span class="form__span">or use email for registration</span> -->
-          <div class="form__input">
-            <q-input
-              style="font-size:16px"
-              rounded
-              standout="bg-primary text-white"
-              bottom-slots
-              label="UserName"
-              clearable
-              clear-icon="close"
-              v-model="register.username"
-              ref="register_username"
-              :rules="[val => (val && val.length > 0) || '请输入用户名']"
-            >
-              <template v-slot:prepend>
-                <q-icon name="icon-user" />
-              </template>
-            </q-input>
-          </div>
-          <div class="form__input">
-            <q-input
-              style="font-size:16px"
-              rounded
-              standout="bg-primary text-white"
-              bottom-slots
-              label="Email"
-              clearable
-              clear-icon="close"
-              v-model="register.email"
-              type="email"
-              ref="register_email"
-              :rules="[val => (val && val.length > 0) || '请输入邮箱']"
-            >
-              <template v-slot:prepend>
-                <q-icon name="icon-emailFilled" />
-              </template>
-            </q-input>
-          </div>
-          <div class="form__input">
-            <q-input
-              style="font-size:16px"
-              rounded
-              standout="bg-primary text-white"
-              bottom-slots
-              label="Password"
-              :type="isPwd ? 'password' : 'text'"
-              v-model="register.password"
-              ref="register_password"
-              :rules="[val => (val && val.length > 0) || '请输入密码']"
-            >
-              <template v-slot:prepend>
-                <q-icon name="icon-password" />
-              </template>
-              <template v-slot:append>
-                <q-icon
-                  :name="isPwd ? 'visibility_off' : 'visibility'"
-                  class="cursor-pointer"
-                  @click="isPwd = !isPwd"
-                />
-              </template>
-            </q-input>
-          </div>
-          <button class="form__button button submit">注册</button>
-        </form>
-      </div>
-      <!-- 注册 -->
-      <!-- 切换按钮 -->
-      <div class="switch" id="switch-cnt">
-        <div class="switch__circle"></div>
-        <div class="switch__circle switch__circle--t"></div>
-        <div class="switch__container" id="switch-c1">
-          <h2 class="switch__title">面向医院端的医保基金监管系统</h2>
-          <p class="switch__description description">
-            Enter your personal details and start journey with us
-          </p>
-          <q-btn
-            @click="onReset"
-            class="switch__button button switch-btn"
-            :ripple="{ center: true }"
-            color="accent"
-            label="注册"
-            no-caps
-          />
+  <div>
+    <div class="Login">
+      <div class="main">
+        <!-- 登录 -->
+        <div class="container a-container" id="a-container">
+          <form class="form" id="b-form" method="" action="">
+            <h2 class="form_title title">登录</h2>
+            <!-- <div class="form__icons"><img class="form__icon" src="img/3.svg"></div><span class="form__span">or use your email account</span> -->
+            <div class="form__input">
+              <q-input
+                style="font-size:16px"
+                rounded
+                standout="bg-primary text-white"
+                bottom-slots
+                label="UserName"
+                clearable
+                clear-icon="close"
+                v-model="user.username"
+                ref="login_username"
+                :rules="[val => (val && val.length > 0) || '请输入用户名']"
+              >
+                <template v-slot:prepend>
+                  <q-icon name="icon-user" />
+                </template>
+              </q-input>
+            </div>
+            <div class="form__input">
+              <q-input
+                style="font-size:16px"
+                rounded
+                standout="bg-primary text-white"
+                bottom-slots
+                label="Password"
+                :type="isPwd ? 'password' : 'text'"
+                v-model="user.password"
+                ref="login_password"
+                :rules="[val => (val && val.length > 0) || '请输入密码']"
+              >
+                <template v-slot:prepend>
+                  <q-icon name="icon-password" />
+                </template>
+                <template v-slot:append>
+                  <q-icon
+                    :name="isPwd ? 'visibility_off' : 'visibility'"
+                    class="cursor-pointer"
+                    @click="isPwd = !isPwd"
+                  />
+                </template>
+              </q-input>
+            </div>
+            <q-btn
+              class="form__button button submit"
+              :loading="submitting"
+              color="secondary"
+              @click="simulateProgress"
+              label="登录"
+            />
+          </form>
         </div>
-        <div class="switch__container is-hidden" id="switch-c2">
-          <h2 class="switch__title">已有账号？</h2>
-          <p class="switch__description description">
-            To keep connected with us please login with your personal info
-          </p>
-          <q-btn
-            @click="onReset"
-            class="switch__button button switch-btn"
-            :ripple="{ center: true }"
-            color="accent"
-            label="登录"
-            no-caps
-          />
+        <!-- 登录 -->
+        <!-- 注册 -->
+        <div class="container b-container" id="b-container">
+          <form class="form" id="a-form" method="" action="">
+            <h2 class="form_title title">注册</h2>
+            <!-- <div class="form__icons"><img class="form__icon" src="img/1.svg" alt=""><img class="form__icon" src="img/2.svg"></div> -->
+            <!-- <span class="form__span">or use email for registration</span> -->
+            <div class="form__input">
+              <q-input
+                style="font-size:16px"
+                rounded
+                standout="bg-primary text-white"
+                bottom-slots
+                label="UserName"
+                clearable
+                clear-icon="close"
+                v-model="register.username"
+                ref="register_username"
+                :rules="[val => (val && val.length > 0) || '请输入用户名']"
+              >
+                <template v-slot:prepend>
+                  <q-icon name="icon-user" />
+                </template>
+              </q-input>
+            </div>
+            <div class="form__input">
+              <q-input
+                style="font-size:16px"
+                rounded
+                standout="bg-primary text-white"
+                bottom-slots
+                label="Email"
+                clearable
+                clear-icon="close"
+                v-model="register.email"
+                type="email"
+                ref="register_email"
+                :rules="[val => (val && val.length > 0) || '请输入邮箱']"
+              >
+                <template v-slot:prepend>
+                  <q-icon name="icon-emailFilled" />
+                </template>
+              </q-input>
+            </div>
+            <div class="form__input">
+              <q-input
+                style="font-size:16px"
+                rounded
+                standout="bg-primary text-white"
+                bottom-slots
+                label="Password"
+                :type="isPwd ? 'password' : 'text'"
+                v-model="register.password"
+                ref="register_password"
+                :rules="[val => (val && val.length > 0) || '请输入密码']"
+              >
+                <template v-slot:prepend>
+                  <q-icon name="icon-password" />
+                </template>
+                <template v-slot:append>
+                  <q-icon
+                    :name="isPwd ? 'visibility_off' : 'visibility'"
+                    class="cursor-pointer"
+                    @click="isPwd = !isPwd"
+                  />
+                </template>
+              </q-input>
+            </div>
+            <button class="form__button button submit">注册</button>
+          </form>
         </div>
+        <!-- 注册 -->
+        <!-- 切换按钮 -->
+        <div class="switch" id="switch-cnt">
+          <div class="switch__circle"></div>
+          <div class="switch__circle switch__circle--t"></div>
+          <div class="switch__container" id="switch-c1">
+            <h2 class="switch__title">面向医院端的医保基金监管系统</h2>
+            <p class="switch__description description">
+              Enter your personal details and start journey with us
+            </p>
+            <q-btn
+              @click="onReset"
+              class="switch__button button switch-btn"
+              :ripple="{ center: true }"
+              color="accent"
+              label="注册"
+              no-caps
+            />
+          </div>
+          <div class="switch__container is-hidden" id="switch-c2">
+            <h2 class="switch__title">已有账号？</h2>
+            <p class="switch__description description">
+              To keep connected with us please login with your personal info
+            </p>
+            <q-btn
+              @click="onReset"
+              class="switch__button button switch-btn"
+              :ripple="{ center: true }"
+              color="accent"
+              label="登录"
+              no-caps
+            />
+          </div>
+        </div>
+        <!-- 切换按钮 -->
       </div>
-      <!-- 切换按钮 -->
     </div>
+    <q-dialog v-model="verifyForm">
+      <q-card style="padding:15px;" class="bg-secondary text-white">
+        <q-card-section class="row items-center">
+          <div class="text-h6">滑动验证</div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-card-section>
+        <q-card-section>
+          <verifySlider @callback="verified(1)"></verifySlider
+        ></q-card-section>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
 <script>
+import verifySlider from "../../components/utils/Verify.vue";
 export default {
+  components: { verifySlider },
   data() {
     return {
       submitting: false,
@@ -184,34 +200,33 @@ export default {
         password: "",
         email: ""
       },
-      verify: {
-        // 滑块验证码
-        width: 350,
-        height: 45,
-        text: "请拖动滑块进行验证",
-        successText: "验证成功",
-        // 以下内容是为drag-verify添加样式
-        background: "#cccccc",
-        progressBarBg: "#F2C037",
-        completedBg: "#21BA45",
-        handlerBg: "#fff",
-        textSize: "18px",
-        isCircle: "true",
-        handlerIcon: "icon-tick",
-        successIcon: "icon-tick"
-      }
+      verifyForm: false
     };
   },
   methods: {
-    passcallback(e) {
-      if (this.$refs.Verify.isPassing == true) {
-        this.is_success = true;
-        this.isPassing = false;
-        // this.$refs.Verify.isPassing = false; //如果登录失败
-      }
+    verified(number) {
+      this.submitting = true;
+      this.verifyForm = false;
+      let form = {
+        userName: this.user.username,
+        password: this.user.password
+      };
+      this.$http
+        .post("/user/login", form)
+        .then(res => {
+          console.log(res);
+        })
+        .catch(() => {});
+      // we set loading state
+      this[`loading${number}`] = true;
+      // simulate a delay
+      setTimeout(() => {
+        // we're done, we reset loading state
+        this[`loading${number}`] = false;
+        this.submitting = false;
+      }, 3000);
     },
     simulateProgress(number) {
-      this.submitting = true;
       let that = this;
       this.$refs.login_username.validate();
       this.$refs.login_password.validate();
@@ -222,27 +237,7 @@ export default {
       ) {
         this.formHasError = true;
       } else {
-        console.log(11);
-        let form = {
-          userName: this.user.username,
-          password: this.user.password
-        };
-        this.$http
-          .post("/user/login", form)
-          .then(res => {
-            console.log(res);
-          })
-          .catch(err => {
-            console.log(err);
-          });
-        // we set loading state
-        this[`loading${number}`] = true;
-        // simulate a delay
-        setTimeout(() => {
-          // we're done, we reset loading state
-          this[`loading${number}`] = false;
-          this.submitting = false;
-        }, 3000);
+        this.verifyForm = true;
       }
     },
     onReset() {

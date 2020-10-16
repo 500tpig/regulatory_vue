@@ -7,26 +7,26 @@ const http = axios.create({
 });
 //  响应拦截
 http.interceptors.response.use(
-  response => response,
-  err => {
-    let msg = "未知错误";
-    if (err && err.response && err.response.status) {
-      switch (err.response.status) {
-        case 400:
-          msg: err.response.message;
-          break;
-        case 401:
-          msg = "未登录";
-          break;
-        case 500:
-          msg = "服务器错误";
-          break;
+  function(response) {
+    // Any status code that lie within the range of 2xx cause this function to trigger
+    // Do something with response data
+    return response;
+  },
+  function(error) {
+    let errMsg = "未知错误";
+    if (error && error.response && error.response.status) {
+      let errCode = error.response.status;
+      if (errCode === 401) {
+        errMsg = "请先登录";
+      } else if (errCode >= 400) {
+        errMsg = error.response.data.msg;
       }
     }
     Notify.create({
       color: "negative",
-      message: msg
+      message: errMsg
     });
+    return Promise.reject(error);
   }
 );
 Vue.prototype.$http = http;
