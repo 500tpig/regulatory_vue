@@ -167,7 +167,7 @@
       </div>
     </div>
     <q-dialog v-model="verifyForm">
-      <q-card style="padding:15px;" class="bg-secondary text-white">
+      <q-card style="padding:15px;" class="">
         <q-card-section class="row items-center">
           <div class="text-h6">滑动验证</div>
           <q-space />
@@ -223,7 +223,7 @@ export default {
               this.$q.notify({
                 message: "登录成功！"
               });
-              this.$router.push("/about");
+              this.$router.push("/home");
             }, 1500);
           }
         })
