@@ -17,7 +17,7 @@
           shrink
           class="row items-center no-wrap"
         >
-          <span class="q-ml-sm" color="primary">医保基金监管系统</span>
+          <span class="q-ml-sm text-primary">医保基金监管系统</span>
         </q-toolbar-title>
 
         <q-space />
@@ -46,7 +46,7 @@
         </div>
       </q-toolbar>
     </q-header>
-
+    <!-- 侧边栏 -->
     <q-drawer
       v-model="leftDrawerOpen"
       show-if-above
@@ -62,48 +62,51 @@
             v-for="link in links1"
             :key="link.text"
             clickable
+            @click="toHome()"
+            :class="{ 'bg-primary': links1[0].select }"
           >
             <q-item-section avatar>
-              <q-icon :name="link.icon" />
+              <q-icon
+                :class="{ 'text-white': links1[0].select }"
+                :name="link.icon"
+              />
             </q-item-section>
             <q-item-section>
-              <q-item-label>{{ link.text }}</q-item-label>
+              <q-item-label :class="{ 'text-white': links1[0].select }">{{
+                link.text
+              }}</q-item-label>
             </q-item-section>
           </q-item>
-
           <q-separator inset class="q-my-sm" />
-
-          <q-item
-            class="GNL__drawer-item"
-            v-ripple
-            v-for="link in links2"
-            :key="link.text"
-            clickable
+          <!-- 下拉 -->
+          <q-expansion-item
+            expand-separator
+            icon="icon-neibujijin"
+            label="基金使用概况"
           >
-            <q-item-section avatar>
-              <q-icon :name="link.icon" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>{{ link.text }}</q-item-label>
-            </q-item-section>
-          </q-item>
-
-          <q-separator inset class="q-my-sm" />
-
-          <q-item
-            class="GNL__drawer-item"
-            v-ripple
-            v-for="link in links3"
-            :key="link.text"
-            clickable
-          >
-            <q-item-section>
-              <q-item-label
-                >{{ link.text }}
-                <q-icon v-if="link.icon" :name="link.icon" />
-              </q-item-label>
-            </q-item-section>
-          </q-item>
+            <q-item
+              class="GNL__drawer-item"
+              v-ripple
+              v-for="(link, index) in links2"
+              :key="index"
+              clickable
+              @click="toPage(index)"
+              :class="{ 'bg-primary': link.select }"
+            >
+              <q-item-section avatar>
+                <q-icon
+                  :class="{ 'text-white': link.select }"
+                  :name="link.icon"
+                />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label :class="{ 'text-white': link.select }">{{
+                  link.text
+                }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-expansion-item>
+          <!-- <q-separator inset class="q-my-sm" /> -->
 
           <div class="q-mt-md">
             <div class="flex flex-center q-gutter-xs">
@@ -125,7 +128,7 @@
                 class="GNL__drawer-footer-link"
                 href="javascript:void(0)"
                 aria-label="About"
-                >About Google</a
+                >About Us</a
               >
             </div>
           </div>
@@ -142,60 +145,58 @@
 <script>
 import { fasGlobeAmericas, fasFlask } from "@quasar/extras/fontawesome-v5";
 export default {
-  name: "GoogleNewsLayout",
+  name: "Layout",
   data() {
     return {
       leftDrawerOpen: false,
-      search: "",
-      showAdvanced: false,
-      showDateOptions: false,
-      exactPhrase: "",
-      hasWords: "",
-      excludeWords: "",
-      byWebsite: "",
-      byDate: "Any time",
-      links1: [
-        { icon: "web", text: "Top stories" },
-        { icon: "person", text: "For you" },
-        { icon: "star_border", text: "Favourites" },
-        { icon: "search", text: "Saved searches" }
-      ],
+      expanded: ["Satisfied customers (with avatar)", "Good food (with icon)"],
+      links1: [{ icon: "home", text: "首页", url: "/home", select: false }],
       links2: [
-        { icon: "flag", text: "Canada" },
-        { icon: fasGlobeAmericas, text: "World" },
-        { icon: "place", text: "Local" },
-        { icon: "domain", text: "Business" },
-        { icon: "memory", text: "Technology" },
-        { icon: "local_movies", text: "Entertainment" },
-        { icon: "directions_bike", text: "Sports" },
-        { icon: fasFlask, text: "Science" },
-        { icon: "fitness_center", text: "Health " }
-      ],
-      links3: [
-        { icon: "", text: "Language & region" },
-        { icon: "", text: "Settings" },
-        { icon: "open_in_new", text: "Get the Android app" },
-        { icon: "open_in_new", text: "Get the iOS app" },
-        { icon: "", text: "Send feedback" },
-        { icon: "open_in_new", text: "Help" }
+        {
+          icon: "icon-riqi1",
+          text: "按时间分析",
+          url: "/foundation/by_time",
+          select: false
+        },
+        {
+          icon: "star_border",
+          text: "Favourites",
+          select: false,
+          url: "/foundation/by_time"
+        },
+        {
+          icon: "search",
+          text: "Saved searches",
+          select: false,
+          url: "/foundation/by_time"
+        }
       ]
     };
   },
+  mounted() {
+    this.links1[0].select = true;
+  },
   methods: {
-    onClear() {
-      this.exactPhrase = "";
-      this.hasWords = "";
-      this.excludeWords = "";
-      this.byWebsite = "";
-      this.byDate = "Any time";
-    },
-    changeDate(option) {
-      this.byDate = option;
-      this.showDateOptions = false;
-    },
     logout() {
       this.$store.dispatch("user/userLogout");
       this.$router.push("/login");
+    },
+    toHome() {
+      for (let i = 0; i < this.links2.length; i++)
+        this.links2[i].select = false;
+      this.links1[0].select = true;
+      this.$router.push(this.links1[0].url).catch(err => {
+        console.log("输出报错", err);
+      });
+    },
+    toPage(index) {
+      this.links1[0].select = false;
+      for (let i = 0; i < this.links2.length; i++)
+        this.links2[i].select = false;
+      this.links2[index].select = true;
+      this.$router.push(this.links2[index].url).catch(err => {
+        console.log("输出报错", err);
+      });
     }
   }
 };
@@ -217,7 +218,7 @@ export default {
     .q-item__label
       color: #3c4043
       letter-spacing: .01785714em
-      font-size: .875rem
+      font-size: .9rem
       font-weight: 500
       line-height: 1.25rem
   &__drawer-footer-link
