@@ -1,16 +1,16 @@
 const routes = [
   {
     path: "/",
-    redirect: "login"
+    redirect: "Login"
   },
   {
     path: "/login",
-    name: "login",
+    name: "Login",
     component: () => import("pages/Login")
   },
   {
     path: "/home",
-    name: "home",
+    name: "Home",
     meta: { requireAuth: true },
     component: () => import("layouts/MainLayout"),
     children: [
