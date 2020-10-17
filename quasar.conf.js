@@ -109,7 +109,13 @@ module.exports = function(ctx) {
       // directives: [],
 
       // Quasar plugins
-      plugins: ["Notify", "Dialog", "LocalStorage", "LoadingBar"],
+      plugins: [
+        "Notify",
+        "Dialog",
+        "LocalStorage",
+        "SessionStorage",
+        "LoadingBar"
+      ],
       config: {
         notify: {
           color: "positive",
