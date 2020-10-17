@@ -2,7 +2,7 @@
   "name": "regulatory_vue",
   "version": "0.0.1",
   "description": "A Quasar Framework app",
-  "productName": "Quasar App",
+  "productName": "医保基金监管系统",
   "author": "500tpig <995375558@qq.com>",
   "private": true,
   "scripts": {

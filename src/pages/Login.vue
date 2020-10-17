@@ -184,6 +184,7 @@
 <script>
 import verifySlider from "components/utils/Verify.vue";
 export default {
+  name: "Login",
   components: { verifySlider },
   data() {
     return {
