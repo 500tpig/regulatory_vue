@@ -217,18 +217,13 @@ export default {
       this.$http
         .post("/user/login", form)
         .then(async res => {
-          // console.log(res);
+          console.log(res);
           if (res.status === 200) {
-            // await that.$store.commit("user/setUserInfo", res.data.data);
-            // this.$q.localStorage.set("token", res.data.data.token);
             setTimeout(() => {
               // we're done, we reset loading state
               this[`loading${number}`] = false;
               this.submitting = false;
-              // this.$store.dispatch(
-              //   "user/asyncSetUserInfo",
-              //   res.data.data.token
-              // );
+              this.$store.dispatch("user/asyncSetUserInfo", res.data.data);
             }, 2000);
           }
         })

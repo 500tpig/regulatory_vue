@@ -31,4 +31,4 @@ http.interceptors.response.use(
 );
 Vue.prototype.$http = http;
 
-export { http };
+export default http;
