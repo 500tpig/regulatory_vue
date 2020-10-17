@@ -31,7 +31,7 @@ export default async (/* { app, router, Vue ... } */ { router, store }) => {
     }
     /*如果本地 存在 token 则 不允许直接跳转到 登录页面*/
     if (to.fullPath == "/login") {
-      if (localStorage.getItem("token") && store.state.user.isLogin) {
+      if (sessionStorage.getItem("token") && store.state.user.isLogin) {
         next({
           path: from.fullPath
         });
