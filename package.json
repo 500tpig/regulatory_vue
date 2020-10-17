@@ -14,6 +14,7 @@
     "axios": "^0.18.1",
     "core-js": "^3.6.5",
     "quasar": "^1.0.0",
+    "vue-drag-verify": "^1.0.6",
     "vue-monoplasty-slide-verify": "^1.1.3"
   },
   "devDependencies": {

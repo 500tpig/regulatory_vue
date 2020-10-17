@@ -219,12 +219,15 @@ export default {
         .then(async res => {
           console.log(res);
           if (res.status === 200) {
+            this.$store.dispatch("user/asyncSetUserInfo", res.data.data);
             setTimeout(() => {
               // we're done, we reset loading state
               this[`loading${number}`] = false;
               this.submitting = false;
-              this.$store.dispatch("user/asyncSetUserInfo", res.data.data);
-            }, 2000);
+              this.$q.notify({
+                message: "登录成功！"
+              });
+            }, 1500);
           }
         })
         .catch(() => {
