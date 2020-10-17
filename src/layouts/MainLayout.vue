@@ -17,10 +17,7 @@
           shrink
           class="row items-center no-wrap"
         >
-          <img
-            src="https://cdn.quasar.dev/img/layout-gallery/logo-google.svg"
-          />
-          <span class="q-ml-sm">News</span>
+          <span class="q-ml-sm" style="color:primary;">医保基金监管系统</span>
         </q-toolbar-title>
 
         <q-space />

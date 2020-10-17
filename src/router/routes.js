@@ -1,11 +1,15 @@
 const routes = [
+  // {
+  //   path: "/",
+  //   redirect: "login"
+  // },
   {
     path: "/login",
     name: "login",
     component: () => import("pages/Login/index")
   },
   {
-    path: "/",
+    path: "/home",
     name: "home",
     meta: { requireAuth: true },
     component: () => import("layouts/MainLayout"),

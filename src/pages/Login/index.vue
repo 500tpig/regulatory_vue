@@ -213,7 +213,6 @@ export default {
       this.$http
         .post("/login", this.user)
         .then(async res => {
-          console.log(res);
           if (res.status === 200) {
             this.$store.dispatch("user/asyncSetUserInfo", res.data.data);
             setTimeout(() => {
@@ -223,6 +222,7 @@ export default {
               this.$q.notify({
                 message: "登录成功！"
               });
+              this.$router.push("/about");
             }, 1500);
           }
         })
@@ -247,7 +247,7 @@ export default {
     },
     onReset() {
       setTimeout(() => {
-        this.user.username = null;
+        this.user.userName = null;
         this.user.password = null;
       }, 500);
 
