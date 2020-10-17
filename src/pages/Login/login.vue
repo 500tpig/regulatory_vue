@@ -536,7 +536,7 @@ export default {
   visibility: hidden;
   opacity: 0;
   position: absolute;
-  transition: 1.25s;
+  transition: 1s;
 }
 
 .is-gx {

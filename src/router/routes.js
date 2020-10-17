@@ -1,23 +1,23 @@
 const routes = [
   {
     path: "/",
-    redirect: "Login"
+    redirect: "login"
   },
   {
     path: "/login",
-    name: "Login",
-    component: () => import("pages/Login")
+    name: "login",
+    component: () => import("pages/Login/login")
   },
   {
     path: "/home",
-    name: "Home",
+    name: "home",
     meta: { requireAuth: true },
     component: () => import("layouts/MainLayout"),
     children: [
       {
         path: "/about",
         meta: { requireAuth: true },
-        component: () => import("pages/Home")
+        component: () => import("pages/Home/home")
       }
     ]
   },
