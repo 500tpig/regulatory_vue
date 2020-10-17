@@ -6,7 +6,7 @@ const routes = [
   {
     path: "/login",
     name: "login",
-    component: () => import("pages/Login/index")
+    component: () => import("pages/Login")
   },
   {
     path: "/home",
@@ -17,7 +17,7 @@ const routes = [
       {
         path: "/about",
         meta: { requireAuth: true },
-        component: () => import("pages/Home/index")
+        component: () => import("pages/Home")
       }
     ]
   },

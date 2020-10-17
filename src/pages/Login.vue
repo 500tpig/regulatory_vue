@@ -182,7 +182,7 @@
 </template>
 
 <script>
-import verifySlider from "../../components/utils/Verify.vue";
+import verifySlider from "components/utils/Verify.vue";
 export default {
   components: { verifySlider },
   data() {
