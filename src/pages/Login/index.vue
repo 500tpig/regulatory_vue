@@ -16,7 +16,7 @@
                 label="UserName"
                 clearable
                 clear-icon="close"
-                v-model="user.username"
+                v-model="user.userName"
                 ref="login_username"
                 :rules="[val => (val && val.length > 0) || '请输入用户名']"
               >
@@ -74,7 +74,7 @@
                 label="UserName"
                 clearable
                 clear-icon="close"
-                v-model="register.username"
+                v-model="register.userName"
                 ref="register_username"
                 :rules="[val => (val && val.length > 0) || '请输入用户名']"
               >
@@ -191,12 +191,12 @@ export default {
       isPwd: true,
       isPassing: true,
       user: {
-        username: "admin",
+        userName: "admin",
         password: "admin",
         email: ""
       },
       register: {
-        username: "",
+        userName: "",
         password: "",
         email: ""
       },
@@ -210,12 +210,8 @@ export default {
       this.verifyForm = false;
       // we set loading state
       this[`loading${number}`] = true;
-      let form = {
-        userName: this.user.username,
-        password: this.user.password
-      };
       this.$http
-        .post("/user/login", form)
+        .post("/login", this.user)
         .then(async res => {
           console.log(res);
           if (res.status === 200) {

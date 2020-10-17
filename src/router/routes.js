@@ -1,27 +1,28 @@
 const routes = [
   {
-    path: "/home",
-    component: () => import("layouts/MainLayout.vue"),
-    children: [
-      {
-        path: "/about",
-        component: () => import("pages/Index.vue")
-      }
-    ]
-  },
-  {
     path: "/login",
-    component: () => import("pages/login/index.vue")
+    name: "login",
+    component: () => import("pages/Login/index")
   },
   {
     path: "/",
-    component: () => import("pages/login/index.vue")
+    name: "home",
+    meta: { requireAuth: true },
+    component: () => import("layouts/MainLayout"),
+    children: [
+      {
+        path: "/about",
+        meta: { requireAuth: true },
+        component: () => import("pages/Home/index")
+      }
+    ]
   },
   // Always leave this as last one,
   // but you can also remove it
   {
     path: "*",
-    component: () => import("pages/Error404.vue")
+    name: "404",
+    component: () => import("pages/Error404")
   }
 ];
 
