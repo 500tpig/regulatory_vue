@@ -205,26 +205,37 @@ export default {
   },
   methods: {
     verified(number) {
+      let that = this;
       this.submitting = true;
       this.verifyForm = false;
+      // we set loading state
+      this[`loading${number}`] = true;
       let form = {
         userName: this.user.username,
         password: this.user.password
       };
       this.$http
         .post("/user/login", form)
-        .then(res => {
-          console.log(res);
+        .then(async res => {
+          // console.log(res);
+          if (res.status === 200) {
+            // await that.$store.commit("user/setUserInfo", res.data.data);
+            // this.$q.localStorage.set("token", res.data.data.token);
+            setTimeout(() => {
+              // we're done, we reset loading state
+              this[`loading${number}`] = false;
+              this.submitting = false;
+              // this.$store.dispatch(
+              //   "user/asyncSetUserInfo",
+              //   res.data.data.token
+              // );
+            }, 2000);
+          }
         })
-        .catch(() => {});
-      // we set loading state
-      this[`loading${number}`] = true;
-      // simulate a delay
-      setTimeout(() => {
-        // we're done, we reset loading state
-        this[`loading${number}`] = false;
-        this.submitting = false;
-      }, 3000);
+        .catch(() => {
+          this[`loading${number}`] = false;
+          this.submitting = false;
+        });
     },
     simulateProgress(number) {
       let that = this;
@@ -244,7 +255,7 @@ export default {
       setTimeout(() => {
         this.user.username = null;
         this.user.password = null;
-      }, 1500);
+      }, 500);
 
       this.$refs.login_username.resetValidation();
       this.$refs.login_password.resetValidation();
