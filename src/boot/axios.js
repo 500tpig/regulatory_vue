@@ -3,7 +3,7 @@ import axios from "axios";
 import { Notify } from "quasar";
 const http = axios.create({
   baseURL: "http://localhost:8090",
-  timeout: 10000
+  timeout: 100000
 });
 //  响应拦截
 http.interceptors.response.use(
@@ -30,3 +30,5 @@ http.interceptors.response.use(
   }
 );
 Vue.prototype.$http = http;
+
+export { http };
