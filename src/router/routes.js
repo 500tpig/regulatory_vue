@@ -9,15 +9,21 @@ const routes = [
     component: () => import("pages/Login/login")
   },
   {
-    path: "/home",
-    name: "home",
+    path: "/index",
+    name: "index",
     meta: { requireAuth: true },
     component: () => import("layouts/MainLayout"),
     children: [
       {
-        path: "/about",
+        path: "/home",
+        name: "home",
         meta: { requireAuth: true },
         component: () => import("pages/Home/home")
+      },
+      {
+        path: "/foundation/by_time",
+        meta: { requireAuth: true },
+        component: () => import("pages/Foundation/byTime")
       }
     ]
   },
