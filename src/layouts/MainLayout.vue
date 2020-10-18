@@ -19,6 +19,16 @@
         >
           <span class="q-ml-sm text-primary">医保基金监管系统</span>
         </q-toolbar-title>
+        <q-toolbar inset>
+          <q-breadcrumbs active-color="primary" style="font-size: 16px">
+            <q-breadcrumbs-el
+              v-for="(item, index) in breadcrumbs"
+              :key="index"
+              :label="item.label"
+              :icon="item.icon"
+            />
+          </q-breadcrumbs>
+        </q-toolbar>
 
         <q-space />
 
@@ -45,6 +55,11 @@
           </q-btn>
         </div>
       </q-toolbar>
+      <q-tabs v-model="tab">
+        <q-tab name="images" label="Images" />
+        <q-tab name="videos" label="Videos" />
+        <q-tab name="articles" label="Articles" />
+      </q-tabs>
     </q-header>
     <!-- 侧边栏 -->
     <q-drawer
@@ -81,6 +96,7 @@
           <!-- 下拉 -->
           <q-expansion-item
             expand-separator
+            v-model="expanded[0]"
             icon="icon-neibujijin"
             label="基金使用概况"
           >
@@ -90,7 +106,7 @@
               v-for="(link, index) in links2"
               :key="index"
               clickable
-              @click="toPage(index)"
+              @click="toPage(links2, index)"
               :class="{ 'bg-primary': link.select }"
             >
               <q-item-section avatar>
@@ -148,8 +164,9 @@ export default {
   name: "Layout",
   data() {
     return {
+      tab: "",
       leftDrawerOpen: false,
-      expanded: ["Satisfied customers (with avatar)", "Good food (with icon)"],
+      expanded: [false],
       links1: [{ icon: "home", text: "首页", url: "/home", select: false }],
       links2: [
         {
@@ -162,19 +179,57 @@ export default {
           icon: "star_border",
           text: "Favourites",
           select: false,
-          url: "/foundation/by_time"
+          url: "/foundation/by_time1"
         },
         {
           icon: "search",
           text: "Saved searches",
           select: false,
-          url: "/foundation/by_time"
+          url: "/foundation/by_time2"
         }
+      ],
+      breadcrumbs: [
+        // {
+        //   label:"",
+        //   icon:""
+        // }
       ]
     };
   },
   mounted() {
-    this.links1[0].select = true;
+    if (this.$route.path === "/home") {
+      this.links1[0].select = true;
+      this.breadcrumbs = [
+        {
+          label: "Home",
+          icon: "home"
+        }
+      ];
+    } else {
+      // 路径是按基金使用
+      if (this.$route.path.startsWith("/foundation")) {
+        this.expanded[0] = true;
+        for (let i = 0; i < this.links2.length; i++) {
+          if (this.$route.path === this.links2[i].url)
+            this.links2[i].select = true;
+          this.breadcrumbs = [
+            {
+              label: "Home",
+              icon: "home"
+            },
+            {
+              label: "基金使用概况",
+              icon: "icon-neibujijin"
+            },
+            {
+              label: this.links2[i].text,
+              icon: this.links2[i].icon
+            }
+          ];
+          break;
+        }
+      }
+    }
   },
   methods: {
     logout() {
@@ -182,6 +237,14 @@ export default {
       this.$router.push("/login");
     },
     toHome() {
+      let currentUrl = this.$route.path;
+      if (currentUrl === this.links1[0].url) return;
+      this.breadcrumbs = [
+        {
+          label: "Home",
+          icon: "home"
+        }
+      ];
       for (let i = 0; i < this.links2.length; i++)
         this.links2[i].select = false;
       this.links1[0].select = true;
@@ -189,12 +252,27 @@ export default {
         console.log("输出报错", err);
       });
     },
-    toPage(index) {
+    toPage(arr, index) {
+      let currentUrl = this.$route.path;
+      if (currentUrl === arr[index].url) return;
       this.links1[0].select = false;
-      for (let i = 0; i < this.links2.length; i++)
-        this.links2[i].select = false;
-      this.links2[index].select = true;
-      this.$router.push(this.links2[index].url).catch(err => {
+      for (let i = 0; i < arr.length; i++) arr[i].select = false;
+      arr[index].select = true;
+      this.breadcrumbs = [
+        {
+          label: "Home",
+          icon: "home"
+        },
+        {
+          label: "基金使用概况",
+          icon: "icon-neibujijin"
+        },
+        {
+          label: arr[index].text,
+          icon: arr[index].icon
+        }
+      ];
+      this.$router.push(arr[index].url).catch(err => {
         console.log("输出报错", err);
       });
     }
