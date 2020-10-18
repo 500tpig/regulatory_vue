@@ -30,3 +30,8 @@ export default {
   }
 };
 </script>
+<style lang="scss">
+main {
+  background: #eef0f3;
+}
+</style>

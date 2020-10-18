@@ -19,19 +19,20 @@
         >
           <span class="q-ml-sm text-primary">医保基金监管系统</span>
         </q-toolbar-title>
-        <q-toolbar inset>
-          <q-breadcrumbs active-color="primary" style="font-size: 16px">
-            <q-breadcrumbs-el
-              v-for="(item, index) in breadcrumbs"
-              :key="index"
-              :label="item.label"
-              :icon="item.icon"
-            />
-          </q-breadcrumbs>
-        </q-toolbar>
-
+        <q-breadcrumbs
+          active-color="primary"
+          style="font-size: 14px"
+          class="q-ml-xl"
+        >
+          <q-breadcrumbs-el
+            v-for="(item, index) in breadcrumbs"
+            :key="index"
+            :label="item.label"
+            :icon="item.icon"
+          />
+        </q-breadcrumbs>
         <q-space />
-
+        <!-- 头像 -->
         <div class="q-gutter-sm row items-center no-wrap">
           <q-btn dense flat no-wrap>
             <q-avatar rounded size="30px">
@@ -55,11 +56,6 @@
           </q-btn>
         </div>
       </q-toolbar>
-      <q-tabs v-model="tab">
-        <q-tab name="images" label="Images" />
-        <q-tab name="videos" label="Videos" />
-        <q-tab name="articles" label="Articles" />
-      </q-tabs>
     </q-header>
     <!-- 侧边栏 -->
     <q-drawer
