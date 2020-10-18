@@ -4,7 +4,7 @@
     :r="10"
     :w="310"
     :h="155"
-    slider-text="msg"
+    slider-text="请滑动验证"
     @success="onSuccess"
     @fail="onFail"
     @refresh="onRefresh"
