@@ -7,12 +7,9 @@ export default async (/* { app, router, Vue ... } */ { router, store }) => {
   // something to do
   //路由守卫
   router.beforeEach((to, from, next) => {
-    console.log(11);
     // 判断是否需要登录
-    console.log(to.meta.requireAuth);
     if (to.meta.requireAuth) {
       // 判断登录状态
-      console.log(store.state.user.isLogin);
       if (store.state.user.isLogin) {
         next();
       } else {

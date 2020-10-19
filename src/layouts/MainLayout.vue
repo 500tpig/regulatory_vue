@@ -56,6 +56,33 @@
           </q-btn>
         </div>
       </q-toolbar>
+      <q-tabs
+        align="left"
+        dense
+        inline-label
+        indicator-color="primary"
+        active-color="primary"
+        class="text-grey-5"
+      >
+        <q-route-tab
+          v-for="(item, index) in tabs"
+          :key="index"
+          :icon="item.icon"
+          :to="item.to"
+          :label="item.label"
+          @click="switchTab(item.to)"
+        >
+          <!-- <q-btn
+            round
+            flat
+            color="text-grey-5"
+            icon="close"
+            size="xs"
+            class="show"
+            @click="closeTab"
+          /> -->
+        </q-route-tab>
+      </q-tabs>
     </q-header>
     <!-- 侧边栏 -->
     <q-drawer
@@ -68,7 +95,7 @@
       <q-scroll-area class="fit">
         <q-list padding class="text-grey-8">
           <q-item
-            class="GNL__drawer-item"
+            class="GNL__drawer-item q-mb-xs"
             v-ripple
             v-for="link in links1"
             :key="link.text"
@@ -88,7 +115,7 @@
               }}</q-item-label>
             </q-item-section>
           </q-item>
-          <q-separator inset class="q-my-sm" />
+          <!-- <q-separator inset class="q-my-sm" /> -->
           <!-- 下拉 -->
           <q-expansion-item
             expand-separator
@@ -148,6 +175,13 @@
       </q-scroll-area>
     </q-drawer>
 
+    <!-- <q-header>
+      <div class="Tabs q-pa-sm">
+        <q-chip square removable color="primary" text-color="white" icon="cake">
+          Eclair
+        </q-chip>
+      </div>
+    </q-header> -->
     <q-page-container>
       <router-view />
     </q-page-container>
@@ -160,7 +194,18 @@ export default {
   name: "Layout",
   data() {
     return {
-      tab: "",
+      tabs: [
+        {
+          icon: "home",
+          to: "/home",
+          label: "Home"
+        },
+        {
+          icon: "icon-riqi1",
+          to: "/foundation/by_time",
+          label: "按时间分析"
+        }
+      ],
       leftDrawerOpen: false,
       expanded: [false],
       links1: [{ icon: "home", text: "首页", url: "/home", select: false }],
@@ -184,12 +229,7 @@ export default {
           url: "/foundation/by_time2"
         }
       ],
-      breadcrumbs: [
-        // {
-        //   label:"",
-        //   icon:""
-        // }
-      ]
+      breadcrumbs: []
     };
   },
   mounted() {
@@ -228,6 +268,17 @@ export default {
     }
   },
   methods: {
+    switchTab(url) {
+      this.links1[0].select = false;
+      for (let i = 0; i < this.links2.length; i++) {
+        if (this.links2[i].url === url) this.links2[i].select = true;
+        else this.links2[i].select = false;
+      }
+      if (url === "/home") {
+        this.links1[0].select = true;
+        return;
+      }
+    },
     logout() {
       this.$store.dispatch("user/userLogout");
       this.$router.push("/login");
@@ -276,10 +327,15 @@ export default {
 };
 </script>
 
+<style lang="scss">
+.GNL__toolbar {
+  border-bottom: dotted $sub-text 0.5px;
+}
+</style>
 <style lang="sass">
 .GNL
   &__toolbar
-    height: 64px
+    // height: 64px
   &__toolbar-input
     width: 55%
   &__drawer-item

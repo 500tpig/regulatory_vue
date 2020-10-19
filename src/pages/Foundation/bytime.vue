@@ -1,6 +1,7 @@
 <template>
   <q-page class="flex flex-center">
-    <div id="main"></div>
+    <div id="main" style="display:none;"></div>
+    <input />
   </q-page>
 </template>
 
@@ -15,7 +16,6 @@ export default {
       let resizeDiv = document.getElementById(dom);
       // 绘制图表
       myChart.setOption(option);
-      console.log(EleResize);
       let listener = function() {
         myChart.resize();
       };
