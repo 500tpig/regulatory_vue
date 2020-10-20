@@ -1,6 +1,6 @@
 <template>
   <q-layout view="hHh lpR fFf" class="bg-grey-1">
-    <q-header elevated class="bg-white text-grey-8" height-hint="64">
+    <q-header elevated class="bg-primary text-white" height-hint="64">
       <q-toolbar class="GNL__toolbar">
         <q-btn
           flat
@@ -11,18 +11,21 @@
           icon="menu"
           class="q-mr-sm"
         />
-
+        <!-- 头部标题 -->
         <q-toolbar-title
           v-if="$q.screen.gt.xs"
           shrink
           class="row items-center no-wrap"
         >
-          <span class="q-ml-sm text-primary">医保基金监管系统</span>
+          <span class="q-ml-sm text-white text-weight-bolder"
+            >医保基金监管系统</span
+          >
         </q-toolbar-title>
+        <!-- 面包屑 -->
         <q-breadcrumbs
-          active-color="primary"
-          style="font-size: 14px"
-          class="q-ml-xl"
+          active-color="white"
+          style="font-size: 15px"
+          class="q-ml-xl text-weight-medium"
         >
           <q-breadcrumbs-el
             v-for="(item, index) in breadcrumbs"
@@ -56,12 +59,13 @@
           </q-btn>
         </div>
       </q-toolbar>
+      <!-- tab栏 -->
       <q-tabs
         align="left"
         dense
         inline-label
         indicator-color="primary"
-        active-color="primary"
+        active-color="white"
         class="text-grey-5"
       >
         <q-route-tab
@@ -72,15 +76,6 @@
           :label="item.label"
           @click="switchTab(item.to)"
         >
-          <!-- <q-btn
-            round
-            flat
-            color="text-grey-5"
-            icon="close"
-            size="xs"
-            class="show"
-            @click="closeTab"
-          /> -->
         </q-route-tab>
       </q-tabs>
     </q-header>
@@ -93,7 +88,7 @@
       :width="280"
     >
       <q-scroll-area class="fit">
-        <q-list padding class="text-grey-8">
+        <q-list padding>
           <q-item
             class="GNL__drawer-item q-mb-xs"
             v-ripple
@@ -145,8 +140,6 @@
               </q-item-section>
             </q-item>
           </q-expansion-item>
-          <!-- <q-separator inset class="q-my-sm" /> -->
-
           <div class="q-mt-md">
             <div class="flex flex-center q-gutter-xs">
               <a
@@ -326,16 +319,10 @@ export default {
   }
 };
 </script>
-
-<style lang="scss">
-.GNL__toolbar {
-  border-bottom: dotted $sub-text 0.5px;
-}
-</style>
 <style lang="sass">
 .GNL
   &__toolbar
-    // height: 64px
+    height: 64px
   &__toolbar-input
     width: 55%
   &__drawer-item
