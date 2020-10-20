@@ -1,6 +1,6 @@
 <template>
   <div id="q-app">
-    <keep-alive><router-view /></keep-alive>
+    <router-view />
   </div>
 </template>
 <script>
@@ -32,6 +32,12 @@ export default {
 </script>
 <style lang="scss">
 main {
-  background: #eef0f3;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  // color: $card-primary-text;
+  letter-spacing: 0.5px;
+  word-spacing: 1.5px;
+  height: auto;
 }
 </style>
