@@ -1,174 +1,104 @@
 <template>
   <q-page class="byTIme q-pt-lg">
     <div class="row byTime-searchBar-row">
+      <!-- 筛选栏 -->
       <div class="col-8 offset-2 byTime-searchBar-row-col">
         <q-card
-          class="byTime-searchBar-row-col-card bg-white text-primary q-py-sm"
+          class="byTime-searchBar-row-col-card bg-white text-primary q-pt-md"
         >
           <!-- <q-separator dark /> -->
           <q-card-section horizontal class="row q-px-lg items-center">
-            <div class="col-0 byTime-searchBar-row-col-card-select">
+            <div class=" byTime-searchBar-row-col-card-select">
               <q-select
-                filled
-                use-chips
-                multiple
-                v-model="multiple"
+                v-model="searchParam.type"
                 :options="options"
-                label="类型"
-              />
+                multiple
+                rounded
+                outlined
+                prefix="类型"
+                color="primary"
+                bg-color="white"
+              >
+                <template v-slot:selected-item="scope">
+                  <q-chip
+                    removable
+                    dense
+                    @remove="scope.removeAtIndex(scope.index)"
+                    :tabindex="scope.tabindex"
+                    color="white"
+                    text-color="primary"
+                    class="q-mx-xs"
+                  >
+                    {{ scope.opt }}
+                  </q-chip>
+                </template>
+              </q-select>
             </div>
             <div class=" q-ml-lg">
               <q-input
-                v-model="startDate"
+                v-model="searchParam.startDate"
                 prefix="开始日期 :"
-                filled
                 type="date"
+                rounded
+                outlined
+                :input-style="{ color: '#018DA7' }"
               />
             </div>
             <div class=" q-ml-lg">
               <q-input
-                v-model="startDate"
+                v-model="searchParam.endDate"
                 prefix="结束日期 :"
-                filled
                 type="date"
+                rounded
+                outlined
+                :input-style="{ color: '#018DA7' }"
               />
             </div>
           </q-card-section>
           <q-card-actions align="right">
-            <q-btn class=" q-mr-lg" flat>提交</q-btn>
+            <q-btn class="q-mr-lg" flat>提交</q-btn>
           </q-card-actions>
         </q-card>
       </div>
     </div>
-    <div id="main" style=""></div>
+    <div class="row">
+      <div class="col-8 offset-2 ">
+        <q-card class="q-mt-lg q-pt-md">
+          <div id="main"></div>
+        </q-card>
+      </div>
+    </div>
   </q-page>
 </template>
 
 <script>
 import { EleResize } from "assets/js/esresize";
+import { byTimeOption } from "assets/js/charts/byTimeOption";
 export default {
   name: "Echarts",
   data() {
     return {
-      multiple: null,
+      searchParam: {
+        startDate: "",
+        endDate: "",
+        type: ["个人支付", "医保支付", "医疗总费用"]
+      },
       options: ["个人支付", "医保支付", "医疗总费用"],
-      startDate: ""
+      model: {
+        label: "Google",
+        value: "goog",
+        icon: "mail"
+      }
     };
   },
   methods: {
     onItemClick() {},
-    drawLine(dom, option) {
-      // 基于准备好的dom，初始化echarts实例
-      let myChart = echarts.init(document.getElementById(dom));
-      let resizeDiv = document.getElementById(dom);
-      // 绘制图表
-      myChart.setOption(option);
-      let listener = function() {
-        myChart.resize();
-      };
-      EleResize.on(resizeDiv, listener);
-    },
     myEcharts() {
       // 基于准备好的dom，初始化echarts实例
       let myChart = this.$echarts.init(document.getElementById("main"));
       let resizeDiv = document.getElementById("main");
       // 指定图表的配置项和数据
-      let option = {
-        title: {
-          // text: "ECharts 入门示例"
-        },
-        tooltip: {
-          trigger: "axis",
-          formatter: function(data) {
-            let str = data[0].axisValue + "<br/>";
-            data.map(item => {
-              str += item.seriesName + " : " + item.value + "元<br/>";
-            });
-
-            return str;
-          },
-          axisPointer: {
-            type: "cross",
-            crossStyle: {
-              color: "#999"
-            }
-          }
-        },
-        grid: {
-          containLabel: true
-        },
-
-        legend: {
-          data: ["个人支付", "医保支付", "总费用"],
-          x: "center",
-          top: 10
-        },
-        xAxis: {
-          name: "时间",
-          axisPointer: {
-            type: "shadow"
-          },
-          nameTextStyle: {
-            padding: [0, 0, 0, -10] // 四个数字分别为上右下左与原位置距离
-          },
-          type: "category",
-          data: [
-            "2016-01",
-            "2016-02",
-            "2016-03",
-            "2016-04",
-            "2016-05",
-            "2016-06"
-          ],
-          axisLabel: {
-            interval: 0,
-            rotate: 40
-          }
-        },
-        yAxis: [
-          {
-            name: "金额",
-            type: "value"
-          }
-        ],
-        series: [
-          {
-            name: "个人支付",
-            type: "bar",
-            data: [5, 20, 36, 10, 10, 20],
-            // barMaxWidth: 60,
-            stack: "one",
-            itemStyle: {
-              normal: {
-                color: "#EBA954"
-              }
-            }
-          },
-          {
-            name: "医保支付",
-            type: "bar",
-            stack: "one",
-            data: [5, 20, 36, 10, 10, 20],
-            // barMaxWidth: 60,
-            itemStyle: {
-              normal: {
-                color: "#01949B"
-              }
-            }
-          },
-          {
-            name: "总费用",
-            type: "line",
-            data: [10, 40, 72, 20, 20, 40],
-            itemStyle: {
-              normal: {
-                color: "#C23531"
-              }
-            }
-          }
-        ]
-      };
-
+      let option = byTimeOption;
       // 使用刚指定的配置项和数据显示图表。
       myChart.setOption(option);
       let linstener = function() {
@@ -186,12 +116,15 @@ export default {
 <style lang="scss" scoped>
 .byTIme {
   #main {
-    width: 80%;
-    height: 300px;
+    // width: 80%;
+    height: 600px;
   }
   .byTime-searchBar-row {
     .byTime-searchBar-row-col {
       .byTime-searchBar-row-col-card {
+        .input:focus {
+          color: white;
+        }
         .byTime-searchBar-row-col-card-select {
           width: auto;
           min-width: 200px;

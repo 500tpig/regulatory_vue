@@ -35,7 +35,7 @@ main {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  // color: $card-primary-text;
+  color: #f1f1f1;
   letter-spacing: 0.5px;
   word-spacing: 1.5px;
   height: auto;
