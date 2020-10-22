@@ -1,6 +1,6 @@
 <template>
   <q-layout view="hHh lpR fFf" class="bg-grey-1">
-    <q-header elevated class="bg-primary text-white" height-hint="64">
+    <q-header elevated class="bg-white text-primary" height-hint="64">
       <q-toolbar class="GNL__toolbar">
         <q-btn
           flat
@@ -12,21 +12,31 @@
           class="q-mr-sm"
         />
         <!-- 头部标题 -->
+        <q-img
+          :src="titleIcon"
+          spinner-color="white"
+          style="height: 32px; width: 32px"
+        />
         <q-toolbar-title
           v-if="$q.screen.gt.xs"
           shrink
           class="row items-center no-wrap"
         >
-          <span class="q-ml-sm text-white text-weight-bolder"
-            >医保基金监管系统</span
-          >
+          <span class="text-primary text-weight-bolder">医保基金监管系统</span>
         </q-toolbar-title>
+        <!-- 头部标题 -->
         <!-- 面包屑 -->
         <q-breadcrumbs
-          active-color="white"
-          style="font-size: 15px"
-          class="q-ml-xl text-weight-medium"
+          class="text-weight-medium text-grey-9 breadcrumbs q-ml-sm q-pl-md"
         >
+          <!-- <template v-slot:separator>
+            <q-icon
+              size="1.5em"
+              name="chevron_right"
+              color="accent"
+              class="text-weight-medium"
+            />
+          </template> -->
           <q-breadcrumbs-el
             v-for="(item, index) in breadcrumbs"
             :key="index"
@@ -60,13 +70,13 @@
         </div>
       </q-toolbar>
       <!-- tab栏 -->
-      <q-tabs
+      <!-- <q-tabs
         align="left"
         dense
         inline-label
-        indicator-color="primary"
-        active-color="white"
-        class="text-grey-5"
+        indicator-color="transparent"
+        active-color="primary"
+        class=" text-grey-7"
       >
         <q-route-tab
           v-for="(item, index) in tabs"
@@ -77,97 +87,93 @@
           @click="switchTab(item.to)"
         >
         </q-route-tab>
-      </q-tabs>
+      </q-tabs> -->
     </q-header>
     <!-- 侧边栏 -->
     <q-drawer
       v-model="leftDrawerOpen"
       show-if-above
-      bordered
-      content-class="bg-white"
-      :width="280"
+      content-class="bg-white shadow-1"
+      :width="260"
     >
-      <q-scroll-area class="fit">
-        <q-list padding>
+      <q-list>
+        <!-- 首页 -->
+        <q-item
+          class="GNL__drawer-item q-my-sm"
+          v-ripple
+          v-for="link in links1"
+          :key="link.text"
+          clickable
+          :class="{ selectItem: link.select }"
+          @click="toHome()"
+        >
+          <q-item-section avatar>
+            <q-icon :class="{ 'text-white': link.select }" :name="link.icon" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label :class="{ 'text-white': link.select }">{{
+              link.text
+            }}</q-item-label>
+          </q-item-section>
+        </q-item>
+        <!-- <q-separator inset class="q-my-sm" /> -->
+        <!-- 下拉 -->
+        <q-expansion-item
+          expand-separator
+          v-model="expanded[0]"
+          icon="icon-neibujijin"
+          label="基金使用概况"
+        >
           <q-item
-            class="GNL__drawer-item q-mb-xs"
+            class="GNL__drawer-item"
             v-ripple
-            v-for="link in links1"
-            :key="link.text"
+            v-for="(link, index) in links2"
+            :key="index"
             clickable
-            @click="toHome()"
-            :class="{ 'bg-primary': links1[0].select }"
+            @click="toPage(links2, index)"
+            :class="{ selectItem: link.select }"
           >
             <q-item-section avatar>
               <q-icon
-                :class="{ 'text-white': links1[0].select }"
+                :class="{ 'text-white': link.select }"
                 :name="link.icon"
               />
             </q-item-section>
             <q-item-section>
-              <q-item-label :class="{ 'text-white': links1[0].select }">{{
+              <q-item-label :class="{ 'text-white': link.select }">{{
                 link.text
               }}</q-item-label>
             </q-item-section>
           </q-item>
-          <!-- <q-separator inset class="q-my-sm" /> -->
-          <!-- 下拉 -->
-          <q-expansion-item
-            expand-separator
-            v-model="expanded[0]"
-            icon="icon-neibujijin"
-            label="基金使用概况"
-          >
-            <q-item
-              class="GNL__drawer-item"
-              v-ripple
-              v-for="(link, index) in links2"
-              :key="index"
-              clickable
-              @click="toPage(links2, index)"
-              :class="{ 'bg-primary': link.select }"
+        </q-expansion-item>
+        <!-- 下拉 -->
+        <div class="q-mt-md">
+          <div class="flex flex-center q-gutter-xs">
+            <a
+              class="GNL__drawer-footer-link"
+              href="javascript:void(0)"
+              aria-label="Privacy"
+              >Privacy</a
             >
-              <q-item-section avatar>
-                <q-icon
-                  :class="{ 'text-white': link.select }"
-                  :name="link.icon"
-                />
-              </q-item-section>
-              <q-item-section>
-                <q-item-label :class="{ 'text-white': link.select }">{{
-                  link.text
-                }}</q-item-label>
-              </q-item-section>
-            </q-item>
-          </q-expansion-item>
-          <div class="q-mt-md">
-            <div class="flex flex-center q-gutter-xs">
-              <a
-                class="GNL__drawer-footer-link"
-                href="javascript:void(0)"
-                aria-label="Privacy"
-                >Privacy</a
-              >
-              <span> · </span>
-              <a
-                class="GNL__drawer-footer-link"
-                href="javascript:void(0)"
-                aria-label="Terms"
-                >Terms</a
-              >
-              <span> · </span>
-              <a
-                class="GNL__drawer-footer-link"
-                href="javascript:void(0)"
-                aria-label="About"
-                >About Us</a
-              >
-            </div>
+            <span> · </span>
+            <a
+              class="GNL__drawer-footer-link"
+              href="javascript:void(0)"
+              aria-label="Terms"
+              >Terms</a
+            >
+            <span> · </span>
+            <a
+              class="GNL__drawer-footer-link"
+              href="javascript:void(0)"
+              aria-label="About"
+              >About Us</a
+            >
           </div>
-        </q-list>
-      </q-scroll-area>
+        </div>
+      </q-list>
     </q-drawer>
-
+    <!-- 侧边栏 -->
     <!-- <q-header>
       <div class="Tabs q-pa-sm">
         <q-chip square removable color="primary" text-color="white" icon="cake">
@@ -187,6 +193,7 @@ export default {
   name: "Layout",
   data() {
     return {
+      titleIcon: require("../../public/icons/HFRS-256x256.png"),
       tabs: [
         {
           icon: "home",
@@ -319,6 +326,19 @@ export default {
   }
 };
 </script>
+<style lang="scss" scoped>
+.breadcrumbs {
+  font-size: 15px;
+}
+.selectItem {
+  background-clip: content-box;
+  background: linear-gradient(118deg, #7367f0, rgba(115, 103, 240, 0.7));
+  box-shadow: 0 0 10px 1px rgba(115, 103, 240, 0.7);
+  color: #ffffff;
+  border-radius: 4px;
+  margin: 8px 15px 8px;
+}
+</style>
 <style lang="sass">
 .GNL
   &__toolbar
@@ -326,9 +346,9 @@ export default {
   &__toolbar-input
     width: 55%
   &__drawer-item
-    line-height: 24px
-    border-radius: 0 24px 24px 0
-    margin-right: 12px
+    // line-height: 24px
+    // border-radius: 0 24px 24px 0
+    // margin-right: 12px
     .q-item__section--avatar
       .q-icon
         color: #5f6368
