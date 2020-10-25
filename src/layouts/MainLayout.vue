@@ -96,42 +96,17 @@
       content-class="bg-white shadow-1"
       :width="260"
     >
-      <q-list>
-        <!-- 首页 -->
-        <q-item
-          class="GNL__drawer-item q-my-sm"
-          v-ripple
-          v-for="link in links1"
-          :key="link.text"
-          clickable
-          :class="{ selectItem: link.select }"
-          @click="toHome()"
-        >
-          <q-item-section avatar>
-            <q-icon :class="{ 'text-white': link.select }" :name="link.icon" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label :class="{ 'text-white': link.select }">{{
-              link.text
-            }}</q-item-label>
-          </q-item-section>
-        </q-item>
-        <!-- <q-separator inset class="q-my-sm" /> -->
-        <!-- 下拉 -->
-        <q-expansion-item
-          expand-separator
-          v-model="expanded[0]"
-          icon="icon-neibujijin"
-          label="基金使用概况"
-        >
+      <q-scroll-area class="fit">
+        <q-list>
+          <!-- 首页 -->
           <q-item
-            class="GNL__drawer-item"
+            class="GNL__drawer-item q-my-sm"
             v-ripple
-            v-for="(link, index) in links2"
-            :key="index"
+            v-for="link in links1"
+            :key="link.text"
             clickable
-            @click="toPage(links2, index)"
             :class="{ selectItem: link.select }"
+            @click="toHome()"
           >
             <q-item-section avatar>
               <q-icon
@@ -145,33 +120,63 @@
               }}</q-item-label>
             </q-item-section>
           </q-item>
-        </q-expansion-item>
-        <!-- 下拉 -->
-        <div class="q-mt-md">
-          <div class="flex flex-center q-gutter-xs">
-            <a
-              class="GNL__drawer-footer-link"
-              href="javascript:void(0)"
-              aria-label="Privacy"
-              >Privacy</a
+          <!-- <q-separator inset class="q-my-sm" /> -->
+          <!-- 下拉 -->
+          <q-expansion-item
+            expand-separator
+            v-model="expanded[0]"
+            icon="icon-neibujijin"
+            label="基金使用概况"
+          >
+            <q-item
+              class="GNL__drawer-item"
+              v-ripple
+              v-for="(link, index) in links2"
+              :key="index"
+              clickable
+              @click="toPage(links2, index)"
+              :class="{ selectItem: link.select }"
             >
-            <span> · </span>
-            <a
-              class="GNL__drawer-footer-link"
-              href="javascript:void(0)"
-              aria-label="Terms"
-              >Terms</a
-            >
-            <span> · </span>
-            <a
-              class="GNL__drawer-footer-link"
-              href="javascript:void(0)"
-              aria-label="About"
-              >About Us</a
-            >
+              <q-item-section avatar>
+                <q-icon
+                  :class="{ 'text-white': link.select }"
+                  :name="link.icon"
+                />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label :class="{ 'text-white': link.select }">{{
+                  link.text
+                }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-expansion-item>
+          <!-- 下拉 -->
+          <div class="q-mt-md">
+            <div class="flex flex-center q-gutter-xs">
+              <a
+                class="GNL__drawer-footer-link"
+                href="javascript:void(0)"
+                aria-label="Privacy"
+                >Privacy</a
+              >
+              <span> · </span>
+              <a
+                class="GNL__drawer-footer-link"
+                href="javascript:void(0)"
+                aria-label="Terms"
+                >Terms</a
+              >
+              <span> · </span>
+              <a
+                class="GNL__drawer-footer-link"
+                href="javascript:void(0)"
+                aria-label="About"
+                >About Us</a
+              >
+            </div>
           </div>
-        </div>
-      </q-list>
+        </q-list>
+      </q-scroll-area>
     </q-drawer>
     <!-- 侧边栏 -->
     <!-- <q-header>

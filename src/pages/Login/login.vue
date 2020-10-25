@@ -212,7 +212,7 @@ export default {
       // we set loading state
       this[`loading${number}`] = true;
       this.$http
-        .post("/login", this.user)
+        .post("/user/login", this.user)
         .then(async res => {
           if (res.status === 200) {
             this.$store.dispatch("user/asyncSetUserInfo", res.data.data);
