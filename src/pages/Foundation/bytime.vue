@@ -7,24 +7,34 @@
           class="byTime-searchBar-row-col-card bg-white text-primary q-pt-md"
         >
           <!-- <q-separator dark /> -->
-          <q-card-section horizontal class="row items-center justify-center">
-            <span class="q-mr-sm">类型选择 :</span>
-            <el-select
-              v-model="searchParam.type"
-              multiple
-              placeholder="请选择"
-              class="col-4"
-            >
-              <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              >
-              </el-option>
-            </el-select>
+          <q-card-section
+            horizontal
+            class="row items-center q-pl-xl"
+            style="font-size:16px;font-weight:500;"
+          >
+            <div class="q-mr-sm">类型选择:</div>
+            <div class="q-gutter-sm text-grey-8" style="font-size:14px;">
+              <q-radio
+                v-model="searchParam.type"
+                val="OC"
+                label="门诊费用"
+                color="teal"
+              />
+              <q-radio
+                v-model="searchParam.type"
+                val="HC"
+                label="住院费用"
+                color="orange"
+              />
+              <q-radio
+                v-model="searchParam.type"
+                val="OCAndHC"
+                label="全选"
+                color="cyan"
+              />
+            </div>
             <div>
-              <span class="q-ml-lg q-mr-sm">日期选择 :</span>
+              <span class="q-ml-lg q-mr-sm">日期选择:</span>
               <el-date-picker
                 align="center"
                 value-format="yyyyMMdd"
@@ -40,6 +50,13 @@
             </div>
           </q-card-section>
           <q-card-actions align="right">
+            <q-btn
+              class="q-mr-lg"
+              flat
+              @click="submit(reduction)"
+              v-if="isShowReduction"
+              >还原</q-btn
+            >
             <q-btn class="q-mr-lg" flat @click="submit">提交</q-btn>
           </q-card-actions>
         </q-card>
@@ -52,15 +69,31 @@
         </q-card>
       </div>
     </div>
-    <div class="row q-mt-lg">
-      <q-card class="col-5 offset-1">
+    <div class="row q-mt-lg justify-center">
+      <q-card class="col-5">
+        <div id="byTimeRingChart"></div>
+      </q-card>
+      <q-card class="col-5 q-ml-lg">
         <div id="byTimePieChart"></div>
       </q-card>
+    </div>
+    <div class="row q-mt-lg justify-evenly">
       <div>
         <q-table
-          class="byTimeTable col-5 q-ml-lg shadow-2"
-          title="医保支付详情表"
-          :data="byTimeTable.data"
+          class="byTimeTable shadow-2"
+          :title="OCTableData.title"
+          :data="OCTableData.data"
+          :columns="byTimeTable.columns"
+          row-key="index"
+          flat
+          bordered
+        />
+      </div>
+      <div>
+        <q-table
+          class="byTimeTable shadow-2"
+          :title="HCTableData.title"
+          :data="HCTableData.data"
           :columns="byTimeTable.columns"
           row-key="index"
           flat
@@ -73,19 +106,25 @@
 
 <script>
 import { EleResize } from "assets/js/util/esresize";
-import { getMonthLastDay } from "assets/js/util/common";
+import { getMonthLastDay, formatDate } from "assets/js/util/common";
 import {
   setbyTimeChartOption,
-  setbyTimePieChartOption
+  setbyTimePieChartOption,
+  setbyTimeRingChartOption
 } from "assets/js/charts/byTimeOption";
 export default {
   name: "byTime",
   data() {
     return {
+      types: "",
+      reduction: "reduction",
+      isShowReduction: false,
       searchParam: {
         chargingTime: ["20160701", "20161231"],
-        type: ["individualPay", "medicarePay", "totalCost"]
+        type: ""
       },
+      OCTableData: { title: "门诊费用详情表", data: [] },
+      HCTableData: { title: "住院费用详情表", data: [] },
       byTimeTable: {
         columns: [
           {
@@ -137,11 +176,9 @@ export default {
         data: []
       },
       options: [
-        { value: "individualPay", label: "个人支付" },
-        { value: "medicarePay", label: "医保支付" },
-        { value: "totalCost", label: "医疗总费用" }
+        { value: "OC", label: "门诊收费" },
+        { value: "HC", label: "住院收费" }
       ],
-
       pickerOptions: {
         shortcuts: [
           {
@@ -172,32 +209,35 @@ export default {
     };
   },
   methods: {
-    async submit() {
-      let parm = {};
-      this.searchParam.type.map(item => {
-        parm[item] = item;
-      });
-      parm.startDate = this.searchParam.chargingTime[0];
-      parm.endDate = getMonthLastDay(this.searchParam.chargingTime[1]);
-      let optionData;
+    // 初始化请求
+    async initialize() {
+      let param = {
+        type: "OCAndHC",
+        startDate: "20160701",
+        endDate: "20161231"
+      };
+      let optionData = [];
       await this.$http
-        .post("/fundUse/getFundUseByTime", parm)
-        .then(async res => {
+        .post("/fundUse/monthlyFee", param)
+        .then(res => {
           if (res.status === 200) {
             optionData = res.data.data;
           }
         })
         .catch(() => {});
-      let histogramOption = setbyTimeChartOption(optionData);
-      this.changeChart(histogramOption, "byTimeHistogram");
-      this.formatTableData(optionData);
-      let pieOption = setbyTimePieChartOption(optionData);
-      this.changeChart(pieOption, "byTimePieChart");
+      let ringData = {};
+      await this.$http
+        .post("/fundUse/monthlyFeeOCAndHC", param)
+        .then(res => {
+          if (res.status === 200) {
+            ringData = res.data.data;
+          }
+        })
+        .catch(() => {});
+      this.afterHttp(optionData, ringData);
     },
-    changeChart(option, id) {
-      let myChart = this.$echarts.init(document.getElementById(id));
-      myChart.setOption(option, true);
-    },
+
+    // 画图表
     drawChart(option, id) {
       // 基于准备好的dom，初始化echarts实例
       let myChart = this.$echarts.init(document.getElementById(id));
@@ -205,52 +245,147 @@ export default {
       // 指定图表的配置项和数据
       // 使用刚指定的配置项和数据显示图表。
       myChart.setOption(option, true);
+      let that = this;
+      if (id === "byTimeHistogram") {
+        myChart.on("click", function(param) {
+          that.drillDown(param.name);
+        });
+      }
       let linstener = function() {
         myChart.resize();
       };
       EleResize.on(resizeDiv, linstener);
     },
-    async initialize() {
-      let parm = {
-        totalCost: "totalCost",
-        individualPay: "individualPay",
-        medicarePay: "medicarePay",
-        startDate: "20160701",
-        endDate: "20161231"
-      };
+
+    // 图表下钻
+    async drillDown(month) {
+      this.isShowReduction = true;
+      let param = {};
+      param.startDate = (month + "01").replace("-", "");
+      param.endDate = getMonthLastDay(month.replace("-", ""));
+      param.type = this.searchParam.type;
+      param.isDrillDown = "true";
       let optionData = [];
       await this.$http
-        .post("/fundUse/getFundUseByTime", parm)
-        .then(async res => {
+        .post("/fundUse/monthlyFee", param)
+        .then(res => {
           if (res.status === 200) {
             optionData = res.data.data;
-            let histogramOption = setbyTimeChartOption(optionData);
-            this.drawChart(histogramOption, "byTimeHistogram");
-            this.formatTableData(optionData);
-            let pieOption = setbyTimePieChartOption(optionData);
-            this.drawChart(pieOption, "byTimePieChart");
           }
         })
         .catch(() => {});
+      let ringData = {};
+      await this.$http
+        .post("/fundUse/monthlyFeeOCAndHC", param)
+        .then(res => {
+          if (res.status === 200) {
+            ringData = res.data.data;
+          }
+        })
+        .catch(() => {});
+      this.afterHttp(optionData, ringData, month);
     },
-    formatTableData(optionData) {
-      this.byTimeTable.data = [];
-      for (let i = 0; i < optionData.length; i++) {
-        let temp = {};
-        temp.index = i + 1;
-        temp.individualPay = optionData[i].individualPay;
-        temp.medicarePay = optionData[i].medicarePay;
-        temp.totalCost = optionData[i].totalCost;
-        temp.chargingTime =
-          optionData[i].chargingTime.slice(0, 4) +
-          "-" +
-          optionData[i].chargingTime.slice(4);
-        temp.ratio =
-          ((optionData[i].medicarePay / optionData[i].totalCost) * 100).toFixed(
-            2
-          ) + "%";
-        this.byTimeTable.data.push(temp);
+
+    changeChart(option, id) {
+      let myChart = this.$echarts.init(document.getElementById(id));
+      myChart.setOption(option, true);
+    },
+
+    // 渲染表格数据
+    formatTableData(tableDataObj, month) {
+      this.HCTableData.data = [];
+      let tempTitle;
+      console.log(month);
+      if (month !== undefined) {
+        tempTitle = month + " ";
+      } else {
+        tempTitle =
+          formatDate(this.searchParam.chargingTime[0]) +
+          " 至 " +
+          formatDate(this.searchParam.chargingTime[1]) +
+          " ";
       }
+      this.HCTableData.title = tempTitle + "住院费用详情表";
+      this.OCTableData.data = [];
+      this.OCTableData.title = tempTitle + "门诊费用详情表";
+
+      for (let key in tableDataObj) {
+        let table = tableDataObj[key];
+        for (let i = 0; i < table.length; i++) {
+          let temp = {};
+          temp.index = i + 1;
+          temp.individualPay = table[i].individualPay;
+          temp.medicarePay = table[i].medicarePay;
+          temp.totalCost = table[i].totalCost;
+          temp.chargingTime =
+            table[i].chargingTime.slice(0, 4) +
+            "-" +
+            table[i].chargingTime.slice(4);
+          if (temp.chargingTime.length >= 8) {
+            temp.chargingTime =
+              temp.chargingTime.slice(0, 7) +
+              "-" +
+              temp.chargingTime.slice(7, 9);
+          }
+          temp.ratio =
+            ((table[i].medicarePay / table[i].totalCost) * 100).toFixed(2) +
+            "%";
+          if (key === "OC") {
+            this.OCTableData.data.push(temp);
+          } else {
+            this.HCTableData.data.push(temp);
+          }
+        }
+      }
+    },
+
+    afterHttp(optionData, ringData, month) {
+      let histogramOption = setbyTimeChartOption(optionData);
+      this.drawChart(histogramOption, "byTimeHistogram");
+
+      this.formatTableData(ringData, month);
+
+      let pieOption = setbyTimePieChartOption(optionData);
+      this.drawChart(pieOption, "byTimePieChart");
+
+      let ringOption = setbyTimeRingChartOption(ringData);
+      this.drawChart(ringOption, "byTimeRingChart");
+    },
+
+    // 提交查询
+    async submit(str) {
+      if (str === "reduction") {
+        this.isShowReduction = false;
+      }
+      let param = {};
+      param.type = this.searchParam.type;
+      param.startDate = this.searchParam.chargingTime[0];
+      param.endDate = getMonthLastDay(this.searchParam.chargingTime[1]);
+      let optionData;
+      await this.$http
+        .post("/fundUse/monthlyFee", param)
+        .then(async res => {
+          if (res.status === 200) {
+            optionData = res.data.data;
+          }
+        })
+        .catch(() => {});
+      let ringData;
+      await this.$http
+        .post("/fundUse/monthlyFeeOCAndHC", param)
+        .then(res => {
+          if (res.status === 200) {
+            ringData = res.data.data;
+          }
+        })
+        .catch(() => {});
+      let histogramOption = setbyTimeChartOption(optionData);
+      this.changeChart(histogramOption, "byTimeHistogram");
+      this.formatTableData(ringData);
+      let pieOption = setbyTimePieChartOption(optionData);
+      this.changeChart(pieOption, "byTimePieChart");
+      let ringOption = setbyTimeRingChartOption(ringData);
+      this.changeChart(ringOption, "byTimeRingChart");
     }
   },
   mounted() {
@@ -264,12 +399,14 @@ export default {
   #byTimeHistogram {
     height: 600px;
   }
-  #byTimePieChart {
+  #byTimePieChart,
+  #byTimeRingChart {
     height: 400px;
   }
   .byTime-searchBar-row {
     .byTime-searchBar-row-col {
       .byTime-searchBar-row-col-card {
+        // width: 80%;
         .input:focus {
           color: white;
         }
@@ -288,7 +425,7 @@ export default {
   height: 400px
 
   .q-table__title
-    font-size: 24px
+    font-size: 20px
   .q-table__top,
   thead tr:first-child th
     /* bg color is important for th; just specify one */

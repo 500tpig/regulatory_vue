@@ -4,10 +4,15 @@ function setbyTimeChartOption(chartData) {
   let individualPay = [];
   let totalCost = [];
   let medicarePay = [];
+  let interval = 0;
   chartData.map(item => {
-    chargingTime.push(
-      item.chargingTime.slice(0, 4) + "-" + item.chargingTime.slice(4)
-    );
+    let dateStr =
+      item.chargingTime.slice(0, 4) + "-" + item.chargingTime.slice(4);
+    if (dateStr.length >= 8) {
+      interval = 3;
+      dateStr = dateStr.slice(0, 7) + "-" + dateStr.slice(7, 9);
+    }
+    chargingTime.push(dateStr);
     individualPay.push(item.individualPay);
     totalCost.push(item.totalCost);
     medicarePay.push(item.medicarePay);
@@ -182,7 +187,7 @@ function setbyTimeChartOption(chartData) {
         show: false
       },
       axisLabel: {
-        interval: 0,
+        interval: interval,
         textStyle: {
           color: "#556677"
         },
@@ -193,6 +198,8 @@ function setbyTimeChartOption(chartData) {
       },
       axisPointer: {
         label: {
+          color: "#018DA7",
+          fontWeight: "bold",
           // padding: [11, 5, 7],
           padding: [0, 0, 10, 0],
           /*
@@ -276,7 +283,7 @@ function setbyTimeChartOption(chartData) {
         stack: "one",
         itemStyle: {
           normal: {
-            color: "#706AE8",
+            color: "#7367F0",
             barBorderRadius: [30, 30, 0, 0]
           }
         }
@@ -310,7 +317,6 @@ function setbyTimeChartOption(chartData) {
   return byTimeOption;
 }
 function setbyTimePieChartOption(chartData) {
-  console.log(chartData);
   let totalCost = 0;
   let medicarePay = 0;
   let individualPay = 0;
@@ -319,7 +325,7 @@ function setbyTimePieChartOption(chartData) {
     medicarePay = accAdd(medicarePay, item.medicarePay);
     individualPay = accAdd(individualPay, item.individualPay);
   });
-  let color = ["#61C378", "#706AE8"];
+  let color = ["#61C378", "#7367F0"];
 
   let option = {
     color: color,
@@ -371,7 +377,7 @@ function setbyTimePieChartOption(chartData) {
           "" +
           parms.data.name +
           "</br>" +
-          "数量：" +
+          "金额：" +
           parms.data.value +
           "元</br>" +
           "占比：" +
@@ -453,4 +459,189 @@ function setbyTimePieChartOption(chartData) {
   };
   return option;
 }
-export { setbyTimeChartOption, setbyTimePieChartOption };
+function setbyTimeRingChartOption(chartData) {
+  let OC = { individualPay: 0, totalCost: 0, medicarePay: 0 };
+  let HC = { individualPay: 0, totalCost: 0, medicarePay: 0 };
+  chartData.OC.map(item => {
+    OC.totalCost = accAdd(OC.totalCost, item.totalCost);
+    OC.medicarePay = accAdd(OC.medicarePay, item.medicarePay);
+    OC.individualPay = accAdd(OC.individualPay, item.individualPay);
+  });
+  chartData.HC.map(item => {
+    HC.totalCost = accAdd(HC.totalCost, item.totalCost);
+    HC.medicarePay = accAdd(HC.medicarePay, item.medicarePay);
+    HC.individualPay = accAdd(HC.individualPay, item.individualPay);
+  });
+  let echartData = {
+    inner: [
+      {
+        value: OC.totalCost,
+        unit: "元",
+        name: "门诊收费"
+      },
+      {
+        value: HC.totalCost,
+        unit: "元",
+        name: "住院收费"
+      }
+    ],
+    outer: [
+      {
+        value: OC.individualPay,
+        unit: "元",
+        name: "门诊个人支付"
+      },
+      {
+        value: HC.individualPay,
+        unit: "元",
+        name: "医院个人支付"
+      },
+      {
+        value: OC.medicarePay,
+        unit: "元",
+        name: "门诊医保支付"
+      },
+      {
+        value: HC.medicarePay,
+        unit: "元",
+        name: "医院医保支付"
+      }
+    ]
+  };
+  let option = {
+    toolbox: {
+      //可视化的工具箱
+      show: true,
+      right: "2%",
+      top: "2%",
+      feature: {
+        restore: {
+          //重置
+          show: true
+        },
+        saveAsImage: {
+          //保存图片
+          show: true
+        }
+      }
+    },
+    legend: {
+      type: "scroll",
+      orient: "vertical",
+      left: "2%",
+      align: "auto",
+      top: "middle",
+      data: [
+        "门诊收费",
+        "住院收费",
+        "门诊个人支付",
+        "门诊医保支付",
+        "医院个人支付",
+        "医院医保支付"
+      ]
+    },
+    color: ["#00b8a9", "#ff5722", "#f6416c", "#ffde7d", "#a2d5f2", "#f67280"],
+    tooltip: {
+      trigger: "item",
+      borderColor: "rgba(255,255,255,.3)",
+      backgroundColor: "rgba(13,5,30,.6)",
+      borderWidth: 1,
+      padding: 5,
+      formatter: function(parms) {
+        var str =
+          parms.marker +
+          "" +
+          parms.data.name +
+          "</br>" +
+          "金额：" +
+          parms.data.value +
+          "元</br>" +
+          "占比：" +
+          parms.percent +
+          "%";
+        return str;
+      }
+    },
+    series: [
+      {
+        name: "费用情况",
+        type: "pie",
+        radius: [0, "40%"],
+        itemStyle: {
+          normal: {
+            borderColor: "#fff",
+            borderWidth: 2
+          }
+        },
+        label: {
+          normal: {
+            position: "inner"
+          }
+        },
+        labelLine: {
+          normal: {
+            show: false
+          }
+        },
+        data: echartData.inner
+      },
+      {
+        name: "费用情况",
+        type: "pie",
+        radius: ["55%", "70%"],
+        avoidLabelOverlap: true,
+        data: echartData.outer,
+        labelLine: {
+          normal: {
+            length: 20,
+            length2: 140,
+            lineStyle: {
+              color: "#e6e6e6"
+            }
+          }
+        },
+        label: {
+          normal: {
+            formatter: params => {
+              return (
+                "{icon|●}{name|" +
+                params.name +
+                "}{percent|" +
+                params.percent.toFixed(1) +
+                "%}{value|" +
+                "}"
+              );
+            },
+            padding: [0, -130, 25, -130],
+            rich: {
+              color: "#333",
+              icon: {
+                fontSize: 16
+              },
+              name: {
+                fontSize: 14,
+                padding: [0, 5, 0, 5],
+                color: "#666666"
+              },
+              percent: {
+                color: "#333",
+                padding: [0, 5, 0, 0]
+              },
+              value: {
+                fontSize: 16,
+                fontWeight: "bold",
+                color: "#333333"
+              }
+            }
+          }
+        }
+      }
+    ]
+  };
+  return option;
+}
+export {
+  setbyTimeChartOption,
+  setbyTimePieChartOption,
+  setbyTimeRingChartOption
+};

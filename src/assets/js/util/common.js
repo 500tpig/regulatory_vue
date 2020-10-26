@@ -4,6 +4,12 @@ function getMonthLastDay(str) {
   let lastDay = new Date(year, month, 0).getDate();
   return year + month + lastDay;
 }
+//字符串转日期格式，strDate要转为日期格式的字符串
+function formatDate(strDate) {
+  let year = strDate.substring(0, 4);
+  let month = strDate.substring(4, 6);
+  return year + "-" + month;
+}
 //js 小数相加精确结果
 function accAdd(arg1, arg2) {
   if (isNaN(arg1)) {
@@ -43,4 +49,4 @@ function accAdd(arg1, arg2) {
   return (arg1 + arg2) / m;
 }
 
-export { getMonthLastDay, accAdd };
+export { getMonthLastDay, accAdd, formatDate };
