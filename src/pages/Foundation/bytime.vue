@@ -1,110 +1,119 @@
 <template>
-  <q-page class="byTIme q-py-lg">
-    <div class="row byTime-searchBar-row">
-      <!-- 筛选栏 -->
-      <div class="col-8 offset-2 byTime-searchBar-row-col">
-        <q-card
-          class="byTime-searchBar-row-col-card bg-white text-primary q-pt-md"
-        >
-          <!-- <q-separator dark /> -->
-          <q-card-section
-            horizontal
-            class="row items-center q-pl-xl"
-            style="font-size:16px;font-weight:500;"
+  <q-page>
+    <page-base-scroll content_class="byTIme q-pt-lg q-mb-xl">
+      <div class="row byTime-searchBar-row">
+        <!-- 筛选栏 -->
+        <div class="col-8 offset-2 byTime-searchBar-row-col">
+          <q-card
+            class="byTime-searchBar-row-col-card bg-white text-primary q-pt-md"
           >
-            <div class="q-mr-sm">类型选择:</div>
-            <div class="q-gutter-sm text-grey-8" style="font-size:14px;">
-              <q-radio
-                v-model="searchParam.type"
-                val="OC"
-                label="门诊费用"
-                color="teal"
-              />
-              <q-radio
-                v-model="searchParam.type"
-                val="HC"
-                label="住院费用"
-                color="orange"
-              />
-              <q-radio
-                v-model="searchParam.type"
-                val="OCAndHC"
-                label="全选"
-                color="cyan"
-              />
-            </div>
-            <div>
-              <span class="q-ml-lg q-mr-sm">日期选择:</span>
-              <el-date-picker
-                align="center"
-                value-format="yyyyMMdd"
-                v-model="searchParam.chargingTime"
-                type="monthrange"
-                unlink-panels
-                clearable
-                start-placeholder="开始月份"
-                end-placeholder="结束月份"
-                :picker-options="pickerOptions"
-              >
-              </el-date-picker>
-            </div>
-          </q-card-section>
-          <q-card-actions align="right">
-            <q-btn
-              class="q-mr-lg"
-              flat
-              @click="submit(reduction)"
-              v-if="isShowReduction"
-              >还原</q-btn
+            <!-- <q-separator dark /> -->
+            <q-card-section
+              horizontal
+              class="row items-center q-pl-xl"
+              style="font-size:16px;font-weight:500;"
             >
-            <q-btn class="q-mr-lg" flat @click="submit">提交</q-btn>
-          </q-card-actions>
+              <div class="q-mr-sm">类型选择:</div>
+              <div class="q-gutter-sm text-grey-8" style="font-size:14px;">
+                <q-radio
+                  v-model="searchParam.type"
+                  val="OC"
+                  label="门诊费用"
+                  color="teal"
+                />
+                <q-radio
+                  v-model="searchParam.type"
+                  val="HC"
+                  label="住院费用"
+                  color="orange"
+                />
+                <q-radio
+                  v-model="searchParam.type"
+                  val="OCAndHC"
+                  label="全选"
+                  color="cyan"
+                />
+              </div>
+              <div>
+                <span class="q-ml-lg q-mr-md">日期选择:</span>
+                <el-date-picker
+                  align="center"
+                  value-format="yyyyMMdd"
+                  v-model="searchParam.chargingTime"
+                  type="monthrange"
+                  unlink-panels
+                  clearable
+                  start-placeholder="开始月份"
+                  end-placeholder="结束月份"
+                  :picker-options="pickerOptions"
+                >
+                </el-date-picker>
+              </div>
+            </q-card-section>
+            <q-card-actions align="right">
+              <q-btn
+                class="q-mr-lg"
+                flat
+                @click="submit(reduction)"
+                v-if="isShowReduction"
+                >还原</q-btn
+              >
+              <q-btn
+                class="q-mr-lg"
+                flat
+                @click="submit"
+                style="font-size:16px;"
+                >提交</q-btn
+              >
+            </q-card-actions>
+          </q-card>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-8 offset-2 ">
+          <q-card class="q-mt-lg q-pt-md">
+            <div ref="histogram" id="byTimeHistogram"></div>
+          </q-card>
+        </div>
+      </div>
+      <div class="row q-mt-lg justify-center">
+        <q-card class="col-5">
+          <div id="byTimeRingChart"></div>
+        </q-card>
+        <q-card class="col-5 q-ml-lg">
+          <div id="byTimePieChart"></div>
         </q-card>
       </div>
-    </div>
-    <div class="row">
-      <div class="col-8 offset-2 ">
-        <q-card class="q-mt-lg q-pt-md">
-          <div ref="histogram" id="byTimeHistogram"></div>
-        </q-card>
+      <div class="row q-mt-lg justify-evenly">
+        <div>
+          <q-table
+            class="byTimeTable shadow-2"
+            :title="OCTableData.title"
+            :data="OCTableData.data"
+            :columns="byTimeTable.columns"
+            row-key="index"
+            flat
+            bordered
+          />
+        </div>
+        <div>
+          <q-table
+            class="byTimeTable shadow-2"
+            :title="HCTableData.title"
+            :data="HCTableData.data"
+            :columns="byTimeTable.columns"
+            row-key="index"
+            flat
+            bordered
+          />
+        </div>
       </div>
-    </div>
-    <div class="row q-mt-lg justify-center">
-      <q-card class="col-5">
-        <div id="byTimeRingChart"></div>
-      </q-card>
-      <q-card class="col-5 q-ml-lg">
-        <div id="byTimePieChart"></div>
-      </q-card>
-    </div>
-    <div class="row q-mt-lg justify-evenly">
-      <div>
-        <q-table
-          class="byTimeTable shadow-2"
-          :title="OCTableData.title"
-          :data="OCTableData.data"
-          :columns="byTimeTable.columns"
-          row-key="index"
-          flat
-          bordered
-        />
-      </div>
-      <div>
-        <q-table
-          class="byTimeTable shadow-2"
-          :title="HCTableData.title"
-          :data="HCTableData.data"
-          :columns="byTimeTable.columns"
-          row-key="index"
-          flat
-          bordered
-        />
-      </div>
-    </div>
+    </page-base-scroll>
   </q-page>
 </template>
 
 <script>
+import pageBaseScroll from "components/utils/PageScroll";
 import { EleResize } from "assets/js/util/esresize";
 import { getMonthLastDay, formatDate } from "assets/js/util/common";
 import {
@@ -114,6 +123,7 @@ import {
 } from "assets/js/charts/byTimeOption";
 export default {
   name: "byTime",
+  components: { pageBaseScroll: pageBaseScroll },
   data() {
     return {
       types: "",
@@ -396,6 +406,9 @@ export default {
 
 <style lang="scss" scoped>
 .byTIme {
+  .el-input__inner {
+    border: 0.5px solid gray;
+  }
   #byTimeHistogram {
     height: 600px;
   }

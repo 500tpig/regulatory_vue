@@ -606,6 +606,7 @@ function setbyTimeRingChartOption(chartData) {
               return (
                 "{icon|●}{name|" +
                 params.name +
+                " " +
                 "}{percent|" +
                 params.percent.toFixed(1) +
                 "%}{value|" +
@@ -625,9 +626,7 @@ function setbyTimeRingChartOption(chartData) {
               },
               percent: {
                 color: "#333",
-                padding: [0, 5, 0, 0]
-              },
-              value: {
+                padding: [0, 5, 0, 0],
                 fontSize: 16,
                 fontWeight: "bold",
                 color: "#333333"
