@@ -210,16 +210,16 @@ export default {
       links1: [{ icon: "home", text: "首页", url: "/home", select: false }],
       links2: [
         {
-          icon: "icon-riqi1",
+          icon: "icon-rili",
           text: "按时间分析",
           url: "/foundation/by_time",
           select: false
         },
         {
-          icon: "star_border",
-          text: "Favourites",
+          icon: "icon-keshi",
+          text: "按科室分析",
           select: false,
-          url: "/foundation/by_time1"
+          url: "/foundation/by_department"
         },
         {
           icon: "search",
