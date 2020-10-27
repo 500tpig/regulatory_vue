@@ -245,23 +245,24 @@ export default {
       if (this.$route.path.startsWith("/foundation")) {
         this.expanded[0] = true;
         for (let i = 0; i < this.links2.length; i++) {
-          if (this.$route.path === this.links2[i].url)
+          if (this.$route.path === this.links2[i].url) {
             this.links2[i].select = true;
-          this.breadcrumbs = [
-            {
-              label: "Home",
-              icon: "home"
-            },
-            {
-              label: "基金使用概况",
-              icon: "icon-neibujijin"
-            },
-            {
-              label: this.links2[i].text,
-              icon: this.links2[i].icon
-            }
-          ];
-          break;
+            this.breadcrumbs = [
+              {
+                label: "Home",
+                icon: "home"
+              },
+              {
+                label: "基金使用概况",
+                icon: "icon-neibujijin"
+              },
+              {
+                label: this.links2[i].text,
+                icon: this.links2[i].icon
+              }
+            ];
+            break;
+          }
         }
       }
     }

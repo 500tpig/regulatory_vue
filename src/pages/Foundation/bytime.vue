@@ -1,5 +1,5 @@
 <template>
-  <q-page transition-show="jump-down" transition-hide="jump-up">
+  <q-page>
     <page-base-scroll content_class="byTIme q-pt-lg q-mb-xl">
       <div class="row byTime-searchBar-row">
         <!-- 筛选栏 -->
@@ -426,7 +426,7 @@ export default {
 <style lang="scss" scoped>
 .byTIme {
   .el-input__inner {
-    border: 0.5px solid gray;
+    border: 1px solid rgba(0, 0, 0, 0.24);
   }
   #byTimeHistogram {
     height: 600px;
