@@ -114,7 +114,8 @@ module.exports = function(ctx) {
         "Dialog",
         "LocalStorage",
         "SessionStorage",
-        "LoadingBar"
+        "LoadingBar",
+        "Loading"
       ],
       config: {
         notify: {

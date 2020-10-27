@@ -1,5 +1,5 @@
 <template>
-  <q-page>
+  <q-page transition-show="jump-down" transition-hide="jump-up">
     <page-base-scroll content_class="byTIme q-pt-lg q-mb-xl">
       <div class="row byTime-searchBar-row">
         <!-- 筛选栏 -->
@@ -131,7 +131,7 @@ export default {
       isShowReduction: false,
       searchParam: {
         chargingTime: ["20160701", "20161231"],
-        type: ""
+        type: "OCAndHC"
       },
       OCTableData: { title: "门诊费用详情表", data: [] },
       HCTableData: { title: "住院费用详情表", data: [] },
@@ -244,7 +244,7 @@ export default {
           }
         })
         .catch(() => {});
-      this.afterHttp(optionData, ringData);
+      await this.afterHttp(optionData, ringData);
     },
 
     // 画图表
@@ -305,7 +305,6 @@ export default {
     formatTableData(tableDataObj, month) {
       this.HCTableData.data = [];
       let tempTitle;
-      console.log(month);
       if (month !== undefined) {
         tempTitle = month + " ";
       } else {
@@ -396,11 +395,31 @@ export default {
       this.changeChart(pieOption, "byTimePieChart");
       let ringOption = setbyTimeRingChartOption(ringData);
       this.changeChart(ringOption, "byTimeRingChart");
+    },
+    showLoading() {
+      this.$q.loading.show();
+
+      // hiding in 2s
+      this.timer = setTimeout(() => {
+        this.$q.loading.hide();
+        this.timer = void 0;
+      }, 2000);
+    }
+  },
+
+  beforeDestroy() {
+    if (this.timer !== void 0) {
+      clearTimeout(this.timer);
+      this.$q.loading.hide();
     }
   },
   mounted() {
     this.initialize();
-  }
+    // this.$q.loading.show({
+    //   delay: 400 // ms
+    // });
+  },
+  created() {}
 };
 </script>
 
