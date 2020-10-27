@@ -1,6 +1,6 @@
 <template>
   <q-layout view="hHh lpR fFf" class="bg-grey-1">
-    <q-header elevated class="bg-white text-primary" height-hint="64">
+    <q-header elevated class="bg-white text-primary q-py-sm">
       <q-toolbar class="GNL__toolbar">
         <q-btn
           flat
@@ -93,8 +93,9 @@
     <q-drawer
       v-model="leftDrawerOpen"
       show-if-above
-      content-class="bg-white shadow-1"
+      content-class="bg-white"
       :width="260"
+      elevated
     >
       <q-scroll-area class="fit">
         <q-list>
@@ -178,14 +179,6 @@
         </q-list>
       </q-scroll-area>
     </q-drawer>
-    <!-- 侧边栏 -->
-    <!-- <q-header>
-      <div class="Tabs q-pa-sm">
-        <q-chip square removable color="primary" text-color="white" icon="cake">
-          Eclair
-        </q-chip>
-      </div>
-    </q-header> -->
     <q-page-container>
       <router-view />
     </q-page-container>
@@ -198,6 +191,7 @@ export default {
   name: "Layout",
   data() {
     return {
+      hint: 58,
       titleIcon: require("../../public/icons/HFRS-256x256.png"),
       tabs: [
         {
@@ -346,10 +340,7 @@ export default {
 </style>
 <style lang="sass">
 .GNL
-  &__toolbar
-    height: 64px
-  &__toolbar-input
-    width: 55%
+
   &__drawer-item
     // line-height: 24px
     // border-radius: 0 24px 24px 0

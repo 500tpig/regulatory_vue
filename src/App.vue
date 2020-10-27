@@ -31,6 +31,12 @@ export default {
 };
 </script>
 <style lang="scss">
+html {
+  overflow: hidden;
+}
+body {
+  overflow: hidden;
+}
 main {
   margin: 0;
   padding: 0;
