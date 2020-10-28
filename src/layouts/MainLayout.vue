@@ -49,7 +49,7 @@
         <div class="q-gutter-sm row items-center no-wrap">
           <q-btn dense flat no-wrap>
             <q-avatar rounded size="30px">
-              <img src="https://cdn.quasar.dev/img/boy-avatar.png" />
+              <img :src="portrait" />
             </q-avatar>
             <q-icon name="arrow_drop_down" size="16px" />
 
@@ -191,8 +191,8 @@ export default {
   name: "Layout",
   data() {
     return {
-      hint: 58,
       titleIcon: require("../../public/icons/HFRS-256x256.png"),
+      portrait: require("assets/image/pp.png"),
       tabs: [
         {
           icon: "home",

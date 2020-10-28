@@ -1,6 +1,6 @@
 <template>
   <q-page>
-    <page-base-scroll content_class="byTIme q-pt-lg q-mb-xl">
+    <page-base-scroll content_class="byTime q-pt-lg q-mb-xl">
       <div class="row byTime-searchBar-row">
         <!-- 筛选栏 -->
         <div class="col-8 offset-2 byTime-searchBar-row-col">
@@ -115,7 +115,11 @@
 <script>
 import pageBaseScroll from "components/utils/PageScroll";
 import { EleResize } from "assets/js/util/esresize";
-import { getMonthLastDay, formatDate } from "assets/js/util/common";
+import {
+  getMonthLastDay,
+  formatDate,
+  pickerOptions
+} from "assets/js/util/common";
 import {
   setbyTimeChartOption,
   setbyTimePieChartOption,
@@ -189,33 +193,7 @@ export default {
         { value: "OC", label: "门诊收费" },
         { value: "HC", label: "住院收费" }
       ],
-      pickerOptions: {
-        shortcuts: [
-          {
-            text: "本月",
-            onClick(picker) {
-              picker.$emit("pick", [new Date(), new Date()]);
-            }
-          },
-          {
-            text: "今年至今",
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date(new Date().getFullYear(), 0);
-              picker.$emit("pick", [start, end]);
-            }
-          },
-          {
-            text: "最近六个月",
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setMonth(start.getMonth() - 6);
-              picker.$emit("pick", [start, end]);
-            }
-          }
-        ]
-      }
+      pickerOptions: pickerOptions
     };
   },
   methods: {
@@ -363,6 +341,7 @@ export default {
 
     // 提交查询
     async submit(str) {
+      this.isShowReduction = false;
       if (str === "reduction") {
         this.isShowReduction = false;
       }
@@ -395,36 +374,17 @@ export default {
       this.changeChart(pieOption, "byTimePieChart");
       let ringOption = setbyTimeRingChartOption(ringData);
       this.changeChart(ringOption, "byTimeRingChart");
-    },
-    showLoading() {
-      this.$q.loading.show();
-
-      // hiding in 2s
-      this.timer = setTimeout(() => {
-        this.$q.loading.hide();
-        this.timer = void 0;
-      }, 2000);
-    }
-  },
-
-  beforeDestroy() {
-    if (this.timer !== void 0) {
-      clearTimeout(this.timer);
-      this.$q.loading.hide();
     }
   },
   mounted() {
     this.initialize();
-    // this.$q.loading.show({
-    //   delay: 400 // ms
-    // });
   },
   created() {}
 };
 </script>
 
 <style lang="scss" scoped>
-.byTIme {
+.byTime {
   .el-input__inner {
     border: 1px solid rgba(0, 0, 0, 0.24);
   }

@@ -18,7 +18,7 @@
               :input-style="{ textAlign: 'center' }"
               :rules="[
                 val => (val !== null && val !== '') || '请输入科室数量',
-                val => (val > 0 && val < 100) || '科室数量小于或者为0'
+                val => val > 0 || '科室数量小于或者为0'
               ]"
             />
             <div>
@@ -32,10 +32,6 @@
                 clearable
                 start-placeholder="开始月份"
                 end-placeholder="结束月份"
-                :rules="[
-                  val => (val !== null && val !== '') || 'Please type your age',
-                  val => (val > 0 && val < 100) || 'Please type a real age'
-                ]"
                 :picker-options="pickerOptions"
               >
               </el-date-picker>
@@ -46,12 +42,24 @@
           </q-card-actions>
         </q-card>
       </div>
+      <div class="row">
+        <div class="col-8 offset-2 ">
+          <q-card class="q-mt-lg q-pt-md">
+            <div ref="histogram" id="byDepartmentHistogram"></div>
+          </q-card>
+        </div>
+      </div>
     </page-base-scroll>
   </q-page>
 </template>
 
 <script>
 import pageBaseScroll from "components/utils/PageScroll";
+import {
+  getMonthLastDay,
+  formatDate,
+  pickerOptions
+} from "assets/js/util/common";
 export default {
   components: { pageBaseScroll: pageBaseScroll },
   data() {
@@ -60,34 +68,42 @@ export default {
         chargingTime: ["20160701", "20161231"],
         departmentNum: 15
       },
-      pickerOptions: {
-        shortcuts: [
-          {
-            text: "本月",
-            onClick(picker) {
-              picker.$emit("pick", [new Date(), new Date()]);
-            }
-          },
-          {
-            text: "今年至今",
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date(new Date().getFullYear(), 0);
-              picker.$emit("pick", [start, end]);
-            }
-          },
-          {
-            text: "最近六个月",
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setMonth(start.getMonth() - 6);
-              picker.$emit("pick", [start, end]);
-            }
-          }
-        ]
-      }
+      pickerOptions: pickerOptions
     };
+  },
+  mounted() {
+    this.initialize();
+  },
+  methods: {
+    // 初始化请求
+    async initialize() {
+      let param = {
+        type: "OCAndHC",
+        startDate: "20160701",
+        endDate: "20161231",
+        mode: "byDepartment"
+      };
+      let optionData = [];
+      await this.$http
+        .post("/fundUse/monthlyFee", param)
+        .then(res => {
+          if (res.status === 200) {
+            optionData = res.data.data;
+          }
+        })
+        .catch(() => {});
+      console.log(optionData);
+      // let ringData = {};
+      // await this.$http
+      //   .post("/fundUse/monthlyFeeOCAndHC", param)
+      //   .then(res => {
+      //     if (res.status === 200) {
+      //       ringData = res.data.data;
+      //     }
+      //   })
+      //   .catch(() => {});
+      // console.log(ringData);
+    }
   }
 };
 </script>

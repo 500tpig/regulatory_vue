@@ -46,10 +46,14 @@ http.interceptors.response.use(
         errMsg = error.response.data.msg;
       }
     }
+    setTimeout(() => {
+      Loading.hide();
+    }, 600);
     Notify.create({
       color: "negative",
       message: errMsg
     });
+
     return Promise.reject(error);
   }
 );
