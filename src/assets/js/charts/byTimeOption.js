@@ -1,5 +1,5 @@
 import { accAdd } from "../util/common";
-function setbyTimeChartOption(chartData) {
+function setbyTimeChartOption(chartData, title) {
   let chargingTime = [];
   let individualPay = [];
   let totalCost = [];
@@ -19,7 +19,9 @@ function setbyTimeChartOption(chartData) {
   });
   let byTimeOption = {
     title: {
-      // text: "ECharts 入门示例"
+      text: title,
+      left: "5%",
+      top: "1%"
     },
     toolbox: {
       //可视化的工具箱
@@ -101,7 +103,7 @@ function setbyTimeChartOption(chartData) {
       extraCssText: "box-shadow: 1px 0 2px 0 rgba(163,163,163,0.5)"
     },
     grid: {
-      top: "10%",
+      top: "12%",
       bottom: "18%"
       // x: 40,
       // y: 40,
@@ -173,7 +175,7 @@ function setbyTimeChartOption(chartData) {
     legend: {
       data: ["个人支付", "医保支付", "医疗总费用"],
       x: "center",
-      top: 10
+      top: "4%"
     },
     xAxis: {
       type: "category",
@@ -256,7 +258,7 @@ function setbyTimeChartOption(chartData) {
           formatter: function(value, index) {
             if (value > 100000000)
               return (value / 100000000).toFixed(2) + "亿元";
-            else if (value > 10000) return value / 10000 + "万元";
+            else if (value >= 10000) return value / 10000 + "万元";
             return value.toFixed(2) + "元";
           }
         }

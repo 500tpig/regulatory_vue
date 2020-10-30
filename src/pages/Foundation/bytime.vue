@@ -19,19 +19,19 @@
                   v-model="searchParam.type"
                   val="OC"
                   label="门诊费用"
-                  color="teal"
+                  color="teal-5"
                 />
                 <q-radio
                   v-model="searchParam.type"
                   val="HC"
                   label="住院费用"
-                  color="orange"
+                  color="deep-orange-6"
                 />
                 <q-radio
                   v-model="searchParam.type"
                   val="OCAndHC"
                   label="全选"
-                  color="cyan"
+                  color="blue-6"
                 />
               </div>
               <div>
@@ -71,7 +71,7 @@
       </div>
       <div class="row">
         <div class="col-8 offset-2 ">
-          <q-card class="q-mt-lg q-pt-md">
+          <q-card class="q-mt-lg q-pt-sm">
             <div ref="histogram" id="byTimeHistogram"></div>
           </q-card>
         </div>
@@ -130,7 +130,10 @@ export default {
   components: { pageBaseScroll: pageBaseScroll },
   data() {
     return {
-      types: "",
+      isInitialize: true,
+      chartTitle: {
+        histogram: ""
+      },
       reduction: "reduction",
       isShowReduction: false,
       searchParam: {
@@ -201,8 +204,8 @@ export default {
     async initialize() {
       let param = {
         type: "OCAndHC",
-        startDate: "20160701",
-        endDate: "20161231"
+        startDate: this.searchParam.chargingTime[0],
+        endDate: this.searchParam.chargingTime[1]
       };
       let optionData = [];
       await this.$http
@@ -222,7 +225,7 @@ export default {
           }
         })
         .catch(() => {});
-      await this.afterHttp(optionData, ringData);
+      this.afterHttp(optionData, ringData);
     },
 
     // 画图表
@@ -239,10 +242,25 @@ export default {
           that.drillDown(param.name);
         });
       }
-      let linstener = function() {
-        myChart.resize();
-      };
-      EleResize.on(resizeDiv, linstener);
+      if (this.isInitialize) {
+        let histogram = this.$echarts.init(
+          document.getElementById("byTimeHistogram")
+        );
+        let pie = this.$echarts.init(document.getElementById("byTimePieChart"));
+        let ring = this.$echarts.init(
+          document.getElementById("byTimeRingChart")
+        );
+        let histogramDiv = document.getElementById("byTimeHistogram");
+        let pieDiv = document.getElementById("byTimePieChart");
+        let ringDiv = document.getElementById("byTimeRingChart");
+        let linstener = function() {
+          histogram.resize();
+          pie.resize();
+          ring.resize();
+        };
+        EleResize.on(resizeDiv, linstener);
+        this.isInitialize = false;
+      }
     },
 
     // 图表下钻
@@ -327,16 +345,29 @@ export default {
     },
 
     afterHttp(optionData, ringData, month) {
-      let histogramOption = setbyTimeChartOption(optionData);
-      this.drawChart(histogramOption, "byTimeHistogram");
-
-      this.formatTableData(ringData, month);
-
+      let titleStr = " 总费用";
+      if (this.searchParam.type === "OC") {
+        titleStr = " 门诊费用";
+      } else if (this.searchParam.type === "HC") {
+        titleStr = " 住院费用";
+      }
+      this.chartTitle.histogram =
+        formatDate(this.searchParam.chargingTime[0]) +
+        " 至 " +
+        formatDate(this.searchParam.chargingTime[1]) +
+        titleStr;
+      let histogramOption = setbyTimeChartOption(
+        optionData,
+        this.chartTitle.histogram
+      );
       let pieOption = setbyTimePieChartOption(optionData);
       this.drawChart(pieOption, "byTimePieChart");
 
       let ringOption = setbyTimeRingChartOption(ringData);
       this.drawChart(ringOption, "byTimeRingChart");
+      this.drawChart(histogramOption, "byTimeHistogram");
+
+      this.formatTableData(ringData, month);
     },
 
     // 提交查询
@@ -367,19 +398,12 @@ export default {
           }
         })
         .catch(() => {});
-      let histogramOption = setbyTimeChartOption(optionData);
-      this.changeChart(histogramOption, "byTimeHistogram");
-      this.formatTableData(ringData);
-      let pieOption = setbyTimePieChartOption(optionData);
-      this.changeChart(pieOption, "byTimePieChart");
-      let ringOption = setbyTimeRingChartOption(ringData);
-      this.changeChart(ringOption, "byTimeRingChart");
+      this.afterHttp(optionData, ringData);
     }
   },
   mounted() {
     this.initialize();
-  },
-  created() {}
+  }
 };
 </script>
 

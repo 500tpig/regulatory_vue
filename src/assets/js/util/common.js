@@ -8,7 +8,9 @@ function getMonthLastDay(str) {
 function formatDate(strDate) {
   let year = strDate.substring(0, 4);
   let month = strDate.substring(4, 6);
-  return year + "-" + month;
+  let day = "";
+  if (strDate.length > 6) day = strDate.substring(6, 8);
+  return year + "-" + month + "-" + day;
 }
 //js 小数相加精确结果
 function accAdd(arg1, arg2) {
