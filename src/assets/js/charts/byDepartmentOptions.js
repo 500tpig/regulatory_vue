@@ -1,3 +1,4 @@
+import { accAdd } from "../util/common";
 function setDepartmentChartOption(chartData) {
   let departments = [];
   let individualPay = [];
@@ -74,17 +75,6 @@ function setDepartmentChartOption(chartData) {
           display: "<span>ƒ</span> (params)"
         }
       },
-      axisPointer: {
-        label: {
-          type: "cross",
-          show: true,
-          backgroundColor: "#fff",
-          color: "#556677",
-          borderColor: "rgba(0,0,0,0)",
-          shadowColor: "rgba(0,0,0,0)",
-          shadowOffsetY: 0
-        }
-      },
       backgroundColor: "#fff",
       textStyle: {
         color: "#5c6c7c"
@@ -106,7 +96,7 @@ function setDepartmentChartOption(chartData) {
         start: 0,
         end: 100,
         handleSize: "100%",
-        bottom: "5%",
+        bottom: "4%",
         // left: "14%",
         // right: "30%",
         handleIcon: "M0,0 v9.7h5 v-9.7h-5 Z",
@@ -170,74 +160,9 @@ function setDepartmentChartOption(chartData) {
     xAxis: {
       type: "category",
       data: departments,
-      axisLine: {
-        lineStyle: {
-          color: "#DCE2E8"
-        }
-      },
-      axisTick: {
-        show: false
-      },
       axisLabel: {
-        // interval: 0,
-        textStyle: {
-          color: "#556677"
-        },
-        // 默认x轴字体大小
-        fontSize: 12,
-        // margin:文字到x轴的距离
-        margin: 15
-      },
-      axisPointer: {
-        label: {
-          color: "#018DA7",
-          fontWeight: "bold",
-          // padding: [11, 5, 7],
-          padding: [0, 0, 10, 0],
-          /*
-    除了padding[0]建议必须是0之外，其他三项可随意设置
-    和CSSpadding相同，[上，右，下，左]
-    如果需要下边线超出文字，设左右padding即可，注：左右padding最好相同
-    padding[2]的10:
-    10 = 文字距下边线的距离 + 下边线的宽度
-    如：UI图中文字距下边线距离为7 下边线宽度为2
-    则padding: [0, 0, 9, 0]
-                */
-          // 这里的margin和axisLabel的margin要一致!
-          margin: 15,
-          // 移入时的字体大小
-          fontSize: 12,
-          backgroundColor: {
-            type: "linear",
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
-            colorStops: [
-              {
-                offset: 0,
-                color: "#fff" // 0% 处的颜色
-              },
-              {
-                // offset: 0.9,
-                offset: 0.86,
-                /*
-                    0.86 = （文字 + 文字距下边线的距离）/（文字 + 文字距下边线的距离 + 下边线的宽度）   
-                    */
-                color: "#fff" // 0% 处的颜色
-              },
-              {
-                offset: 0.86,
-                color: "#33c0cd" // 0% 处的颜色
-              },
-              {
-                offset: 1,
-                color: "#33c0cd" // 100% 处的颜色
-              }
-            ],
-            global: false // 缺省为 false
-          }
-        }
+        interval: 0,
+        rotate: 30
       }
     },
     yAxis: [
@@ -308,4 +233,208 @@ function setDepartmentChartOption(chartData) {
   };
   return byTimeOption;
 }
-export { setDepartmentChartOption };
+function setDepartmentRingOption(chartData, title) {
+  // console.log(chartData);
+  if (chartData.length === 0) {
+    title = "暂无数据";
+  }
+  let sum = 0;
+  let data = [];
+  chartData.map(item => {
+    let temp = {};
+    temp.name = item.department;
+    sum = accAdd(item.totalCost, sum);
+    temp.value = item.totalCost;
+    data.push(temp);
+  });
+  let colorList = [
+    "#0090ff",
+    "#06d3c4",
+    "#ffbc32",
+    "#2ccc44",
+    "#ff3976",
+    "#6173d6",
+    "#914ce5",
+    "#42b1cc",
+    "#ff55ac",
+    "#0090ff",
+    "#06d3c4",
+    "#ffbc32",
+    "#2ccc44",
+    "#ff3976",
+    "#6173d6",
+    "#914ce5",
+    "#42b1cc",
+    "#ff55ac",
+    "#0090ff",
+    "#06d3c4",
+    "#ffbc32",
+    "#2ccc44",
+    "#ff3976",
+    "#6173d6",
+    "#914ce5",
+    "#42b1cc",
+    "#ff55ac",
+    "#0090ff",
+    "#06d3c4",
+    "#ffbc32",
+    "#2ccc44",
+    "#ff3976",
+    "#6173d6",
+    "#914ce5",
+    "#42b1cc",
+    "#ff55ac",
+    "#0090ff",
+    "#06d3c4",
+    "#ffbc32",
+    "#2ccc44",
+    "#ff3976",
+    "#6173d6",
+    "#914ce5",
+    "#42b1cc",
+    "#ff55ac",
+    "#0090ff",
+    "#06d3c4",
+    "#ffbc32",
+    "#2ccc44",
+    "#ff3976",
+    "#6173d6",
+    "#914ce5",
+    "#42b1cc",
+    "#ff55ac",
+    "#0090ff",
+    "#06d3c4",
+    "#ffbc32",
+    "#2ccc44",
+    "#ff3976",
+    "#6173d6",
+    "#914ce5",
+    "#42b1cc",
+    "#ff55ac",
+    "#0090ff",
+    "#06d3c4",
+    "#ffbc32",
+    "#2ccc44",
+    "#ff3976",
+    "#6173d6",
+    "#914ce5",
+    "#42b1cc",
+    "#ff55ac",
+    "#0090ff",
+    "#06d3c4",
+    "#ffbc32",
+    "#2ccc44",
+    "#ff3976",
+    "#6173d6",
+    "#914ce5",
+    "#42b1cc",
+    "#ff55ac",
+    "#0090ff",
+    "#06d3c4",
+    "#ffbc32",
+    "#2ccc44",
+    "#ff3976",
+    "#6173d6",
+    "#914ce5",
+    "#42b1cc",
+    "#ff55ac",
+    "#0090ff",
+    "#06d3c4",
+    "#ffbc32",
+    "#2ccc44",
+    "#ff3976",
+    "#6173d6",
+    "#914ce5",
+    "#42b1cc",
+    "#ff55ac"
+  ];
+  let option = {
+    title: {
+      text: "{name|" + title + "}\n{val|" + sum + "}",
+      top: "center",
+      left: "center",
+      textStyle: {
+        rich: {
+          name: {
+            fontSize: 16,
+            fontWeight: "normal",
+            color: "#666666",
+            padding: [10, 0]
+          },
+          val: {
+            fontSize: 20,
+            fontWeight: "bold",
+            color: "#D95E5A"
+          }
+        }
+      }
+    },
+    tooltip: {
+      trigger: "item",
+      borderColor: "rgba(255,255,255,.3)",
+      backgroundColor: "rgba(13,5,30,.6)",
+      borderWidth: 1,
+      padding: 5,
+      formatter: function(parms) {
+        var str =
+          parms.marker +
+          "" +
+          parms.data.name +
+          "</br>" +
+          "金额：" +
+          parms.data.value +
+          "元</br>" +
+          "占比：" +
+          parms.percent +
+          "%";
+        return str;
+      }
+    },
+    series: [
+      {
+        type: "pie",
+        center: ["50%", "50%"],
+        radius: ["40%", "70%"],
+        clockwise: true,
+        avoidLabelOverlap: true,
+        hoverOffset: 15,
+        itemStyle: {
+          normal: {
+            color: function(params) {
+              return colorList[params.dataIndex];
+            }
+          }
+        },
+        label: {
+          show: true,
+          position: "outside",
+          formatter: "{a|{b}：{d}%}\n{hr|}",
+          rich: {
+            hr: {
+              backgroundColor: "t",
+              borderRadius: 3,
+              width: 3,
+              height: 3,
+              padding: [3, 3, 0, -12]
+            },
+            a: {
+              padding: [-30, 15, -20, 5]
+            }
+          }
+        },
+        labelLine: {
+          normal: {
+            length: 15,
+            length2: 20,
+            lineStyle: {
+              width: 1
+            }
+          }
+        },
+        data: data
+      }
+    ]
+  };
+  return option;
+}
+export { setDepartmentChartOption, setDepartmentRingOption };

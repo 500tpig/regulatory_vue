@@ -12,6 +12,12 @@ function formatDate(strDate) {
   if (strDate.length > 6) day = strDate.substring(6, 8);
   return year + "-" + month + "-" + day;
 }
+function shallowCopyObj(originalObj, targetObj) {
+  for (let key in originalObj) {
+    targetObj[key] = originalObj[key];
+  }
+  return targetObj;
+}
 //js 小数相加精确结果
 function accAdd(arg1, arg2) {
   if (isNaN(arg1)) {
@@ -77,4 +83,4 @@ const pickerOptions = {
     }
   ]
 };
-export { getMonthLastDay, accAdd, formatDate, pickerOptions };
+export { getMonthLastDay, accAdd, formatDate, pickerOptions, shallowCopyObj };

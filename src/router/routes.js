@@ -21,6 +21,11 @@ const routes = [
         component: () => import("pages/Home/home")
       },
       {
+        path: "/foundation/overview",
+        meta: { requireAuth: true },
+        component: () => import("pages/Foundation/overview")
+      },
+      {
         path: "/foundation/by_time",
         meta: { requireAuth: true },
         component: () => import("pages/Foundation/byTime")
@@ -29,6 +34,16 @@ const routes = [
         path: "/foundation/by_department",
         meta: { requireAuth: true },
         component: () => import("pages/Foundation/byDepartment")
+      },
+      {
+        path: "/foundation/by_disease",
+        meta: { requireAuth: true },
+        component: () => import("pages/Foundation/byDisease")
+      },
+      {
+        path: "/foundation/by_ageGroup",
+        meta: { requireAuth: true },
+        component: () => import("pages/Foundation/byAgeGroup")
       }
     ]
   },

@@ -1,6 +1,6 @@
 <template>
   <q-layout view="hHh lpR fFf" class="bg-grey-1">
-    <q-header elevated class="bg-white text-primary q-py-sm">
+    <q-header elevated class="bg-white text-primary q-pt-sm">
       <q-toolbar class="GNL__toolbar">
         <q-btn
           flat
@@ -15,12 +15,13 @@
         <q-img
           :src="titleIcon"
           spinner-color="white"
-          style="height: 32px; width: 32px"
+          style="height: 24px; width: 24px"
         />
         <q-toolbar-title
           v-if="$q.screen.gt.xs"
           shrink
           class="row items-center no-wrap"
+          style="padding:0 0 0 8px;"
         >
           <span class="text-primary text-weight-bolder">医保基金监管系统</span>
         </q-toolbar-title>
@@ -44,6 +45,7 @@
             :icon="item.icon"
           />
         </q-breadcrumbs>
+
         <q-space />
         <!-- 头像 -->
         <div class="q-gutter-sm row items-center no-wrap">
@@ -69,31 +71,12 @@
           </q-btn>
         </div>
       </q-toolbar>
-      <!-- tab栏 -->
-      <!-- <q-tabs
-        align="left"
-        dense
-        inline-label
-        indicator-color="transparent"
-        active-color="primary"
-        class=" text-grey-7"
-      >
-        <q-route-tab
-          v-for="(item, index) in tabs"
-          :key="index"
-          :icon="item.icon"
-          :to="item.to"
-          :label="item.label"
-          @click="switchTab(item.to)"
-        >
-        </q-route-tab>
-      </q-tabs> -->
     </q-header>
     <!-- 侧边栏 -->
     <q-drawer
       v-model="leftDrawerOpen"
       show-if-above
-      content-class="bg-white"
+      content-class="bg-white q-pt-xs"
       :width="260"
       elevated
     >
@@ -103,7 +86,7 @@
           <q-item
             class="GNL__drawer-item q-my-sm"
             v-ripple
-            v-for="link in links1"
+            v-for="link in drawers.homeDrawer"
             :key="link.text"
             clickable
             :class="{ selectItem: link.select }"
@@ -123,6 +106,7 @@
           </q-item>
           <!-- <q-separator inset class="q-my-sm" /> -->
           <!-- 下拉 -->
+          <!--  -->
           <q-expansion-item
             expand-separator
             v-model="expanded[0]"
@@ -132,10 +116,10 @@
             <q-item
               class="GNL__drawer-item"
               v-ripple
-              v-for="(link, index) in links2"
+              v-for="(link, index) in cuttingArr(drawers.fundUseDrawer)"
               :key="index"
               clickable
-              @click="toPage(links2, index)"
+              @click="toPage(drawers.fundUseDrawer, index + 1)"
               :class="{ selectItem: link.select }"
             >
               <q-item-section avatar>
@@ -150,7 +134,9 @@
                 }}</q-item-label>
               </q-item-section>
             </q-item>
+            <div style="height:4px;"></div>
           </q-expansion-item>
+          <!--  -->
           <!-- 下拉 -->
           <div class="q-mt-md">
             <div class="flex flex-center q-gutter-xs">
@@ -180,6 +166,32 @@
       </q-scroll-area>
     </q-drawer>
     <q-page-container>
+      <!-- <q-tabs
+        v-model="currentTab"
+        inline-label
+        align="left"
+        dense
+        indicator-color="primary"
+        active-color="white"
+        class="text-grey-5 bg-primary"
+      >
+        <q-tab
+          v-for="(item, index) in tabs"
+          :key="index"
+          :name="item.name"
+          :icon="item.icon"
+          :label="item.label"
+        >
+          <q-btn
+            v-if="item.name !== '/home'"
+            @click.stop="closeTab(item.name)"
+            icon="close"
+            flat
+            size="8px"
+            round
+          />
+        </q-tab>
+      </q-tabs> -->
       <router-view />
     </q-page-container>
   </q-layout>
@@ -191,137 +203,153 @@ export default {
   name: "Layout",
   data() {
     return {
-      titleIcon: require("../../public/icons/HFRS-256x256.png"),
-      portrait: require("assets/image/pp.png"),
+      currentTab: "/home",
       tabs: [
         {
+          name: "/home",
           icon: "home",
-          to: "/home",
-          label: "Home"
+          label: "首页"
         },
         {
-          icon: "icon-riqi1",
-          to: "/foundation/by_time",
+          name: "/foundation/by_time",
+          icon: "icon-rili",
           label: "按时间分析"
         }
       ],
-      leftDrawerOpen: false,
+      leftDrawerOpen: true,
       expanded: [false],
-      links1: [{ icon: "home", text: "首页", url: "/home", select: false }],
-      links2: [
+      drawers: {
+        homeDrawer: [
+          { icon: "home", text: "首页", url: "/home", select: false }
+        ],
+        fundUseDrawer: [
+          {
+            text: "基金使用概况",
+            icon: "icon-neibujijin"
+          },
+          {
+            icon: "icon-zonglanbeifen",
+            text: "基金使用总览",
+            url: "/foundation/overview",
+            select: false
+          },
+          {
+            icon: "icon-rili",
+            text: "按时间分析",
+            url: "/foundation/by_time",
+            select: false
+          },
+          {
+            icon: "icon-keshi",
+            text: "按科室分析",
+            select: false,
+            url: "/foundation/by_department"
+          },
+          {
+            icon: "icon-yiliaohangyedeICON-",
+            text: "按疾病分析",
+            select: false,
+            url: "/foundation/by_disease"
+          },
+          {
+            icon: "icon-nianlingguangfan-02",
+            text: "按年龄分析",
+            select: false,
+            url: "/foundation/by_ageGroup"
+          }
+        ]
+      },
+      titleIcon: require("../../public/icons/HFRS-256x256.png"),
+      portrait: require("assets/image/pp.png"),
+      breadcrumbs: [
         {
-          icon: "icon-rili",
-          text: "按时间分析",
-          url: "/foundation/by_time",
-          select: false
-        },
-        {
-          icon: "icon-keshi",
-          text: "按科室分析",
-          select: false,
-          url: "/foundation/by_department"
-        },
-        {
-          icon: "search",
-          text: "Saved searches",
-          select: false,
-          url: "/foundation/by_time2"
+          label: "Home",
+          icon: "home"
         }
-      ],
-      breadcrumbs: []
+      ]
     };
   },
   mounted() {
-    if (this.$route.path === "/home") {
-      this.links1[0].select = true;
-      this.breadcrumbs = [
-        {
-          label: "Home",
-          icon: "home"
+    let currentPath = this.$route.path;
+    let that = this;
+    if (currentPath === "/home") {
+      this.drawers.homeDrawer[0].select = true;
+    }
+    if (currentPath.startsWith("/foundation")) {
+      this.expanded[0] = true;
+      this.drawers.fundUseDrawer.map(item => {
+        if (currentPath === item.url) {
+          item.select = true;
+          that.breadcrumbs.push({
+            label: "基金使用概况",
+            icon: "icon-neibujijin"
+          });
+          that.breadcrumbs.push({
+            label: item.text,
+            icon: item.icon
+          });
         }
-      ];
-    } else {
-      // 路径是按基金使用
-      if (this.$route.path.startsWith("/foundation")) {
-        this.expanded[0] = true;
-        for (let i = 0; i < this.links2.length; i++) {
-          if (this.$route.path === this.links2[i].url) {
-            this.links2[i].select = true;
-            this.breadcrumbs = [
-              {
-                label: "Home",
-                icon: "home"
-              },
-              {
-                label: "基金使用概况",
-                icon: "icon-neibujijin"
-              },
-              {
-                label: this.links2[i].text,
-                icon: this.links2[i].icon
-              }
-            ];
-            break;
-          }
-        }
-      }
+      });
     }
   },
   methods: {
-    switchTab(url) {
-      this.links1[0].select = false;
-      for (let i = 0; i < this.links2.length; i++) {
-        if (this.links2[i].url === url) this.links2[i].select = true;
-        else this.links2[i].select = false;
-      }
-      if (url === "/home") {
-        this.links1[0].select = true;
-        return;
-      }
-    },
-    logout() {
-      this.$store.dispatch("user/userLogout");
-      this.$router.push("/login");
-    },
     toHome() {
       let currentUrl = this.$route.path;
-      if (currentUrl === this.links1[0].url) return;
+      if (currentUrl === this.drawers.homeDrawer[0].url) return;
       this.breadcrumbs = [
         {
           label: "Home",
           icon: "home"
         }
       ];
-      for (let i = 0; i < this.links2.length; i++)
-        this.links2[i].select = false;
-      this.links1[0].select = true;
-      this.$router.push(this.links1[0].url).catch(err => {
+      for (let key in this.drawers) {
+        this.drawers[key].map(item => {
+          item.select = false;
+        });
+      }
+      this.drawers.homeDrawer[0].select = true;
+      this.$router.push(this.drawers.homeDrawer[0].url).catch(err => {
         console.log("输出报错", err);
       });
     },
     toPage(arr, index) {
       let currentUrl = this.$route.path;
       if (currentUrl === arr[index].url) return;
-      this.links1[0].select = false;
-      for (let i = 0; i < arr.length; i++) arr[i].select = false;
+      for (let key in this.drawers) {
+        this.drawers[key].map(item => {
+          item.select = false;
+        });
+      }
       arr[index].select = true;
       this.breadcrumbs = [
         {
           label: "Home",
           icon: "home"
-        },
+        }
+      ];
+      this.breadcrumbs.push(
         {
-          label: "基金使用概况",
-          icon: "icon-neibujijin"
+          label: arr[0].text,
+          icon: arr[0].icon
         },
         {
           label: arr[index].text,
           icon: arr[index].icon
         }
-      ];
+      );
       this.$router.push(arr[index].url).catch(err => {
         console.log("输出报错", err);
       });
+    },
+    closeTab(url) {
+      console.log(12);
+    },
+    logout() {
+      this.$store.dispatch("user/userLogout");
+      this.$router.push("/login");
+    },
+    cuttingArr(arr) {
+      return arr.slice(1, arr.length);
     }
   }
 };
@@ -330,10 +358,11 @@ export default {
 .breadcrumbs {
   font-size: 15px;
 }
+
 .selectItem {
   background-clip: content-box;
-  background: linear-gradient(118deg, #7367f0, rgba(115, 103, 240, 0.7));
-  box-shadow: 0 0 10px 1px rgba(115, 103, 240, 0.7);
+  background: linear-gradient(118deg, $primary, rgba(1, 141, 167, 0.7));
+  box-shadow: 0 0 10px 1px rgba(1, 141, 167, 0.7);
   color: #ffffff;
   border-radius: 4px;
   margin: 8px 15px 8px;
@@ -343,7 +372,7 @@ export default {
 .GNL
 
   &__drawer-item
-    // line-height: 24px
+    line-height: 24px
     // border-radius: 0 24px 24px 0
     // margin-right: 12px
     .q-item__section--avatar

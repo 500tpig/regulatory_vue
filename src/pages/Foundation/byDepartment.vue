@@ -1,94 +1,153 @@
 <template>
   <q-page class="byDepartment">
-    <page-base-scroll content_class="q-pt-lg q-mb-xl">
+    <page-base-scroll content_class="q-pt-md q-pb-lg">
       <div class="row justify-center">
-        <q-card class="col-7 q-pt-md">
-          <q-card-section
-            horizontal
-            class="row items-center q-pl-xl cardSection"
-            style="font-size:16px;font-weight:500;"
-          >
-            <div class="q-mr-sm">类型选择:</div>
-            <div class="q-gutter-sm text-grey-8" style="font-size:14px;">
-              <q-radio
-                v-model="searchParam.type"
-                val="OC"
-                label="门诊费用"
-                color="teal-5"
-              />
-              <q-radio
-                v-model="searchParam.type"
-                val="HC"
-                label="住院费用"
-                color="deep-orange-6"
-              />
-              <q-radio
-                v-model="searchParam.type"
-                val="OCAndHC"
-                label="全选"
-                color="blue-6"
-              />
-            </div>
-            <div>
-              <span class="q-ml-lg q-mr-md">日期选择:</span>
-              <el-date-picker
-                align="center"
-                value-format="yyyyMMdd"
-                v-model="searchParam.chargingTime"
-                type="monthrange"
-                unlink-panels
-                clearable
-                start-placeholder="开始月份"
-                end-placeholder="结束月份"
-                :picker-options="pickerOptions"
-              >
-              </el-date-picker>
-            </div>
-          </q-card-section>
-          <q-card-section
-            horizontal
-            class="row items-center q-pl-xl cardSection q-mt-xs"
-            style="font-size:16px;font-weight:500;"
-          >
-            <span class="q-mr-sm">科室数量:</span>
-            <q-input
-              class="numberInput"
-              v-model.number="searchParam.departmentNum"
-              type="number"
-              outlined
-              dense
-              :input-style="{ textAlign: 'center' }"
-              :rules="[
-                val => (val !== null && val !== '') || '请输入科室数量',
-                val => val > 0 || '科室数量小于或者为0'
-              ]"
-            />
-            <div class="q-mr-sm q-ml-md">排序方式:</div>
-            <div class="q-gutter-sm text-grey-8" style="font-size:14px;">
-              <q-radio
-                v-model="searchParam.order"
-                val="ASC"
-                label="升序"
-                color="yellow-8"
-              />
-              <q-radio
-                v-model="searchParam.order"
-                val="DESC"
-                label="降序"
-                color="yellow-10"
-              />
-            </div>
-          </q-card-section>
-          <q-card-actions align="right">
-            <q-btn
-              class="q-mr-lg"
-              flat
-              style="font-size:16px;"
-              @click="initialize"
-              >提交</q-btn
+        <q-expansion-item
+          class="shadow-1 overflow-hidden col-8"
+          style="border-radius: 30px"
+          icon="icon-icon_shaixuan"
+          label="筛选条件"
+          v-model="common.expanded[0]"
+          header-class="bg-primary text-white text-weight-medium"
+          expand-icon-class="text-white"
+        >
+          <q-card class="q-pt-md text-grey-8 text-weight-medium text-subtitle1">
+            <q-card-section
+              horizontal
+              class=" items-center q-pl-xl cardSection"
             >
-          </q-card-actions>
-        </q-card>
+              <div class="q-mr-sm">类型选择:</div>
+              <div class="text-grey-8" style="font-size:14px;">
+                <q-radio v-model="searchParam.type" val="OC" label="门诊费用" />
+                <q-radio v-model="searchParam.type" val="HC" label="住院费用" />
+                <q-radio
+                  v-model="searchParam.type"
+                  val="OCAndHC"
+                  label="全选"
+                />
+              </div>
+              <div>
+                <span class="q-ml-lg q-mr-md">日期选择:</span>
+                <el-date-picker
+                  align="center"
+                  value-format="yyyyMMdd"
+                  v-model="searchParam.chargingTime"
+                  type="daterange"
+                  unlink-panels
+                  clearable
+                  start-placeholder="开始月份"
+                  end-placeholder="结束月份"
+                  :picker-options="common.pickerOptions"
+                  style="width:60%;"
+                >
+                </el-date-picker>
+              </div>
+            </q-card-section>
+            <q-card-section
+              horizontal
+              class="row items-center q-pl-xl cardSection q-mt-sm"
+            >
+              <div class="q-mr-sm">排序方式:</div>
+              <div class=" text-grey-8 text-subtitle2">
+                <q-radio
+                  v-model="searchParam.order"
+                  val="ASC"
+                  label="升序"
+                  color="yellow-8"
+                />
+                <q-radio
+                  v-model="searchParam.order"
+                  val="DESC"
+                  label="降序"
+                  color="yellow-10"
+                />
+              </div>
+              <span class="q-mr-sm q-ml-md">展示科室数量:</span>
+              <q-input
+                class="numberInput"
+                v-model.number="searchParam.departmentNum"
+                type="number"
+                outlined
+                dense
+                :disable="searchParam.showAllDep"
+                :input-style="{ textAlign: 'center' }"
+                :rules="[
+                  val => (val !== null && val !== '') || '请输入科室数量',
+                  val => val > 0 || '科室数量小于或者为0'
+                ]"
+              />
+              <span class="q-mx-sm">或</span>
+              <q-checkbox
+                v-model="searchParam.showAllDep"
+                val="DESC"
+                label="全部"
+                color="red"
+              />
+              <div class="text-subtitle2 q-ml-xs" v-if="searchParam.showAllDep">
+                <q-icon name="warning" color="negative"></q-icon>
+                <span class="text-negative">可能导致页面卡顿卡死</span>
+              </div>
+            </q-card-section>
+            <q-card-section
+              horizontal
+              class="row items-center q-pl-xl cardSection q-mt-xs"
+            >
+              <q-toggle
+                :label="common.switchLable"
+                color="pink"
+                v-model="searchParam.selectSpecific"
+                left-label
+                @input="toggleFun"
+              />
+              <q-btn
+                color="warning"
+                label="重选科室"
+                @click="common.dialog.showDialog = true"
+                class="q-ml-sm"
+                v-if="
+                  searchParam.departmentList.length !== 0 &&
+                    searchParam.selectSpecific
+                "
+              />
+            </q-card-section>
+            <q-card-section
+              horizontal
+              v-if="
+                searchParam.departmentList.length !== 0 &&
+                  searchParam.selectSpecific
+              "
+              class="row items-center q-pl-xl cardSection q-mt-xs"
+            >
+              <div style="max-width: 400px">
+                <q-expansion-item v-model="common.expanded[1]" label="已选科室">
+                  <q-card>
+                    <q-card-section>
+                      <q-chip
+                        v-for="(item, index) in searchParam.departmentList"
+                        :key="index"
+                        removable
+                        color="primary"
+                        text-color="white"
+                        @remove="remove(index)"
+                      >
+                        {{ item }}
+                      </q-chip>
+                    </q-card-section>
+                  </q-card>
+                </q-expansion-item>
+              </div>
+            </q-card-section>
+            <q-card-actions align="right">
+              <q-btn
+                class="q-mr-lg"
+                flat
+                style="font-size:16px;"
+                @click="initialize"
+                >提交</q-btn
+              >
+            </q-card-actions>
+          </q-card>
+        </q-expansion-item>
       </div>
       <div class="row">
         <div class="col-8 offset-2 ">
@@ -97,31 +156,148 @@
           </q-card>
         </div>
       </div>
+      <div class="row q-mt-lg justify-center">
+        <q-card class="col-5">
+          <div id="byDepartmentRingChartOC"></div>
+        </q-card>
+        <q-card class="col-5 q-ml-lg">
+          <div id="byDepartmentRingChartHC"></div>
+        </q-card>
+      </div>
+      <div class="row q-mt-lg justify-center">
+        <q-table
+          class="shadow-2 byDepartmentTable col-5"
+          :title="common.OCTableData.title"
+          :data="common.OCTableData.data"
+          :columns="common.byDepartmentTable.columns"
+          row-key="index"
+          flat
+          bordered
+        />
+        <q-table
+          class="shadow-2 col-5 byDepartmentTable q-ml-md"
+          :title="common.HCTableData.title"
+          :data="common.HCTableData.data"
+          :columns="common.byDepartmentTable.columns"
+          row-key="index"
+          flat
+          bordered
+        />
+      </div>
     </page-base-scroll>
+    <q-dialog v-model="common.dialog.showDialog" @before-hide="hideDilog"
+      ><specificTable
+        @selectConfirm="selectConfirm"
+        url="/fundUse/getDepartmentOC"
+        :searchParam="searchParam"
+        :columns="common.dialog.columns"
+    /></q-dialog>
   </q-page>
 </template>
 
 <script>
 import pageBaseScroll from "components/utils/PageScroll";
 import { EleResize } from "assets/js/util/esresize";
-import { setDepartmentChartOption } from "assets/js/charts/byDepartmentOptions";
+import {
+  setDepartmentChartOption,
+  setDepartmentRingOption
+} from "assets/js/charts/byDepartmentOptions";
 import {
   getMonthLastDay,
   formatDate,
-  pickerOptions
+  pickerOptions,
+  shallowCopyObj
 } from "assets/js/util/common";
+import specificTable from "components/utils/specificTable";
 export default {
-  components: { pageBaseScroll: pageBaseScroll },
+  components: { pageBaseScroll, specificTable },
   data() {
     return {
       searchParam: {
         chargingTime: ["20160701", "20161231"],
         departmentNum: 15,
         type: "OCAndHC",
-        order: "DESC"
+        order: "DESC",
+        selectSpecific: false,
+        showAllDep: false,
+        departmentList: []
       },
-      pickerOptions: pickerOptions,
-      isInitialize: true
+      common: {
+        switchLable: "选择所有科室",
+        pickerOptions: pickerOptions,
+        isInitialize: true,
+        expanded: [true, true],
+        byDepartmentTable: {
+          columns: [
+            {
+              name: "index",
+              label: "#",
+              field: "index",
+              align: "center",
+              sortable: true
+            },
+            {
+              name: "department",
+              label: "科室",
+              field: "department",
+              sortable: true,
+              align: "center"
+            },
+            {
+              name: "individualPay",
+              label: "个人支付费用",
+              field: "individualPay",
+              align: "center",
+              format: val => `${val}` + `元`,
+              sortable: true
+            },
+            {
+              name: "medicarePay",
+              align: "center",
+              label: "医保支付费用",
+              field: "medicarePay",
+              format: val => `${val}` + `元`,
+              sortable: true
+            },
+            {
+              name: "totalCost",
+              align: "center",
+              label: "医疗总费用",
+              field: "totalCost",
+              format: val => `${val}` + `元`,
+              sortable: true
+            },
+            {
+              name: "ratio",
+              align: "center",
+              label: "医保支付占比",
+              field: "ratio",
+              sortable: true
+            }
+          ]
+        },
+        OCTableData: { title: "门诊科室费用详情表", data: [] },
+        HCTableData: { title: "住院科室费用详情表", data: [] },
+        dialog: {
+          showDialog: false,
+          columns: [
+            {
+              name: "no",
+              label: "序号",
+              field: "no",
+              align: "center",
+              sortable: true
+            },
+            {
+              name: "department",
+              label: "科室",
+              field: "department",
+              sortable: true,
+              align: "center"
+            }
+          ]
+        }
+      }
     };
   },
   mounted() {
@@ -130,13 +306,14 @@ export default {
   methods: {
     // 初始化请求
     async initialize() {
-      let param = {
-        type: this.searchParam.type,
-        startDate: this.searchParam.chargingTime[0],
-        endDate: this.searchParam.chargingTime[1],
-        departmentNum: this.searchParam.departmentNum,
-        sort: this.searchParam.order
-      };
+      let param = {};
+      let param2 = {};
+      param = shallowCopyObj(this.searchParam, param);
+      param.startDate = this.searchParam.chargingTime[0];
+      param.endDate = this.searchParam.chargingTime[1];
+      param2 = shallowCopyObj(param, param2);
+      param2.departmentList = [];
+
       let optionData = [];
       await this.$http
         .post("/fundUse/monthlyFeeByDepartment", param)
@@ -145,50 +322,149 @@ export default {
             optionData = res.data.data;
           }
         })
+        .catch(e => {});
+      await optionData.map(item => {
+        param2.departmentList.push(item.department);
+      });
+      param2.selectSpecific = true;
+      let ringData = {};
+      await this.$http
+        .post("/fundUse/monthlyFeeOCAndHCByDepartment", param2)
+        .then(res => {
+          if (res.status === 200) {
+            ringData = res.data.data;
+          }
+        })
         .catch(() => {});
-      // let ringData = {};
-      // await this.$http
-      //   .post("/fundUse/monthlyFeeOCAndHC", param)
-      //   .then(res => {
-      //     if (res.status === 200) {
-      //       ringData = res.data.data;
-      //     }
-      //   })
-      //   .catch(() => {});
-      // console.log(ringData);
-      this.afterHttp(optionData);
+      this.afterHttp(optionData, ringData);
     },
 
     // 画图表
     drawChart(option, id) {
       // 基于准备好的dom，初始化echarts实例
-      // let oldChart = this.$echarts.init(document.getElementById(id));
-      // oldChart.dispose();
       let myChart = this.$echarts.init(document.getElementById(id));
       let resizeDiv = document.getElementById(id);
       // 指定图表的配置项和数据
       // 使用刚指定的配置项和数据显示图表。
       myChart.setOption(option, true);
+
       let that = this;
-      // if (id === "byTimeHistogram") {
-      //   myChart.on("click", function(param) {
-      //     that.drillDown(param.name);
-      //   });
-      // }
-      if (this.isInitialize) {
+      if (id === "byDepartmentHistogram") {
+        myChart.on("click", function(param) {
+          that.drillDown(param.name);
+        });
+      }
+
+      if (this.common.isInitialize) {
+        let histogramChart = this.$echarts.init(
+          document.getElementById("byDepartmentHistogram")
+        );
+        let OCChart = this.$echarts.init(
+          document.getElementById("byDepartmentRingChartOC")
+        );
+        let HCChart = this.$echarts.init(
+          document.getElementById("byDepartmentRingChartHC")
+        );
+
+        let histogramDiv = document.getElementById("byDepartmentHistogram");
+        let OCDiv = document.getElementById("byDepartmentRingChartOC");
+        let HCDiv = document.getElementById("byDepartmentRingChartHC");
         let linstener = function() {
-          myChart.resize();
+          histogramChart.resize();
+          OCChart.resize();
+          HCChart.resize();
         };
         EleResize.on(resizeDiv, linstener);
-        this.isInitialize = false;
+        this.common.isInitialize = false;
       }
     },
-    afterHttp(optionData) {
+    // 处理请求后的结果
+    afterHttp(optionData, ringData) {
       let histogramOption = setDepartmentChartOption(optionData);
       this.drawChart(histogramOption, "byDepartmentHistogram");
+
+      let ringOCOption = setDepartmentRingOption(
+        ringData.OC,
+        "门诊科室费用占比"
+      );
+      this.drawChart(ringOCOption, "byDepartmentRingChartOC");
+
+      let ringHCOption = setDepartmentRingOption(
+        ringData.HC,
+        "住院科室费用占比"
+      );
+      this.drawChart(ringHCOption, "byDepartmentRingChartHC");
+
+      this.formatTableData(ringData);
+      // ringData
+    },
+    // 图表下钻
+    async drillDown(department) {
+      console.log(department);
+    },
+
+    // 渲染表格数据
+    formatTableData(tableDataObj) {
+      let tempTitle;
+      tempTitle =
+        formatDate(this.searchParam.chargingTime[0]) +
+        " 至 " +
+        formatDate(this.searchParam.chargingTime[1]) +
+        " ";
+      this.common.OCTableData.title = tempTitle + "门诊科室费用详情表";
+      this.common.HCTableData.title = tempTitle + "住院科室费用详情表";
+      this.common.HCTableData.data = [];
+      this.common.OCTableData.data = [];
+
+      for (let key in tableDataObj) {
+        let table = tableDataObj[key];
+        for (let i = 0; i < table.length; i++) {
+          let temp = {};
+          temp.index = i + 1;
+          temp.individualPay = table[i].individualPay;
+          temp.medicarePay = table[i].medicarePay;
+          temp.totalCost = table[i].totalCost;
+          temp.department = table[i].department;
+          temp.ratio =
+            ((table[i].medicarePay / table[i].totalCost) * 100).toFixed(2) +
+            "%";
+          if (key === "OC") {
+            this.common.OCTableData.data.push(temp);
+          } else {
+            this.common.HCTableData.data.push(temp);
+          }
+        }
+      }
+    },
+
+    // 按钮切换函数
+    toggleFun(value, evt) {
+      if (!this.searchParam.selectSpecific) {
+        this.common.switchLable = "选择所有科室";
+      } else {
+        this.common.switchLable = "选择特定科室";
+        this.common.dialog.showDialog = true;
+      }
+    },
+    // 隐藏对话框
+    hideDilog() {
+      if (this.searchParam.departmentList.length === 0) {
+        this.searchParam.selectSpecific = false;
+      }
+    },
+    // 确定选择科室对话框
+    selectConfirm(data) {
+      this.common.dialog.showDialog = false;
+      let temp = [];
+      data.map(item => {
+        temp.push(item.department);
+      });
+      this.searchParam.departmentList = temp;
+    },
+    remove(index) {
+      this.searchParam.departmentList.splice(index, 1);
     }
-  },
-  beforeDestroy() {}
+  }
 };
 </script>
 <style lang="scss" scoped>
@@ -205,12 +481,45 @@ export default {
     }
     .numberInput {
       font-size: 16px;
-      max-width: 160px;
+      max-width: 100px;
       margin-bottom: -20px;
     }
   }
   #byDepartmentHistogram {
-    height: 600px;
+    height: 620px;
+  }
+  #byDepartmentRingChartOC,
+  #byDepartmentRingChartHC {
+    height: 430px;
   }
 }
+</style>
+
+<style lang="sass">
+.byDepartmentTable
+  /* height or max-height is important */
+  height: 400px !important
+
+  .q-table__middle::-webkit-scrollbar
+    display: none
+
+  .q-table__title
+    font-size: 20px
+  .q-table__top,
+  thead tr:first-child th
+    /* bg color is important for th; just specify one */
+    background-color: #018DA7
+    color: #FFFFFF
+    font-size: 14px
+
+  thead tr th
+    position: sticky
+    z-index: 1
+  thead tr:first-child th
+    top: 0
+
+  /* this is when the loading indicator appears */
+  &.q-table--loading thead tr:last-child th
+    /* height of all previous header rows */
+    top: 48px
 </style>

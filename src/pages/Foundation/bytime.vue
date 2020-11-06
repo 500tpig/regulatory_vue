@@ -1,11 +1,18 @@
 <template>
   <q-page>
-    <page-base-scroll content_class="byTime q-pt-lg q-mb-xl">
-      <div class="row byTime-searchBar-row">
-        <!-- 筛选栏 -->
-        <div class="col-8 offset-2 byTime-searchBar-row-col">
+    <page-base-scroll content_class="byTime q-pt-md q-pb-lg">
+      <div class="row justify-center">
+        <q-expansion-item
+          class="shadow-1 overflow-hidden col-8"
+          style="border-radius: 30px"
+          icon="icon-icon_shaixuan"
+          label="筛选条件"
+          v-model="expanded"
+          header-class="bg-primary text-white text-weight-medium"
+          expand-icon-class="text-white"
+        >
           <q-card
-            class="byTime-searchBar-row-col-card bg-white text-primary q-pt-md"
+            class=" q-pt-md text-grey-8 text-weight-medium text-subtitle1"
           >
             <!-- <q-separator dark /> -->
             <q-card-section
@@ -15,23 +22,12 @@
             >
               <div class="q-mr-sm">类型选择:</div>
               <div class="q-gutter-sm text-grey-8" style="font-size:14px;">
-                <q-radio
-                  v-model="searchParam.type"
-                  val="OC"
-                  label="门诊费用"
-                  color="teal-5"
-                />
-                <q-radio
-                  v-model="searchParam.type"
-                  val="HC"
-                  label="住院费用"
-                  color="deep-orange-6"
-                />
+                <q-radio v-model="searchParam.type" val="OC" label="门诊费用" />
+                <q-radio v-model="searchParam.type" val="HC" label="住院费用" />
                 <q-radio
                   v-model="searchParam.type"
                   val="OCAndHC"
                   label="全选"
-                  color="blue-6"
                 />
               </div>
               <div>
@@ -67,12 +63,11 @@
               >
             </q-card-actions>
           </q-card>
-        </div>
+        </q-expansion-item>
       </div>
       <div class="row">
         <div class="col-8 offset-2 ">
-          <q-card class="q-mt-lg q-pt-sm">
-            <div ref="histogram" id="byTimeHistogram"></div>
+          <q-card class="q-mt-lg q-pt-sm" ref="histogram" id="byTimeHistogram">
           </q-card>
         </div>
       </div>
@@ -84,29 +79,25 @@
           <div id="byTimePieChart"></div>
         </q-card>
       </div>
-      <div class="row q-mt-lg justify-evenly">
-        <div>
-          <q-table
-            class="byTimeTable shadow-2"
-            :title="OCTableData.title"
-            :data="OCTableData.data"
-            :columns="byTimeTable.columns"
-            row-key="index"
-            flat
-            bordered
-          />
-        </div>
-        <div>
-          <q-table
-            class="byTimeTable shadow-2"
-            :title="HCTableData.title"
-            :data="HCTableData.data"
-            :columns="byTimeTable.columns"
-            row-key="index"
-            flat
-            bordered
-          />
-        </div>
+      <div class="row q-mt-lg justify-center">
+        <q-table
+          class="byTimeTable shadow-2 col-5"
+          :title="OCTableData.title"
+          :data="OCTableData.data"
+          :columns="byTimeTable.columns"
+          row-key="index"
+          flat
+          bordered
+        />
+        <q-table
+          class="byTimeTable shadow-2 col-5 q-ml-md"
+          :title="HCTableData.title"
+          :data="HCTableData.data"
+          :columns="byTimeTable.columns"
+          row-key="index"
+          flat
+          bordered
+        />
       </div>
     </page-base-scroll>
   </q-page>
@@ -196,7 +187,8 @@ export default {
         { value: "OC", label: "门诊收费" },
         { value: "HC", label: "住院收费" }
       ],
-      pickerOptions: pickerOptions
+      pickerOptions: pickerOptions,
+      expanded: true
     };
   },
   methods: {
@@ -299,7 +291,6 @@ export default {
 
     // 渲染表格数据
     formatTableData(tableDataObj, month) {
-      this.HCTableData.data = [];
       let tempTitle;
       if (month !== undefined) {
         tempTitle = month + " ";
@@ -310,9 +301,10 @@ export default {
           formatDate(this.searchParam.chargingTime[1]) +
           " ";
       }
-      this.HCTableData.title = tempTitle + "住院费用详情表";
-      this.OCTableData.data = [];
       this.OCTableData.title = tempTitle + "门诊费用详情表";
+      this.HCTableData.title = tempTitle + "住院费用详情表";
+      this.HCTableData.data = [];
+      this.OCTableData.data = [];
 
       for (let key in tableDataObj) {
         let table = tableDataObj[key];
@@ -345,31 +337,38 @@ export default {
     },
 
     afterHttp(optionData, ringData, month) {
-      let titleStr = " 总费用";
+      let titleStr = " 门诊住院总费用";
       if (this.searchParam.type === "OC") {
         titleStr = " 门诊费用";
       } else if (this.searchParam.type === "HC") {
         titleStr = " 住院费用";
       }
-      this.chartTitle.histogram =
-        formatDate(this.searchParam.chargingTime[0]) +
-        " 至 " +
-        formatDate(this.searchParam.chargingTime[1]) +
-        titleStr;
+      let timeStr = "";
+      if (this.isShowReduction) {
+        timeStr = month;
+      } else {
+        timeStr =
+          formatDate(this.searchParam.chargingTime[0]) +
+          " 至 " +
+          formatDate(this.searchParam.chargingTime[1]);
+      }
+      this.chartTitle.histogram = timeStr + titleStr;
       let histogramOption = setbyTimeChartOption(
         optionData,
         this.chartTitle.histogram
       );
-      let pieOption = setbyTimePieChartOption(optionData);
+      let pieOption = setbyTimePieChartOption(optionData, timeStr);
       this.drawChart(pieOption, "byTimePieChart");
 
-      let ringOption = setbyTimeRingChartOption(ringData);
+      let ringOption = setbyTimeRingChartOption(
+        ringData,
+        this.chartTitle.histogram
+      );
       this.drawChart(ringOption, "byTimeRingChart");
       this.drawChart(histogramOption, "byTimeHistogram");
 
       this.formatTableData(ringData, month);
     },
-
     // 提交查询
     async submit(str) {
       this.isShowReduction = false;
@@ -409,6 +408,7 @@ export default {
 
 <style lang="scss" scoped>
 .byTime {
+  height: 100%;
   .el-input__inner {
     border: 1px solid rgba(0, 0, 0, 0.24);
   }
@@ -417,7 +417,7 @@ export default {
   }
   #byTimePieChart,
   #byTimeRingChart {
-    height: 400px;
+    height: 430px;
   }
   .byTime-searchBar-row {
     .byTime-searchBar-row-col {
@@ -439,6 +439,9 @@ export default {
 .byTimeTable
   /* height or max-height is important */
   height: 400px
+
+  .q-table__middle::-webkit-scrollbar
+    display: none
 
   .q-table__title
     font-size: 20px

@@ -175,7 +175,7 @@ function setbyTimeChartOption(chartData, title) {
     legend: {
       data: ["个人支付", "医保支付", "医疗总费用"],
       x: "center",
-      top: "4%"
+      top: "5%"
     },
     xAxis: {
       type: "category",
@@ -318,7 +318,7 @@ function setbyTimeChartOption(chartData, title) {
   };
   return byTimeOption;
 }
-function setbyTimePieChartOption(chartData) {
+function setbyTimePieChartOption(chartData, month) {
   let totalCost = 0;
   let medicarePay = 0;
   let individualPay = 0;
@@ -461,7 +461,7 @@ function setbyTimePieChartOption(chartData) {
   };
   return option;
 }
-function setbyTimeRingChartOption(chartData) {
+function setbyTimeRingChartOption(chartData, month) {
   let OC = { individualPay: 0, totalCost: 0, medicarePay: 0 };
   let HC = { individualPay: 0, totalCost: 0, medicarePay: 0 };
   chartData.OC.map(item => {
@@ -511,6 +511,11 @@ function setbyTimeRingChartOption(chartData) {
     ]
   };
   let option = {
+    title: {
+      text: month + "占比情况",
+      bottom: "1%",
+      x: "center"
+    },
     toolbox: {
       //可视化的工具箱
       show: true,
@@ -615,7 +620,7 @@ function setbyTimeRingChartOption(chartData) {
                 "}"
               );
             },
-            padding: [0, -130, 25, -130],
+            padding: [0, -150, 25, -150],
             rich: {
               color: "#333",
               icon: {
