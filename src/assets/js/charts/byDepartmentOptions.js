@@ -1,19 +1,29 @@
 import { accAdd } from "../util/common";
-function setDepartmentChartOption(chartData) {
+function setDepartmentChartOption(chartData, isDrillDown) {
   let departments = [];
   let individualPay = [];
   let totalCost = [];
   let medicarePay = [];
+  let title = {};
+  if (isDrillDown) {
+    title = {
+      text: chartData[0].department + "费用详情",
+      left: "3%",
+      top: "1%"
+    };
+  }
   chartData.map(item => {
-    departments.push(item.department);
+    if (isDrillDown) {
+      departments.push(item.chargingTime);
+    } else {
+      departments.push(item.department);
+    }
     individualPay.push(item.individualPay);
     totalCost.push(item.totalCost);
     medicarePay.push(item.medicarePay);
   });
   let byTimeOption = {
-    title: {
-      // text: "ECharts 入门示例"
-    },
+    title: title,
     toolbox: {
       //可视化的工具箱
       show: true,
@@ -161,7 +171,7 @@ function setDepartmentChartOption(chartData) {
       type: "category",
       data: departments,
       axisLabel: {
-        interval: 0,
+        // interval: 0,
         rotate: 30
       }
     },

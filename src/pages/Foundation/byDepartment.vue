@@ -165,24 +165,31 @@
         </q-card>
       </div>
       <div class="row q-mt-lg justify-center">
-        <q-table
-          class="shadow-2 byDepartmentTable col-5"
-          :title="common.OCTableData.title"
-          :data="common.OCTableData.data"
-          :columns="common.byDepartmentTable.columns"
-          row-key="index"
-          flat
-          bordered
-        />
-        <q-table
-          class="shadow-2 col-5 byDepartmentTable q-ml-md"
-          :title="common.HCTableData.title"
-          :data="common.HCTableData.data"
-          :columns="common.byDepartmentTable.columns"
-          row-key="index"
-          flat
-          bordered
-        />
+        <div class="col-6" style="padding-left:5%;">
+          <q-table
+            class="shadow-2 byDepartmentTable"
+            :title="common.OCTableData.title"
+            :data="common.OCTableData.data"
+            :columns="common.byDepartmentTable.columns"
+            row-key="index"
+            flat
+            bordered
+            :visible-columns="common.byDepartmentTable.visibleColumns"
+          />
+        </div>
+        <div class=" col-6">
+          <q-table
+            class="shadow-2 byDepartmentTable q-ml-md"
+            style="width:90%"
+            :title="common.HCTableData.title"
+            :data="common.HCTableData.data"
+            :columns="common.byDepartmentTable.columns"
+            row-key="index"
+            flat
+            bordered
+            :visible-columns="common.byDepartmentTable.visibleColumns"
+          />
+        </div>
       </div>
     </page-base-scroll>
     <q-dialog v-model="common.dialog.showDialog" @before-hide="hideDilog"
@@ -220,7 +227,8 @@ export default {
         order: "DESC",
         selectSpecific: false,
         showAllDep: false,
-        departmentList: []
+        departmentList: [],
+        isDrillDown: false
       },
       common: {
         switchLable: "选择所有科室",
@@ -228,6 +236,14 @@ export default {
         isInitialize: true,
         expanded: [true, true],
         byDepartmentTable: {
+          visibleColumns: [
+            "index",
+            "department",
+            "individualPay",
+            "medicarePay",
+            "totalCost",
+            "ratio"
+          ],
           columns: [
             {
               name: "index",
@@ -235,6 +251,13 @@ export default {
               field: "index",
               align: "center",
               sortable: true
+            },
+            {
+              name: "chargingTime",
+              label: "日期",
+              field: "chargingTime",
+              sortable: true,
+              align: "center"
             },
             {
               name: "department",
@@ -308,6 +331,9 @@ export default {
     async initialize() {
       let param = {};
       let param2 = {};
+
+      this.searchParam.isDrillDown = false;
+
       param = shallowCopyObj(this.searchParam, param);
       param.startDate = this.searchParam.chargingTime[0];
       param.endDate = this.searchParam.chargingTime[1];
@@ -349,13 +375,14 @@ export default {
       myChart.setOption(option, true);
 
       let that = this;
-      if (id === "byDepartmentHistogram") {
-        myChart.on("click", function(param) {
-          that.drillDown(param.name);
-        });
-      }
 
       if (this.common.isInitialize) {
+        if (id === "byDepartmentHistogram") {
+          myChart.on("click", function(param) {
+            that.drillDown(param.name);
+          });
+        }
+
         let histogramChart = this.$echarts.init(
           document.getElementById("byDepartmentHistogram")
         );
@@ -380,7 +407,10 @@ export default {
     },
     // 处理请求后的结果
     afterHttp(optionData, ringData) {
-      let histogramOption = setDepartmentChartOption(optionData);
+      let histogramOption = setDepartmentChartOption(
+        optionData,
+        this.searchParam.isDrillDown
+      );
       this.drawChart(histogramOption, "byDepartmentHistogram");
 
       let ringOCOption = setDepartmentRingOption(
@@ -400,19 +430,49 @@ export default {
     },
     // 图表下钻
     async drillDown(department) {
-      console.log(department);
+      this.searchParam.isDrillDown = true;
+      let param = {};
+      param = shallowCopyObj(this.searchParam, param);
+      param.departmentList = [];
+      param.departmentList.push(department);
+      param.selectSpecific = true;
+      param.startDate = this.searchParam.chargingTime[0];
+      param.endDate = this.searchParam.chargingTime[1];
+      param.order = "ASC";
+
+      let optionData = [];
+      await this.$http
+        .post("/fundUse/monthlyFeeByDepartment", param)
+        .then(res => {
+          if (res.status === 200) {
+            optionData = res.data.data;
+          }
+        })
+        .catch(e => {});
+      let histogramOption = setDepartmentChartOption(
+        optionData,
+        this.searchParam.isDrillDown
+      );
+      this.changeChart(histogramOption, "byDepartmentHistogram");
+      let ringData = {};
+      await this.$http
+        .post("/fundUse/monthlyFeeOCAndHCByDepartment", param)
+        .then(res => {
+          if (res.status === 200) {
+            ringData = res.data.data;
+          }
+        })
+        .catch(() => {});
+      this.formatTableData(ringData, department);
+    },
+
+    changeChart(option, id) {
+      let myChart = this.$echarts.init(document.getElementById(id));
+      myChart.setOption(option, true);
     },
 
     // 渲染表格数据
-    formatTableData(tableDataObj) {
-      let tempTitle;
-      tempTitle =
-        formatDate(this.searchParam.chargingTime[0]) +
-        " 至 " +
-        formatDate(this.searchParam.chargingTime[1]) +
-        " ";
-      this.common.OCTableData.title = tempTitle + "门诊科室费用详情表";
-      this.common.HCTableData.title = tempTitle + "住院科室费用详情表";
+    formatTableData(tableDataObj, department) {
       this.common.HCTableData.data = [];
       this.common.OCTableData.data = [];
 
@@ -424,6 +484,9 @@ export default {
           temp.individualPay = table[i].individualPay;
           temp.medicarePay = table[i].medicarePay;
           temp.totalCost = table[i].totalCost;
+          if (this.searchParam.isDrillDown) {
+            temp.chargingTime = table[i].chargingTime;
+          }
           temp.department = table[i].department;
           temp.ratio =
             ((table[i].medicarePay / table[i].totalCost) * 100).toFixed(2) +
@@ -435,6 +498,25 @@ export default {
           }
         }
       }
+      let tempTitle;
+      tempTitle =
+        formatDate(this.searchParam.chargingTime[0]) +
+        " 至 " +
+        formatDate(this.searchParam.chargingTime[1]) +
+        " ";
+      if (this.searchParam.isDrillDown) {
+        this.common.byDepartmentTable.visibleColumns.splice(
+          1,
+          0,
+          "chargingTime"
+        );
+        tempTitle = tempTitle + department;
+      } else {
+        if (this.common.byDepartmentTable.visibleColumns.length === 7)
+          this.common.byDepartmentTable.visibleColumns.splice(1, 1);
+      }
+      this.common.OCTableData.title = tempTitle + "门诊" + "费用详情表";
+      this.common.HCTableData.title = tempTitle + "住院" + "费用详情表";
     },
 
     // 按钮切换函数

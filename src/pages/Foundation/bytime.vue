@@ -284,11 +284,6 @@ export default {
       this.afterHttp(optionData, ringData, month);
     },
 
-    changeChart(option, id) {
-      let myChart = this.$echarts.init(document.getElementById(id));
-      myChart.setOption(option, true);
-    },
-
     // 渲染表格数据
     formatTableData(tableDataObj, month) {
       let tempTitle;
