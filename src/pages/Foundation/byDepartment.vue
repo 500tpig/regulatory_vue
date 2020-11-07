@@ -207,13 +207,15 @@ import pageBaseScroll from "components/utils/PageScroll";
 import { EleResize } from "assets/js/util/esresize";
 import {
   setDepartmentChartOption,
-  setDepartmentRingOption
+  setDepartmentRingOption,
+  setDrillDownRingOption
 } from "assets/js/charts/byDepartmentOptions";
 import {
   getMonthLastDay,
   formatDate,
   pickerOptions,
-  shallowCopyObj
+  shallowCopyObj,
+  accAdd
 } from "assets/js/util/common";
 import specificTable from "components/utils/specificTable";
 export default {
@@ -379,7 +381,7 @@ export default {
       if (this.common.isInitialize) {
         if (id === "byDepartmentHistogram") {
           myChart.on("click", function(param) {
-            that.drillDown(param.name);
+            that.drillDown(param);
           });
         }
 
@@ -429,7 +431,8 @@ export default {
       // ringData
     },
     // 图表下钻
-    async drillDown(department) {
+    async drillDown(chartParam) {
+      let department = chartParam.name;
       this.searchParam.isDrillDown = true;
       let param = {};
       param = shallowCopyObj(this.searchParam, param);
@@ -454,6 +457,45 @@ export default {
         this.searchParam.isDrillDown
       );
       this.changeChart(histogramOption, "byDepartmentHistogram");
+      let data1 = {
+        individualPay: {
+          name: "个人支付费用",
+          value: 0
+        },
+        medicarePay: {
+          name: "医保支付费用",
+          value: 0
+        }
+      };
+      let data2 = {
+        OC: {
+          name: "门诊费用",
+          value: 0
+        },
+        HC: {
+          name: "住院费用",
+          value: 0
+        }
+      };
+      optionData.map(item => {
+        data1.individualPay.value = accAdd(
+          data1.individualPay.value,
+          item.individualPay
+        );
+        data1.medicarePay.value = accAdd(
+          data1.medicarePay.value,
+          item.medicarePay
+        );
+      });
+      let color1 = ["#E271DE", "#F8456B"];
+      let color2 = ["#00FFFF", "#4AEAB0"];
+      let ringChartOption1 = setDrillDownRingOption(
+        data1,
+        "医疗总费用",
+        color1
+      );
+      this.changeChart(ringChartOption1, "byDepartmentRingChartOC");
+
       let ringData = {};
       await this.$http
         .post("/fundUse/monthlyFeeOCAndHCByDepartment", param)
@@ -463,6 +505,23 @@ export default {
           }
         })
         .catch(() => {});
+      for (let key in ringData) {
+        let temp = ringData[key];
+        temp.map(item => {
+          if (key === "OC") {
+            data2.OC.value = accAdd(data2.OC.value, item.totalCost);
+          } else {
+            data2.HC.value = accAdd(data2.HC.value, item.totalCost);
+          }
+        });
+      }
+      let ringChartOption2 = setDrillDownRingOption(
+        data2,
+        "门诊住院总费用",
+        color2
+      );
+      this.changeChart(ringChartOption2, "byDepartmentRingChartHC");
+
       this.formatTableData(ringData, department);
     },
 

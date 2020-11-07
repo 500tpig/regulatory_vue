@@ -447,4 +447,137 @@ function setDepartmentRingOption(chartData, title) {
   };
   return option;
 }
-export { setDepartmentChartOption, setDepartmentRingOption };
+
+function setDrillDownRingOption(chartData, title, color) {
+  let bgColor = "#fff";
+  let echartData = [];
+  let total = 0;
+  for (let key in chartData) {
+    echartData.push(chartData[key]);
+    total = accAdd(total, chartData[key].value);
+  }
+
+  let formatNumber = function(num) {
+    let reg = /(?=(\B)(\d{3})+$)/g;
+    return num.toString().replace(reg, ",");
+  };
+
+  let option = {
+    backgroundColor: bgColor,
+    color: color,
+    // tooltip: {
+    //     trigger: 'item'
+    // },
+    title: [
+      {
+        text: "{name|" + title + "}\n{val|" + formatNumber(total) + "}",
+        top: "center",
+        left: "center",
+        textStyle: {
+          rich: {
+            name: {
+              fontSize: 16,
+              fontWeight: "normal",
+              color: "#666666",
+              padding: [10, 0]
+            },
+            val: {
+              fontSize: 24,
+              fontWeight: "bold",
+              color: "#333333"
+            }
+          }
+        }
+      }
+    ],
+    // legend: {
+    //     orient: 'vertical',
+    //     icon: 'rect',
+    //     x: '80%',
+    //     y: 'center',
+    //     itemWidth: 12,
+    //     itemHeight: 12,
+    //     align: 'left',
+    //     textStyle: {
+    //         rich: {
+    //             name: {
+    //                 fontSize: 12
+    //             },
+    //             value: {
+    //                 fontSize: 16,
+    //                 padding: [0, 5, 0, 15]
+    //             },
+    //             unit: {
+    //                 fontSize: 12
+    //             }
+    //         }
+    //     },
+    //     formatter: function(name) {
+    //         let res = echartData.filter(v => v.name === name);
+    //         res = res[0] || {};
+    //         let unit = res.unit || '';
+    //         return '{name|' + name + '}  {value|' + res.value + '}{unit|' + unit + '}'
+    //     }
+    //     // data: legendName
+    // },
+    series: [
+      {
+        type: "pie",
+        radius: ["45%", "60%"],
+        center: ["50%", "50%"],
+        data: echartData,
+        hoverAnimation: false,
+        itemStyle: {
+          normal: {
+            borderColor: bgColor,
+            borderWidth: 2
+          }
+        },
+        labelLine: {
+          normal: {
+            length: 20,
+            length2: 120,
+            lineStyle: {
+              color: "#e6e6e6"
+            }
+          }
+        },
+        label: {
+          normal: {
+            formatter: params => {
+              return (
+                "{icon|●}{name|" +
+                params.name +
+                "}{value|" +
+                formatNumber(params.value) +
+                "}"
+              );
+            },
+            padding: [0, -140, 25, -150],
+            rich: {
+              icon: {
+                fontSize: 16
+              },
+              name: {
+                fontSize: 14,
+                padding: [0, 10, 0, 4],
+                color: "#666666"
+              },
+              value: {
+                fontSize: 18,
+                fontWeight: "bold",
+                color: "#333333"
+              }
+            }
+          }
+        }
+      }
+    ]
+  };
+  return option;
+}
+export {
+  setDepartmentChartOption,
+  setDepartmentRingOption,
+  setDrillDownRingOption
+};
