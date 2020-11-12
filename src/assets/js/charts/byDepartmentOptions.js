@@ -22,7 +22,7 @@ function setDepartmentChartOption(chartData, isDrillDown) {
     totalCost.push(item.totalCost);
     medicarePay.push(item.medicarePay);
   });
-  let byTimeOption = {
+  let Option = {
     title: title,
     toolbox: {
       //可视化的工具箱
@@ -241,7 +241,7 @@ function setDepartmentChartOption(chartData, isDrillDown) {
       }
     ]
   };
-  return byTimeOption;
+  return Option;
 }
 function setDepartmentRingOption(chartData, title) {
   // console.log(chartData);

@@ -29,7 +29,7 @@
     </q-table>
     <div class="q-ml-md">
       <div class="row justify-center q-pa-md">
-        <div class="text-h6">已选科室</div>
+        <div class="text-h6">已选{{ title }}</div>
       </div>
       <q-scroll-area style="height: 400px;width:300px;">
         <div style="width:100%;" class="row wrap justify-center">
@@ -41,7 +41,7 @@
             text-color="white"
             @remove="remove(index)"
           >
-            {{ item.department }}
+            {{ item.column }}
           </q-chip>
         </div>
       </q-scroll-area>
@@ -59,7 +59,7 @@
 </template>
 <script>
 export default {
-  props: ["url", "searchParam", "columns"],
+  props: ["url", "searchParam", "columns", "title"],
   data() {
     return {
       pageOptions: [10, 15, 20, 25, 50, 0],

@@ -198,6 +198,7 @@
         url="/fundUse/getDepartmentOC"
         :searchParam="searchParam"
         :columns="common.dialog.columns"
+        title="科室"
     /></q-dialog>
   </q-page>
 </template>
@@ -314,9 +315,9 @@ export default {
               sortable: true
             },
             {
-              name: "department",
+              name: "column",
               label: "科室",
-              field: "department",
+              field: "column",
               sortable: true,
               align: "center"
             }
@@ -598,7 +599,7 @@ export default {
       this.common.dialog.showDialog = false;
       let temp = [];
       data.map(item => {
-        temp.push(item.department);
+        temp.push(item.column);
       });
       this.searchParam.departmentList = temp;
     },

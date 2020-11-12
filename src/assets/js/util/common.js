@@ -4,6 +4,24 @@ function getMonthLastDay(str) {
   let lastDay = new Date(year, month, 0).getDate();
   return year + month + lastDay;
 }
+//调用：accDiv(arg1,arg2)
+//返回值：arg1除以arg2的精确结果
+function accDiv(arg1, arg2) {
+  let t1 = 0,
+    t2 = 0,
+    r1,
+    r2;
+  try {
+    t1 = arg1.toString().split(".")[1].length;
+  } catch (e) {}
+  try {
+    t2 = arg2.toString().split(".")[1].length;
+  } catch (e) {}
+
+  r1 = Number(arg1.toString().replace(".", ""));
+  r2 = Number(arg2.toString().replace(".", ""));
+  return (r1 / r2) * Math.pow(2, t2 - t1);
+}
 //字符串转日期格式，strDate要转为日期格式的字符串
 function formatDate(strDate) {
   let year = strDate.substring(0, 4);
@@ -83,4 +101,11 @@ const pickerOptions = {
     }
   ]
 };
-export { getMonthLastDay, accAdd, formatDate, pickerOptions, shallowCopyObj };
+export {
+  getMonthLastDay,
+  accAdd,
+  accDiv,
+  formatDate,
+  pickerOptions,
+  shallowCopyObj
+};
