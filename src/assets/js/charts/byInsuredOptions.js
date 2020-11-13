@@ -1,23 +1,12 @@
 import { accAdd, accDiv, formatDate } from "../util/common";
-function setDiseaseChartOption(chartData, isDrillDown) {
-  let diseases = [];
+function setInsuredChartOption(chartData) {
+  let persons = [];
   let individualPay = [];
   let totalCost = [];
   let medicarePay = [];
   let title = {};
-  if (isDrillDown) {
-    title = {
-      text: chartData[0].disease + "费用详情",
-      left: "3%",
-      top: "1%"
-    };
-  }
   chartData.map(item => {
-    if (isDrillDown) {
-      diseases.push(item.chargingTime);
-    } else {
-      diseases.push(item.disease);
-    }
+    persons.push(item.person);
     individualPay.push(item.individualPay);
     totalCost.push(item.totalCost);
     medicarePay.push(item.medicarePay);
@@ -169,11 +158,48 @@ function setDiseaseChartOption(chartData, isDrillDown) {
     },
     xAxis: {
       type: "category",
-      data: diseases,
+      data: persons,
       axisLabel: {
-        // interval: 0,
-        rotate: 30
+        formatter: function(value, index) {
+          return value.substr(0, 4) + "...";
+        }
       }
+      //   隔行显示
+      //   axisLabel: {
+      //     // interval: 0,
+      //     formatter: function(value, index) {
+      //       if (index % 2 != 0) {
+      //         return "\n\n" + value;
+      //       } else {
+      //         return value;
+      //       }
+      //     }
+      //   }
+
+      //   换行显示
+      //   axisLabel: {
+      //     // interval: 0,
+      //     formatter: function(value) {
+      //       var ret = ""; //拼接加\n返回的类目项
+      //       var maxLength = 3; //每项显示文字个数
+      //       var valLength = value.length; //X轴类目项的文字个数
+      //       var rowN = Math.ceil(valLength / maxLength); //类目项需要换行的行数
+      //       if (rowN > 1) {
+      //         //如果类目项的文字大于3,
+      //         for (var i = 0; i < rowN; i++) {
+      //           var temp = ""; //每次截取的字符串
+      //           var start = i * maxLength; //开始截取的位置
+      //           var end = start + maxLength; //结束截取的位置
+      //           //这里也可以加一个是否是最后一行的判断，但是不加也没有影响，那就不加吧
+      //           temp = value.substring(start, end) + "\n";
+      //           ret += temp; //凭借最终的字符串
+      //         }
+      //         return ret;
+      //       } else {
+      //         return value;
+      //       }
+      //     }
+      //   }
     },
     yAxis: [
       {
@@ -243,14 +269,14 @@ function setDiseaseChartOption(chartData, isDrillDown) {
   };
   return Option;
 }
-function setDiseasePointChartOption(chartData, type, searchParam) {
+function setInsuredPointChartOption(chartData, type, searchParam) {
   let title = "";
   title +=
     formatDate(searchParam.chargingTime[0]) +
     "至" +
     formatDate(searchParam.chargingTime[1]);
-  if (!searchParam.showAllDis) title += " 部分疾病";
-  else title += " 疾病";
+  if (!searchParam.showAllPerson) title += " 部分参保人";
+  else title += " 参保人";
   if (type === "totalCost") {
     title += "总医疗费用";
   } else if (type === "individualPay") {
@@ -339,7 +365,7 @@ function setDiseasePointChartOption(chartData, type, searchParam) {
     //   max = item[type];
     // }
     let temp = {};
-    temp.name = item.disease;
+    temp.name = item.person;
     temp.value = item[type];
     temp.draggable = true;
     temp.itemStyle = {
@@ -358,7 +384,6 @@ function setDiseasePointChartOption(chartData, type, searchParam) {
     // else if (item.symbolSize >= 10 && item.symbolSize <= 20)
     //   item.symbolSize = 30;
   });
-  console.log(data);
   let option = {
     // 图表标题
     title: {
@@ -431,5 +456,4 @@ function setDiseasePointChartOption(chartData, type, searchParam) {
   };
   return option;
 }
-
-export { setDiseaseChartOption, setDiseasePointChartOption };
+export { setInsuredChartOption, setInsuredPointChartOption };

@@ -256,6 +256,12 @@ export default {
             text: "按年龄分析",
             select: false,
             url: "/foundation/by_ageGroup"
+          },
+          {
+            icon: "icon-tubiaozhizuomoban_canbaorenshenfenleibie",
+            text: "按参保人分析",
+            select: false,
+            url: "/foundation/by_insured"
           }
         ]
       },

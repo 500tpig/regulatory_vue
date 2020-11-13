@@ -44,6 +44,11 @@ const routes = [
         path: "/foundation/by_ageGroup",
         meta: { requireAuth: true },
         component: () => import("pages/Foundation/byAgeGroup")
+      },
+      {
+        path: "/foundation/by_insured",
+        meta: { requireAuth: true },
+        component: () => import("pages/Foundation/byInsured")
       }
     ]
   },
