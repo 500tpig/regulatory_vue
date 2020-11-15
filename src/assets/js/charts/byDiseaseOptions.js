@@ -358,7 +358,6 @@ function setDiseasePointChartOption(chartData, type, searchParam) {
     // else if (item.symbolSize >= 10 && item.symbolSize <= 20)
     //   item.symbolSize = 30;
   });
-  console.log(data);
   let option = {
     // 图表标题
     title: {

@@ -175,7 +175,24 @@
             flat
             bordered
             :visible-columns="common.byDepartmentTable.visibleColumns"
-          />
+            :filter="common.byDepartmentTable.filter1"
+          >
+            <template v-slot:top-right>
+              <q-input
+                borderless
+                dense
+                debounce="300"
+                v-model="common.byDepartmentTable.filter1"
+                placeholder="Search"
+                :input-style="{ padding: '8px' }"
+                bg-color="white"
+              >
+                <template v-slot:append>
+                  <q-icon name="search" />
+                </template>
+              </q-input>
+            </template>
+          </q-table>
         </div>
         <div class=" col-6">
           <q-table
@@ -188,7 +205,23 @@
             flat
             bordered
             :visible-columns="common.byDepartmentTable.visibleColumns"
-          />
+            :filter="common.byDepartmentTable.filter2"
+          >
+            <template v-slot:top-right>
+              <q-input
+                borderless
+                dense
+                debounce="300"
+                v-model="common.byDepartmentTable.filter2"
+                placeholder="Search"
+                :input-style="{ padding: '8px' }"
+                bg-color="white"
+              >
+                <template v-slot:append>
+                  <q-icon name="search" />
+                </template>
+              </q-input> </template
+          ></q-table>
         </div>
       </div>
     </page-base-scroll>
@@ -239,6 +272,8 @@ export default {
         isInitialize: true,
         expanded: [true, true],
         byDepartmentTable: {
+          filter1: "",
+          filter2: "",
           visibleColumns: [
             "index",
             "department",
@@ -642,8 +677,8 @@ export default {
   /* height or max-height is important */
   height: 400px !important
 
-  .q-table__middle::-webkit-scrollbar
-    display: none
+  // .q-table__middle::-webkit-scrollbar
+  //   display: none
 
   .q-table__title
     font-size: 20px

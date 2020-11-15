@@ -189,7 +189,23 @@
             row-key="index"
             flat
             bordered
-          />
+            :filter="common.byInsuredTable.filter1"
+          >
+            <template v-slot:top-right>
+              <q-input
+                borderless
+                dense
+                debounce="300"
+                v-model="common.byInsuredTable.filter1"
+                placeholder="Search"
+                :input-style="{ padding: '8px' }"
+                bg-color="white"
+              >
+                <template v-slot:append>
+                  <q-icon name="search" />
+                </template>
+              </q-input> </template
+          ></q-table>
         </div>
         <div class=" col-6">
           <q-table
@@ -201,7 +217,23 @@
             row-key="index"
             flat
             bordered
-          />
+            :filter="common.byInsuredTable.filter2"
+          >
+            <template v-slot:top-right>
+              <q-input
+                borderless
+                dense
+                debounce="300"
+                v-model="common.byInsuredTable.filter2"
+                placeholder="Search"
+                :input-style="{ padding: '8px' }"
+                bg-color="white"
+              >
+                <template v-slot:append>
+                  <q-icon name="search" />
+                </template>
+              </q-input> </template
+          ></q-table>
         </div>
       </div>
     </page-base-scroll>
@@ -255,6 +287,8 @@ export default {
           { label: "个人支付费用", value: "individualPay" }
         ],
         byInsuredTable: {
+          filter1: "",
+          filter2: "",
           visibleColumns: [
             "index",
             "department",
@@ -277,7 +311,7 @@ export default {
               field: "person",
               sortable: true,
               align: "center",
-              format: val => `${val}` + `元`
+              format: val => `${val}`
             },
             {
               name: "individualPay",
@@ -405,7 +439,6 @@ export default {
     // 处理请求后的结果
     afterHttp(optionData, tableDataObj) {
       let histogramOption = setInsuredChartOption(optionData);
-      console.log(22);
       this.drawChart(histogramOption, "byInsuredHistogram");
 
       let pointOption = setInsuredPointChartOption(
@@ -518,8 +551,8 @@ export default {
   /* height or max-height is important */
   height: 400px !important
 
-  .q-table__middle::-webkit-scrollbar
-    display: none
+  // .q-table__middle::-webkit-scrollbar
+  //   display: none
 
   .q-table__title
     font-size: 20px

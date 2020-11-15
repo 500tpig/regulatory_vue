@@ -88,7 +88,23 @@
           row-key="index"
           flat
           bordered
-        />
+          :filter="byTimeTable.filter1"
+        >
+          <template v-slot:top-right>
+            <q-input
+              borderless
+              dense
+              debounce="300"
+              v-model="byTimeTable.filter1"
+              placeholder="Search"
+              :input-style="{ padding: '8px' }"
+              bg-color="white"
+            >
+              <template v-slot:append>
+                <q-icon name="search" />
+              </template>
+            </q-input> </template
+        ></q-table>
         <q-table
           class="byTimeTable shadow-2 col-5 q-ml-md"
           :title="HCTableData.title"
@@ -97,7 +113,23 @@
           row-key="index"
           flat
           bordered
-        />
+          :filter="byTimeTable.filter2"
+        >
+          <template v-slot:top-right>
+            <q-input
+              borderless
+              dense
+              debounce="300"
+              v-model="byTimeTable.filter2"
+              placeholder="Search"
+              :input-style="{ padding: '8px' }"
+              bg-color="white"
+            >
+              <template v-slot:append>
+                <q-icon name="search" />
+              </template>
+            </q-input> </template
+        ></q-table>
       </div>
     </page-base-scroll>
   </q-page>
@@ -134,6 +166,8 @@ export default {
       OCTableData: { title: "门诊费用详情表", data: [] },
       HCTableData: { title: "住院费用详情表", data: [] },
       byTimeTable: {
+        filter1: "",
+        filter2: "",
         columns: [
           {
             name: "index",
@@ -435,8 +469,8 @@ export default {
   /* height or max-height is important */
   height: 400px
 
-  .q-table__middle::-webkit-scrollbar
-    display: none
+  // .q-table__middle::-webkit-scrollbar
+  //   display: none
 
   .q-table__title
     font-size: 20px
