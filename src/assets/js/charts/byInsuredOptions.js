@@ -1,4 +1,4 @@
-import { accAdd, accDiv, formatDate } from "../util/common";
+import { accAdd, calculate, formatDate } from "../util/common";
 function setInsuredChartOption(chartData) {
   let persons = [];
   let individualPay = [];
@@ -379,10 +379,7 @@ function setInsuredPointChartOption(chartData, type, searchParam) {
     count++;
   });
   data.map(item => {
-    item.symbolSize = accDiv(item.value, total) * 1500;
-    // if (item.symbolSize <= 10) item.symbolSize = 20;
-    // else if (item.symbolSize >= 10 && item.symbolSize <= 20)
-    //   item.symbolSize = 30;
+    item.symbolSize = calculate.Div(item.value, total, 4) * 1200;
   });
   let option = {
     // 图表标题
