@@ -14,6 +14,10 @@ const http = axios.create({
 // http request 拦截器
 http.interceptors.request.use(
   config => {
+    let token = sessionStorage.getItem("token");
+    if (token) {
+      config.headers["u-token"] = token;
+    }
     Loading.show({
       spinner: QSpinnerGears,
       spinnerColor: "primary",
