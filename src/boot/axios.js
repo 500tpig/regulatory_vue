@@ -7,6 +7,8 @@ import {
   //使用的自定义旋转器
   QSpinnerGears
 } from "quasar";
+import Router from "../router/index";
+import Store from "../store/index";
 const http = axios.create({
   baseURL: "http://localhost:8090",
   timeout: 100000
@@ -32,16 +34,33 @@ http.interceptors.request.use(
 );
 //  响应拦截
 http.interceptors.response.use(
-  function(response) {
-    // Any status code that lie within the range of 2xx cause this function to trigger
-    // Do something with response data
-    setTimeout(() => {
-      Loading.hide();
-    }, 600);
-    return response;
+  data => {
+    Loading.hide();
+    if (data.data.status === false) {
+      let st = Store();
+      let rt = Router(); // router/index.js 提供工厂函数，这里需要实例化它才能用
+      if (data.data.code === "4301") {
+        if (st.state.user.isLogin) {
+          Notify.create({
+            color: "negative",
+            message: data.data.msg
+          });
+        }
+        rt.push("/login").catch(e => {});
+        st.dispatch("user/userLogout");
+        return;
+      }
+      Notify.create({
+        color: "negative",
+        message: data.data.msg
+      });
+      return;
+    }
+    return data;
   },
-  function(error) {
+  error => {
     let errMsg = "未知错误";
+    console.log(11);
     if (error && error.response && error.response.status) {
       let errCode = error.response.status;
       if (errCode === 401) {
@@ -50,15 +69,13 @@ http.interceptors.response.use(
         errMsg = error.response.data.msg;
       }
     }
-    setTimeout(() => {
-      Loading.hide();
-    }, 600);
+    Loading.hide();
     Notify.create({
       color: "negative",
       message: errMsg
     });
-
-    return Promise.reject(error);
+    Loading.hide();
+    return Promise.resolve(error);
   }
 );
 
