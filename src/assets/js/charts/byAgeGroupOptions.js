@@ -1,4 +1,4 @@
-import { accAdd, calculate } from "../util/common";
+import { accAdd, calculate, formatDate } from "../util/common";
 import "assets/js/util/lodash";
 function setAgeGroupChartOption(chartData, isDrillDown) {
   let ageGroups = [];
@@ -233,7 +233,24 @@ function setAgeGroupChartOption(chartData, isDrillDown) {
   };
   return Option;
 }
-function setAgeGroupDoubleHistogramOption(doubleHistogramData, type) {
+function setAgeGroupDoubleHistogramOption(
+  doubleHistogramData,
+  type,
+  searchParam
+) {
+  let title = "";
+  title +=
+    formatDate(searchParam.chargingTime[0]) +
+    " 至 " +
+    formatDate(searchParam.chargingTime[1]) +
+    " 门诊科室年龄";
+  if (type === "totalCost") {
+    title += "总医疗费用";
+  } else if (type === "individualPay") {
+    title += "个人支付费用";
+  } else {
+    title += "医保支付费用";
+  }
   let data = {
     OC: {
       name: "门诊",
@@ -267,12 +284,60 @@ function setAgeGroupDoubleHistogramOption(doubleHistogramData, type) {
     });
   });
 
-  let top = 0;
+  let top = 30;
   let bottom = 60;
 
   yAxisData = [...yAxisData];
 
   let option = {
+    title: {
+      show: true, //显示策略，默认值true,可选为：true（显示） | false（隐藏）
+      text: title, //主标题文本，'\n'指定换行
+      x: "center", // 水平安放位置，默认为左对齐，可选为：
+      // 'center' ¦ 'left' ¦ 'right'
+      // ¦ {number}（x坐标，单位px）
+      y: "top", // 垂直安放位置，默认为全图顶端，可选为：
+      // 'top' ¦ 'bottom' ¦ 'center'
+      // ¦ {number}（y坐标，单位px）
+      //textAlign: null          // 水平对齐方式，默认根据x设置自动调整
+      backgroundColor: "rgba(0,0,0,0)",
+      borderColor: "#ccc", // 标题边框颜色
+      borderWidth: 0, // 标题边框线宽，单位px，默认为0（无边框）
+      padding: 5, // 标题内边距，单位px，默认各方向内边距为5，
+      // 接受数组分别设定上右下左边距，同css
+      itemGap: 10, // 主副标题纵向间隔，单位px，默认为10，
+      textStyle: {
+        fontSize: 18,
+        fontWeight: "bolder",
+        color: "#333" // 主标题文字颜色
+      },
+      subtextStyle: {
+        color: "#aaa" // 副标题文字颜色
+      }
+    },
+    toolbox: {
+      //可视化的工具箱
+      show: true,
+      right: "5%",
+      top: "0%",
+      feature: {
+        restore: {
+          //重置
+          show: true
+        },
+        saveAsImage: {
+          //保存图片
+          show: true
+        },
+        dataZoom: {
+          show: true
+        },
+        magicType: {
+          //动态类型切换
+          type: ["bar", "line"]
+        }
+      }
+    },
     tooltip: {
       show: true,
       trigger: "axis",
@@ -286,6 +351,16 @@ function setAgeGroupDoubleHistogramOption(doubleHistogramData, type) {
           "金额：" +
           parms[0].value +
           "元</br>";
+        if (parms[0].seriesName === "门诊")
+          str +=
+            "占比：" +
+            calculate.Mul(calculate.Div(parms[0].value, sum.OC), 100, 2) +
+            "%";
+        else
+          str +=
+            "占比：" +
+            calculate.Mul(calculate.Div(parms[0].value, sum.HC), 100, 2) +
+            "%";
         return str;
       },
       axisPointer: {
@@ -307,8 +382,8 @@ function setAgeGroupDoubleHistogramOption(doubleHistogramData, type) {
     },
     grid: [
       {
-        left: "10%",
-        width: "30%",
+        left: "8%",
+        width: "32%",
         containLabel: true,
         bottom
       },
@@ -318,8 +393,8 @@ function setAgeGroupDoubleHistogramOption(doubleHistogramData, type) {
         bottom: bottom + 16
       },
       {
-        right: "10%",
-        width: "30%",
+        right: "8%",
+        width: "32%",
         containLabel: true,
         bottom
       }
