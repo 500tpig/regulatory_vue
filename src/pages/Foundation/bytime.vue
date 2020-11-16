@@ -89,6 +89,7 @@
           flat
           bordered
           :filter="byTimeTable.filter1"
+          :rows-per-page-options="[10, 20, 30, 50, 100]"
         >
           <template v-slot:top-right>
             <q-input
@@ -114,6 +115,7 @@
           flat
           bordered
           :filter="byTimeTable.filter2"
+          :rows-per-page-options="[10, 20, 30, 50, 100]"
         >
           <template v-slot:top-right>
             <q-input
@@ -467,7 +469,7 @@ export default {
 <style lang="sass">
 .byTimeTable
   /* height or max-height is important */
-  height: 400px
+  height: 450px
 
   // .q-table__middle::-webkit-scrollbar
   //   display: none

@@ -176,6 +176,7 @@
             bordered
             :visible-columns="common.byDepartmentTable.visibleColumns"
             :filter="common.byDepartmentTable.filter1"
+            :rows-per-page-options="[10, 20, 30, 50, 100]"
           >
             <template v-slot:top-right>
               <q-input
@@ -206,6 +207,7 @@
             bordered
             :visible-columns="common.byDepartmentTable.visibleColumns"
             :filter="common.byDepartmentTable.filter2"
+            :rows-per-page-options="[10, 20, 30, 50, 100]"
           >
             <template v-slot:top-right>
               <q-input
@@ -675,7 +677,7 @@ export default {
 <style lang="sass">
 .byDepartmentTable
   /* height or max-height is important */
-  height: 400px !important
+  height: 450px !important
 
   // .q-table__middle::-webkit-scrollbar
   //   display: none

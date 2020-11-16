@@ -160,8 +160,8 @@
       </div>
       <div class="row justify-center">
         <div class="col-9">
-          <q-card class="q-mt-lg q-px-md q-pt-md"
-            ><div>
+          <q-card class="q-mt-lg q-px-md q-pt-md">
+            <div>
               <q-select
                 filled
                 v-model="common.model"
@@ -190,6 +190,7 @@
             flat
             bordered
             :filter="common.byInsuredTable.filter1"
+            :rows-per-page-options="[10, 20, 30, 50, 100]"
           >
             <template v-slot:top-right>
               <q-input
@@ -218,6 +219,7 @@
             flat
             bordered
             :filter="common.byInsuredTable.filter2"
+            :rows-per-page-options="[10, 20, 30, 50, 100]"
           >
             <template v-slot:top-right>
               <q-input
@@ -549,7 +551,7 @@ export default {
 <style lang="sass">
 .byInsuredTable
   /* height or max-height is important */
-  height: 400px !important
+  height: 450px !important
 
   // .q-table__middle::-webkit-scrollbar
   //   display: none
