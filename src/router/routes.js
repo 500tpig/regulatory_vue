@@ -49,6 +49,11 @@ const routes = [
         path: "/foundation/by_insured",
         meta: { requireAuth: true },
         component: () => import("pages/Foundation/byInsured")
+      },
+      {
+        path: "/portrait",
+        meta: { requireAuth: true },
+        component: () => import("pages/Portrait/portrait")
       }
     ]
   },

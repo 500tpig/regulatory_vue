@@ -10,6 +10,7 @@ import {
 import Router from "../router/index";
 import Store from "../store/index";
 const http = axios.create({
+  // baseURL: "http://47.101.144.184:8090",
   baseURL: "http://localhost:8090",
   timeout: 100000
 });
@@ -40,7 +41,7 @@ http.interceptors.response.use(
       let st = Store();
       let rt = Router(); // router/index.js 提供工厂函数，这里需要实例化它才能用
       if (data.data.code === "4301") {
-        if (st.state.user.isLogin) {
+        if (sessionStorage.getItem("token") !== null) {
           Notify.create({
             color: "negative",
             message: data.data.msg

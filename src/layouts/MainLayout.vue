@@ -138,6 +138,27 @@
           </q-expansion-item>
           <!--  -->
           <!-- 下拉 -->
+          <q-item
+            class="GNL__drawer-item q-my-sm"
+            v-ripple
+            v-for="link in drawers.portrait"
+            :key="link.text"
+            clickable
+            :class="{ selectItem: link.select }"
+            @click="toPage(drawers.portrait, 0)"
+          >
+            <q-item-section avatar>
+              <q-icon
+                :class="{ 'text-white': link.select }"
+                :name="link.icon"
+              />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label :class="{ 'text-white': link.select }">{{
+                link.text
+              }}</q-item-label>
+            </q-item-section>
+          </q-item>
           <div class="q-mt-md">
             <div class="flex flex-center q-gutter-xs">
               <a
@@ -263,6 +284,14 @@ export default {
             select: false,
             url: "/foundation/by_insured"
           }
+        ],
+        portrait: [
+          {
+            icon: "icon-huaxiangduibifenxi",
+            text: "参保人画像",
+            url: "/portrait",
+            select: false
+          }
         ]
       },
       titleIcon: require("../../public/icons/HFRS-256x256.png"),
@@ -280,6 +309,9 @@ export default {
     let that = this;
     if (currentPath === "/home") {
       this.drawers.homeDrawer[0].select = true;
+    }
+    if (currentPath === "/portrait") {
+      this.drawers.portrait[0].select = true;
     }
     if (currentPath.startsWith("/foundation")) {
       this.expanded[0] = true;
@@ -333,16 +365,23 @@ export default {
           icon: "home"
         }
       ];
-      this.breadcrumbs.push(
-        {
+      if (arr.length > 1) {
+        this.breadcrumbs.push(
+          {
+            label: arr[0].text,
+            icon: arr[0].icon
+          },
+          {
+            label: arr[index].text,
+            icon: arr[index].icon
+          }
+        );
+      } else {
+        this.breadcrumbs.push({
           label: arr[0].text,
           icon: arr[0].icon
-        },
-        {
-          label: arr[index].text,
-          icon: arr[index].icon
-        }
-      );
+        });
+      }
       this.$router.push(arr[index].url).catch(err => {
         console.log("输出报错", err);
       });

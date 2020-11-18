@@ -56,6 +56,7 @@
               @click="simulateProgress"
               label="登录"
             />
+            <span class="forgetPassword">忘记密码？</span>
           </form>
         </div>
         <!-- 登录 -->
@@ -193,7 +194,7 @@ export default {
       isPassing: true,
       user: {
         userName: "admin",
-        password: "admin",
+        password: "Zstp@123456",
         email: ""
       },
       register: {
@@ -225,6 +226,9 @@ export default {
               });
               this.$router.push("/home");
             }, 1500);
+          } else {
+            this.submitting = false;
+            this[`loading${number}`] = false;
           }
         })
         .catch(() => {
@@ -438,7 +442,11 @@ export default {
   border: none;
   outline: none;
 }
-
+.forgetPassword {
+  margin-top: 20px;
+  text-decoration: underline;
+  font-size: 14px;
+}
 /**/
 .a-container {
   z-index: 100;
