@@ -10,7 +10,8 @@ function formatDate(strDate) {
   let month = strDate.substring(4, 6);
   let day = "";
   if (strDate.length > 6) day = strDate.substring(6, 8);
-  return year + "-" + month + "-" + day;
+  if (strDate.length === 6) return year + "-" + month;
+  else return year + "-" + month + "-" + day;
 }
 function shallowCopyObj(originalObj, targetObj) {
   for (let key in originalObj) {
@@ -83,6 +84,7 @@ const pickerOptions = {
     }
   ]
 };
+// js小数相加减乘除
 const calculate = {
   /*
         函数，加法函数，用来得到精确的加法结果 
@@ -160,11 +162,117 @@ const calculate = {
       : Number(resultVal.toFixed(parseInt(d)));
   }
 };
+// 将民族对应码转化为文字
+function Nation(key) {
+  let name = new Array(
+    "汉族",
+    "蒙古族",
+    "回族",
+    "藏族",
+    "维吾尔族",
+    "苗族",
+    "彝族",
+    "壮族",
+    "布依族",
+    "朝鲜族",
+    "满族",
+    "侗族",
+    "瑶族",
+    "白族",
+    "土家族",
+    "哈尼族",
+    "哈萨克族",
+    "傣族",
+    "黎族",
+    "傈僳族",
+    "佤族",
+    "畲族",
+    "高山族",
+    "拉祜族",
+    "水族",
+    "东乡族",
+    "纳西族",
+    "景颇族",
+    "柯尔克孜族",
+    "土族",
+    "达斡尔族",
+    "仫佬族",
+    "羌族",
+    "布朗族",
+    "撒拉族",
+    "毛南族",
+    "仡佬族",
+    "锡伯族",
+    "阿昌族",
+    "普米族",
+    "塔吉克族",
+    "怒族",
+    "乌孜别克族",
+    "俄罗斯族",
+    "鄂温克族",
+    "德昂族",
+    "保安族",
+    "裕固族",
+    "京族",
+    "塔塔尔族",
+    "独龙族",
+    "鄂伦春族",
+    "赫哲族",
+    "门巴族",
+    "珞巴族",
+    "基诺族",
+    "其他",
+    "外国血统"
+  );
+  return name[parseInt(key) - 1];
+}
+/*根据出生日期算出年龄*/
+function jsGetAge(strBirthday) {
+  var returnAge;
+  var strBirthdayArr = strBirthday.split("-");
+  var birthYear = strBirthdayArr[0];
+  var birthMonth = strBirthdayArr[1];
+  var birthDay = strBirthdayArr[2];
+
+  let d = new Date();
+  var nowYear = d.getFullYear();
+  var nowMonth = d.getMonth() + 1;
+  var nowDay = d.getDate();
+
+  if (nowYear == birthYear) {
+    returnAge = 0; //同年 则为0岁
+  } else {
+    var ageDiff = nowYear - birthYear; //年之差
+    if (ageDiff > 0) {
+      if (nowMonth == birthMonth) {
+        var dayDiff = nowDay - birthDay; //日之差
+        if (dayDiff < 0) {
+          returnAge = ageDiff - 1;
+        } else {
+          returnAge = ageDiff;
+        }
+      } else {
+        var monthDiff = nowMonth - birthMonth; //月之差
+        if (monthDiff < 0) {
+          returnAge = ageDiff - 1;
+        } else {
+          returnAge = ageDiff;
+        }
+      }
+    } else {
+      returnAge = -1; //返回-1 表示出生日期输入错误 晚于今天
+    }
+  }
+
+  return returnAge; //返回周岁年龄
+}
 export {
   getMonthLastDay,
   accAdd,
   formatDate,
   pickerOptions,
   shallowCopyObj,
-  calculate
+  calculate,
+  Nation,
+  jsGetAge
 };

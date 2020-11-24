@@ -1,32 +1,22 @@
-import { accAdd } from "../util/common";
-function setbyTimeChartOption(chartData, title) {
-  let chargingTime = [];
+import { formatDate, calculate } from "../util/common";
+function setPortraitMonthlyOption(chartData) {
+  let month = [];
   let individualPay = [];
   let totalCost = [];
   let medicarePay = [];
-  let interval = 0;
+  let title = {};
   chartData.map(item => {
-    let dateStr =
-      item.chargingTime.slice(0, 4) + "-" + item.chargingTime.slice(4);
-    if (dateStr.length >= 8) {
-      interval = 3;
-      dateStr = dateStr.slice(0, 7) + "-" + dateStr.slice(7, 9);
-    }
-    chargingTime.push(dateStr);
+    month.push(formatDate(item.month));
     individualPay.push(item.individualPay);
     totalCost.push(item.totalCost);
     medicarePay.push(item.medicarePay);
   });
-  let byTimeOption = {
-    title: {
-      text: title,
-      left: "5%",
-      top: "1%"
-    },
+  let Option = {
+    title: title,
     toolbox: {
       //可视化的工具箱
       show: true,
-      right: "15%",
+      right: "5%",
       top: "2%",
       feature: {
         dataView: {
@@ -84,17 +74,6 @@ function setbyTimeChartOption(chartData, title) {
           display: "<span>ƒ</span> (params)"
         }
       },
-      axisPointer: {
-        label: {
-          type: "cross",
-          show: true,
-          backgroundColor: "#fff",
-          color: "#556677",
-          borderColor: "rgba(0,0,0,0)",
-          shadowColor: "rgba(0,0,0,0)",
-          shadowOffsetY: 0
-        }
-      },
       backgroundColor: "#fff",
       textStyle: {
         color: "#5c6c7c"
@@ -103,7 +82,7 @@ function setbyTimeChartOption(chartData, title) {
       extraCssText: "box-shadow: 1px 0 2px 0 rgba(163,163,163,0.5)"
     },
     grid: {
-      top: "12%",
+      top: "10%",
       bottom: "18%"
       // x: 40,
       // y: 40,
@@ -116,7 +95,7 @@ function setbyTimeChartOption(chartData, title) {
         start: 0,
         end: 100,
         handleSize: "100%",
-        bottom: "5%",
+        bottom: "4%",
         // left: "14%",
         // right: "30%",
         handleIcon: "M0,0 v9.7h5 v-9.7h-5 Z",
@@ -175,79 +154,14 @@ function setbyTimeChartOption(chartData, title) {
     legend: {
       data: ["个人支付", "医保支付", "医疗总费用"],
       x: "center",
-      top: "5%"
+      top: 10
     },
     xAxis: {
       type: "category",
-      data: chargingTime,
-      axisLine: {
-        lineStyle: {
-          color: "#DCE2E8"
-        }
-      },
-      axisTick: {
-        show: false
-      },
+      data: month,
       axisLabel: {
-        interval: interval,
-        textStyle: {
-          color: "#556677"
-        },
-        // 默认x轴字体大小
-        fontSize: 12,
-        // margin:文字到x轴的距离
-        margin: 15
-      },
-      axisPointer: {
-        label: {
-          color: "#018DA7",
-          fontWeight: "bold",
-          // padding: [11, 5, 7],
-          padding: [0, 0, 10, 0],
-          /*
-    除了padding[0]建议必须是0之外，其他三项可随意设置
-    和CSSpadding相同，[上，右，下，左]
-    如果需要下边线超出文字，设左右padding即可，注：左右padding最好相同
-    padding[2]的10:
-    10 = 文字距下边线的距离 + 下边线的宽度
-    如：UI图中文字距下边线距离为7 下边线宽度为2
-    则padding: [0, 0, 9, 0]
-                */
-          // 这里的margin和axisLabel的margin要一致!
-          margin: 15,
-          // 移入时的字体大小
-          fontSize: 12,
-          backgroundColor: {
-            type: "linear",
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
-            colorStops: [
-              {
-                offset: 0,
-                color: "#fff" // 0% 处的颜色
-              },
-              {
-                // offset: 0.9,
-                offset: 0.86,
-                /*
-                    0.86 = （文字 + 文字距下边线的距离）/（文字 + 文字距下边线的距离 + 下边线的宽度）   
-                    */
-                color: "#fff" // 0% 处的颜色
-              },
-              {
-                offset: 0.86,
-                color: "#33c0cd" // 0% 处的颜色
-              },
-              {
-                offset: 1,
-                color: "#33c0cd" // 100% 处的颜色
-              }
-            ],
-            global: false // 缺省为 false
-          }
-        }
+        // interval: 0,
+        rotate: 30
       }
     },
     yAxis: [
@@ -258,7 +172,7 @@ function setbyTimeChartOption(chartData, title) {
           formatter: function(value, index) {
             if (value > 100000000)
               return (value / 100000000).toFixed(2) + "亿元";
-            else if (value >= 10000) return value / 10000 + "万元";
+            else if (value > 10000) return value / 10000 + "万元";
             return value.toFixed(2) + "元";
           }
         }
@@ -316,16 +230,16 @@ function setbyTimeChartOption(chartData, title) {
       }
     ]
   };
-  return byTimeOption;
+  return Option;
 }
-function setbyTimePieChartOption(chartData, month) {
+function setProportionOfMedicalOption(chartData) {
   let totalCost = 0;
   let medicarePay = 0;
   let individualPay = 0;
   chartData.map(item => {
-    totalCost = accAdd(totalCost, item.totalCost);
-    medicarePay = accAdd(medicarePay, item.medicarePay);
-    individualPay = accAdd(individualPay, item.individualPay);
+    totalCost = calculate.Add(totalCost, item.totalCost);
+    medicarePay = calculate.Add(medicarePay, item.medicarePay);
+    individualPay = calculate.Add(individualPay, item.individualPay);
   });
   let color = ["#61C378", "#7367F0"];
 
@@ -461,18 +375,18 @@ function setbyTimePieChartOption(chartData, month) {
   };
   return option;
 }
-function setbyTimeRingChartOption(chartData, month) {
+function setPortraitRingChartOption(chartData, month) {
   let OC = { individualPay: 0, totalCost: 0, medicarePay: 0 };
   let HC = { individualPay: 0, totalCost: 0, medicarePay: 0 };
   chartData.OC.map(item => {
-    OC.totalCost = accAdd(OC.totalCost, item.totalCost);
-    OC.medicarePay = accAdd(OC.medicarePay, item.medicarePay);
-    OC.individualPay = accAdd(OC.individualPay, item.individualPay);
+    OC.totalCost = calculate.Add(OC.totalCost, item.totalCost);
+    OC.medicarePay = calculate.Add(OC.medicarePay, item.medicarePay);
+    OC.individualPay = calculate.Add(OC.individualPay, item.individualPay);
   });
   chartData.HC.map(item => {
-    HC.totalCost = accAdd(HC.totalCost, item.totalCost);
-    HC.medicarePay = accAdd(HC.medicarePay, item.medicarePay);
-    HC.individualPay = accAdd(HC.individualPay, item.individualPay);
+    HC.totalCost = calculate.Add(HC.totalCost, item.totalCost);
+    HC.medicarePay = calculate.Add(HC.medicarePay, item.medicarePay);
+    HC.individualPay = calculate.Add(HC.individualPay, item.individualPay);
   });
   let echartData = {
     inner: [
@@ -511,11 +425,11 @@ function setbyTimeRingChartOption(chartData, month) {
     ]
   };
   let option = {
-    title: {
-      text: month + "占比情况",
-      bottom: "1%",
-      x: "center"
-    },
+    // title: {
+    //   text: month + "占比情况",
+    //   bottom: "1%",
+    //   x: "center"
+    // },
     toolbox: {
       //可视化的工具箱
       show: true,
@@ -534,10 +448,10 @@ function setbyTimeRingChartOption(chartData, month) {
     },
     legend: {
       type: "scroll",
-      orient: "vertical",
-      left: "2%",
+      // orient: "vertical",
+      left: "center",
       align: "auto",
-      top: "middle",
+      top: "bottom",
       data: [
         "门诊收费",
         "住院收费",
@@ -647,7 +561,7 @@ function setbyTimeRingChartOption(chartData, month) {
   return option;
 }
 export {
-  setbyTimeChartOption,
-  setbyTimePieChartOption,
-  setbyTimeRingChartOption
+  setPortraitMonthlyOption,
+  setProportionOfMedicalOption,
+  setPortraitRingChartOption
 };

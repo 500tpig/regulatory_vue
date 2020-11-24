@@ -8,6 +8,7 @@
     @success="onSuccess"
     @fail="onFail"
     @refresh="onRefresh"
+    :imgs="images"
   ></slide-verify>
 </template>
 
@@ -17,7 +18,7 @@ export default {
   data() {
     return {
       msg: "",
-      images: []
+      images: [require("assets/image/pp.png")]
     };
   },
   methods: {

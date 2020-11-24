@@ -11,9 +11,7 @@ export default {
   components: { pageBaseScroll: pageBaseScroll },
 
   data() {
-    return {
-      image: require("assets/image/1.png")
-    };
+    return {};
   }
 };
 </script>
