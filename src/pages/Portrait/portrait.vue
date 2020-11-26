@@ -139,10 +139,19 @@
       </div>
       <div class="row">
         <q-card class=" q-pa-md row q-mx-lg" id="portraitMonthly"> </q-card>
-        <div class="row" style="width: 46%;">
+        <div class="row" style="width: 45.4%;">
           <q-card class=" q-pa-md row" id="proportionOfMedical"> </q-card>
           <q-card class=" q-mt-md q-pa-md row" id="portraitRingChart"> </q-card>
         </div>
+      </div>
+      <div class="row q-pt-md">
+        <q-card
+          class="row q-px-md q-mx-lg text-primary col-6 items-center"
+          id="portraitNumberOfDepartments"
+        >
+        </q-card>
+        <q-card class="row" id="departmentsCost" style="width: 45.4%;">
+        </q-card>
       </div>
     </page-base-scroll>
   </q-page>
@@ -161,7 +170,9 @@ import { EleResize } from "assets/js/util/esresize";
 import {
   setPortraitMonthlyOption,
   setProportionOfMedicalOption,
-  setPortraitRingChartOption
+  setPortraitRingChartOption,
+  setPortraitNumberOfDepartmentsOption,
+  setDepartmentRingOption
 } from "assets/js/charts/portraitOptions";
 export default {
   components: { pageBaseScroll: pageBaseScroll },
@@ -227,9 +238,30 @@ export default {
           }
         })
         .catch(e => {});
-      this.afterHttp(optionData);
+
+      let numberOfDepartments = [];
+      await this.$http
+        .post("/person/PortraitNumberOfDepartments", param)
+        .then(res => {
+          if (res.status === 200) {
+            numberOfDepartments = res.data.data;
+          }
+        })
+        .catch(e => {});
+
+      let departmentCostData = [];
+      await this.$http
+        .post("/person/PortraitByDepartment", param)
+        .then(res => {
+          if (res.status === 200) {
+            departmentCostData = res.data.data;
+          }
+        })
+        .catch(e => {});
+
+      this.afterHttp(optionData, numberOfDepartments, departmentCostData);
     },
-    afterHttp(optionData) {
+    afterHttp(optionData, numberOfDepartments, departmentCostData) {
       let histogramOption = setPortraitMonthlyOption(
         optionData[this.searchParam.type]
       );
@@ -239,9 +271,20 @@ export default {
         optionData[this.searchParam.type]
       );
       this.drawChart(proportionOfMedicalOption, "proportionOfMedical");
-
       let portraitRingChartOption = setPortraitRingChartOption(optionData);
       this.drawChart(portraitRingChartOption, "portraitRingChart");
+      let portraitNumberOfDepartmentsOption = setPortraitNumberOfDepartmentsOption(
+        numberOfDepartments[this.searchParam.type]
+      );
+      this.drawChart(
+        portraitNumberOfDepartmentsOption,
+        "portraitNumberOfDepartments"
+      );
+      let departmentRingOption = setDepartmentRingOption(
+        departmentCostData[this.searchParam.type],
+        this.searchParam.type
+      );
+      this.drawChart(departmentRingOption, "departmentsCost");
     },
     // 画图表
     drawChart(option, id) {
@@ -262,11 +305,21 @@ export default {
         let portraitRingChart = this.$echarts.init(
           document.getElementById("portraitRingChart")
         );
+        let portraitNumberOfDepartmentsChart = this.$echarts.init(
+          document.getElementById("portraitNumberOfDepartments")
+        );
+
+        let departmentsCostChart = this.$echarts.init(
+          document.getElementById("departmentsCost")
+        );
+
         let histogramDiv = document.getElementById("portraitMonthly");
         let linstener = function() {
           histogram.resize();
           proportionOfMedical.resize();
           portraitRingChart.resize();
+          portraitNumberOfDepartmentsChart.resize();
+          departmentsCostChart.resize();
         };
         EleResize.on(resizeDiv, linstener);
         this.isInitialize = false;
@@ -347,12 +400,19 @@ export default {
     width: 50%;
   }
   #proportionOfMedical {
-    height: 320px;
+    height: 364px;
     width: 100%;
+    margin-top: -88px;
   }
   #portraitRingChart {
-    height: 320px;
+    height: 364px;
     width: 100%;
+  }
+  #portraitNumberOfDepartments {
+    height: 540px;
+  }
+  #departmentsCost {
+    height: 540px;
   }
 }
 </style>
