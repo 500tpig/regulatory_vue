@@ -1,6 +1,6 @@
 <template>
   <q-page class="Portrait">
-    <page-base-scroll content_class="q-mb-md q-pt-lg">
+    <page-base-scroll content_class="q-mb-md q-pt-lg q-pb-md">
       <div class="row justify-between">
         <q-card class="col-5 q-pa-md row firstCard q-ml-lg">
           <q-avatar size="80px" class="q-mr-lg self-center">
@@ -144,14 +144,28 @@
           <q-card class=" q-mt-md q-pa-md row" id="portraitRingChart"> </q-card>
         </div>
       </div>
-      <div class="row q-pt-md">
+      <div class="row q-mt-md">
         <q-card
           class="row q-px-md q-mx-lg text-primary col-6 items-center"
           id="portraitNumberOfDepartments"
         >
         </q-card>
-        <q-card class="row" id="departmentsCost" style="width: 45.4%;">
+        <q-card class="row justify-center q-pt-sm" style="width: 45.4%;">
+          <div>
+            <q-option-group
+              v-model="searchParam.costType"
+              :options="common.costTypeOptions"
+              color="primary"
+              class="text-weight-bold text-primary"
+              inline
+              @input="changeCostType"
+            />
+          </div>
+          <div id="departmentsCost"></div>
         </q-card>
+      </div>
+      <div class="row q-mt-md justify-center">
+        <q-card class="col-10" id="drugPoint"></q-card>
       </div>
     </page-base-scroll>
   </q-page>
@@ -172,7 +186,8 @@ import {
   setProportionOfMedicalOption,
   setPortraitRingChartOption,
   setPortraitNumberOfDepartmentsOption,
-  setDepartmentRingOption
+  setDepartmentRingOption,
+  setDrugPointChartOption
 } from "assets/js/charts/portraitOptions";
 export default {
   components: { pageBaseScroll: pageBaseScroll },
@@ -194,12 +209,28 @@ export default {
             label: "全部",
             value: "OCAndHC"
           }
-        ]
+        ],
+        costTypeOptions: [
+          {
+            label: "个人支出",
+            value: "individualPay"
+          },
+          {
+            label: "医保支出",
+            value: "medicarePay"
+          },
+          {
+            label: "医疗总费用",
+            value: "totalCost"
+          }
+        ],
+        departmentsCostTemp: []
       },
       searchParam: {
         personId: "B4009B864068C706A0ED408167E7A03AFCCA8BF95E698A30",
         chargingTime: ["20160701", "20161231"],
-        type: "OCAndHC"
+        type: "OCAndHC",
+        costType: "totalCost"
       },
       portraitInfo: {
         // photo: require("assets/image/portrait/childBoy.png")
@@ -258,10 +289,31 @@ export default {
           }
         })
         .catch(e => {});
+      this.departmentsCostTemp = departmentCostData;
 
-      this.afterHttp(optionData, numberOfDepartments, departmentCostData);
+      let drugCostData = [];
+      await this.$http
+        .post("/person/PortraitByDrug", param)
+        .then(res => {
+          if (res.status === 200) {
+            drugCostData = res.data.data;
+          }
+        })
+        .catch(e => {});
+
+      this.afterHttp(
+        optionData,
+        numberOfDepartments,
+        departmentCostData,
+        drugCostData
+      );
     },
-    afterHttp(optionData, numberOfDepartments, departmentCostData) {
+    afterHttp(
+      optionData,
+      numberOfDepartments,
+      departmentCostData,
+      drugCostData
+    ) {
       let histogramOption = setPortraitMonthlyOption(
         optionData[this.searchParam.type]
       );
@@ -282,9 +334,16 @@ export default {
       );
       let departmentRingOption = setDepartmentRingOption(
         departmentCostData[this.searchParam.type],
-        this.searchParam.type
+        this.searchParam.type,
+        this.searchParam.costType
       );
       this.drawChart(departmentRingOption, "departmentsCost");
+
+      let drugCostChartOption = setDrugPointChartOption(
+        drugCostData[this.searchParam.type],
+        this.searchParam
+      );
+      this.drawChart(drugCostChartOption, "drugPoint");
     },
     // 画图表
     drawChart(option, id) {
@@ -313,6 +372,10 @@ export default {
           document.getElementById("departmentsCost")
         );
 
+        let drugPointChart = this.$echarts.init(
+          document.getElementById("drugPoint")
+        );
+
         let histogramDiv = document.getElementById("portraitMonthly");
         let linstener = function() {
           histogram.resize();
@@ -320,10 +383,19 @@ export default {
           portraitRingChart.resize();
           portraitNumberOfDepartmentsChart.resize();
           departmentsCostChart.resize();
+          drugPointChart.resize();
         };
         EleResize.on(resizeDiv, linstener);
         this.isInitialize = false;
       }
+    },
+    changeCostType(value, evt) {
+      let departmentRingOption = setDepartmentRingOption(
+        this.departmentsCostTemp[this.searchParam.type],
+        this.searchParam.type,
+        value
+      );
+      this.drawChart(departmentRingOption, "departmentsCost");
     }
   },
   mounted() {
@@ -409,10 +481,14 @@ export default {
     width: 100%;
   }
   #portraitNumberOfDepartments {
-    height: 540px;
+    height: 548px;
   }
   #departmentsCost {
-    height: 540px;
+    height: 500px;
+    width: 100%;
+  }
+  #drugPoint {
+    height: 500px;
   }
 }
 </style>

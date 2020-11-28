@@ -431,18 +431,15 @@ function setPortraitRingChartOption(chartData, month) {
     //   x: "center"
     // },
     toolbox: {
-      //可视化的工具箱
       show: true,
-      right: "2%",
-      top: "2%",
       feature: {
-        restore: {
-          //重置
-          show: true
-        },
+        restore: {},
         saveAsImage: {
-          //保存图片
-          show: true
+          show: true,
+          excludeComponents: ["toolbox"],
+          pixelRatio: 2,
+          type: ["png"],
+          title: ["保存"]
         }
       }
     },
@@ -576,7 +573,6 @@ function setPortraitNumberOfDepartmentsOption(chartData) {
     times.push(item.times);
     departments.push(item.department);
   });
-
   let attackSourcesColor = [
     "#f36c6c",
     "#e6cf4e",
@@ -609,6 +605,39 @@ function setPortraitNumberOfDepartmentsOption(chartData) {
     toolbox: {
       show: true,
       feature: {
+        dataView: {
+          //数据视图
+          show: true,
+          readOnly: true,
+          optionToContent: function(opt) {
+            console.log(opt);
+            let axisData = opt.yAxis[0].data;
+            let series = opt.series[0].data;
+            let tdHeaders = "<td>科室</td>"; //表头
+            // series.forEach(function(item) {
+            //   tdHeaders += "<td>" + item.name + "</td>"; //组装表头
+            // });
+            let table =
+              '<div class="table-responsive"><table class="table table-bordered table-striped table-hover" style="text-align:center;color:#222831;"><tbody><tr>' +
+              tdHeaders +
+              "</tr>";
+            let tdBodys = ""; //数据
+            for (let index = 0; index < series.length; index++) {
+              const element = series[index];
+              tdBodys += "<td>" + series[index].value + "次</td>"; //组装表数据
+              table +=
+                '<tr><td style="padding: 0 10px">' +
+                axisData[index] +
+                "</td>" +
+                tdBodys +
+                "</tr>";
+              tdBodys = "";
+            }
+
+            table += "</tbody></table></div>";
+            return table;
+          }
+        },
         restore: {},
         saveAsImage: {
           show: true,
@@ -854,7 +883,7 @@ function setPortraitNumberOfDepartmentsOption(chartData) {
   };
   return option;
 }
-function setDepartmentRingOption(chartData, type) {
+function setDepartmentRingOption(chartData, type, costType) {
   let title;
   if (chartData.length === 0) {
     title = "暂无数据";
@@ -871,8 +900,8 @@ function setDepartmentRingOption(chartData, type) {
   chartData.map(item => {
     let temp = {};
     temp.name = item.department;
-    sum = calculate.Add(item.totalCost, sum);
-    temp.value = item.totalCost;
+    sum = calculate.Add(item[costType], sum);
+    temp.value = item[costType];
     data.push(temp);
   });
   let colorList = [
@@ -977,6 +1006,19 @@ function setDepartmentRingOption(chartData, type) {
     "#ff55ac"
   ];
   let option = {
+    toolbox: {
+      show: true,
+      feature: {
+        restore: {},
+        saveAsImage: {
+          show: true,
+          excludeComponents: ["toolbox"],
+          pixelRatio: 2,
+          type: ["png"],
+          title: ["保存"]
+        }
+      }
+    },
     legend: {
       type: "scroll",
       orient: "vertical",
@@ -990,7 +1032,7 @@ function setDepartmentRingOption(chartData, type) {
     },
     title: {
       text: "{name|" + title + "}\n{val|" + sum + "}",
-      top: "center",
+      y: "48%",
       left: "center",
       textStyle: {
         rich: {
@@ -1032,7 +1074,7 @@ function setDepartmentRingOption(chartData, type) {
     series: [
       {
         type: "pie",
-        center: ["50%", "50%"],
+        center: ["50%", "55%"],
         radius: ["40%", "70%"],
         clockwise: true,
         avoidLabelOverlap: true,
@@ -1076,11 +1118,198 @@ function setDepartmentRingOption(chartData, type) {
   };
   return option;
 }
+function setDrugPointChartOption(chartData, searchParam) {
+  let title = "";
+  title +=
+    formatDate(searchParam.chargingTime[0]) +
+    "至" +
+    formatDate(searchParam.chargingTime[1]);
+  title += " 部分药品费用";
+  let colorList = [
+    [
+      "#ff7f50",
+      "#87cefa",
+      "#da70d6",
+      "#32cd32",
+      "#6495ed",
+      "#ff69b4",
+      "#ba55d3",
+      "#cd5c5c",
+      "#ffa500",
+      "#40e0d0",
+      "#1e90ff",
+      "#ff6347",
+      "#7b68ee",
+      "#d0648a",
+      "#ffd700",
+      "#6b8e23",
+      "#4ea397",
+      "#3cb371",
+      "#b8860b",
+      "#7bd9a5"
+    ],
+    [
+      "#ff7f50",
+      "#87cefa",
+      "#da70d6",
+      "#32cd32",
+      "#6495ed",
+      "#ff69b4",
+      "#ba55d3",
+      "#cd5c5c",
+      "#ffa500",
+      "#40e0d0",
+      "#1e90ff",
+      "#ff6347",
+      "#7b68ee",
+      "#00fa9a",
+      "#ffd700",
+      "#6b8e23",
+      "#ff00ff",
+      "#3cb371",
+      "#b8860b",
+      "#30e0e0"
+    ],
+    [
+      "#929fff",
+      "#9de0ff",
+      "#ffa897",
+      "#af87fe",
+      "#7dc3fe",
+      "#bb60b2",
+      "#433e7c",
+      "#f47a75",
+      "#009db2",
+      "#024b51",
+      "#0780cf",
+      "#765005",
+      "#e75840",
+      "#26ccd8",
+      "#3685fe",
+      "#9977ef",
+      "#f5616f",
+      "#f7b13f",
+      "#f9e264",
+      "#50c48f"
+    ]
+  ][2];
 
+  let total = 0;
+  let data = [];
+  let count = 0;
+  let max = chartData[0].cost;
+  chartData.map(item => {
+    if (count > 19) {
+      count = 0;
+    }
+    total = calculate.Add(item.cost, total);
+    let temp = {};
+    temp.name = item.drug;
+    temp.value = item.cost;
+    temp.draggable = true;
+    temp.itemStyle = {
+      normal: {
+        shadowBlur: 100,
+        shadowColor: colorList[count],
+        color: colorList[count]
+      }
+    };
+    data.push(temp);
+    count++;
+  });
+  data.map(item => {
+    item.symbolSize = calculate.Div(item.value, max, 4) * 500;
+  });
+  let option = {
+    toolbox: {
+      show: true,
+      feature: {
+        restore: {},
+        saveAsImage: {
+          show: true,
+          excludeComponents: ["toolbox"],
+          pixelRatio: 2,
+          type: ["png"],
+          title: ["保存"]
+        }
+      }
+    },
+    // 图表标题
+    title: {
+      show: true, //显示策略，默认值true,可选为：true（显示） | false（隐藏）
+      text: title, //主标题文本，'\n'指定换行
+      x: "center", // 水平安放位置，默认为左对齐，可选为：
+      // 'center' ¦ 'left' ¦ 'right'
+      // ¦ {number}（x坐标，单位px）
+      y: "bottom", // 垂直安放位置，默认为全图顶端，可选为：
+      // 'top' ¦ 'bottom' ¦ 'center'
+      // ¦ {number}（y坐标，单位px）
+      //textAlign: null          // 水平对齐方式，默认根据x设置自动调整
+      backgroundColor: "rgba(0,0,0,0)",
+      borderColor: "#ccc", // 标题边框颜色
+      borderWidth: 0, // 标题边框线宽，单位px，默认为0（无边框）
+      padding: 5, // 标题内边距，单位px，默认各方向内边距为5，
+      // 接受数组分别设定上右下左边距，同css
+      itemGap: 10, // 主副标题纵向间隔，单位px，默认为10，
+      textStyle: {
+        fontSize: 18,
+        fontWeight: "bolder",
+        color: "#333" // 主标题文字颜色
+      },
+      subtextStyle: {
+        color: "#aaa" // 副标题文字颜色
+      }
+    },
+    backgroundColor: "#fff",
+    tooltip: {
+      trigger: "item",
+      borderColor: "rgba(255,255,255,.3)",
+      backgroundColor: "rgba(13,5,30,.6)",
+      borderWidth: 1,
+      padding: 5,
+      formatter: function(parms) {
+        var str =
+          parms.marker +
+          "" +
+          parms.data.name +
+          "</br>" +
+          "金额：" +
+          parms.data.value +
+          "元</br>";
+        return str;
+      }
+    },
+    animationDurationUpdate: function(idx) {
+      // 越往后的数据延迟越大
+      return idx * 100;
+    },
+    animationEasingUpdate: "bounceIn",
+    color: ["#fff", "#fff", "#fff"],
+    series: [
+      {
+        type: "graph",
+        layout: "force",
+        force: {
+          repulsion: 500,
+          edgeLength: 10
+        },
+        roam: true,
+        label: {
+          normal: {
+            show: true
+          }
+        },
+        data: data
+      }
+    ]
+  };
+  return option;
+}
 export {
   setPortraitMonthlyOption,
   setProportionOfMedicalOption,
   setPortraitRingChartOption,
   setPortraitNumberOfDepartmentsOption,
-  setDepartmentRingOption
+  setDepartmentRingOption,
+  setDrugPointChartOption
 };
