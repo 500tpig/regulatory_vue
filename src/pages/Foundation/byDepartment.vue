@@ -234,6 +234,7 @@
         :searchParam="searchParam"
         :columns="common.dialog.columns"
         title="科室"
+        selection="multiple"
     /></q-dialog>
   </q-page>
 </template>

@@ -1024,7 +1024,7 @@ function setDepartmentRingOption(chartData, type, costType) {
       orient: "vertical",
       left: "2%",
       align: "left",
-      top: "middle",
+      top: "0%",
       textStyle: {
         color: "#8C8C8C"
       },

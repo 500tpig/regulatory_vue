@@ -95,6 +95,14 @@
             <div class="row justify-end">
               <q-btn
                 :ripple="{ center: true }"
+                color="secondary"
+                label="参保人选择"
+                no-caps
+                @click="common.dialog.showDialog = true"
+                class="q-mr-md"
+              />
+              <q-btn
+                :ripple="{ center: true }"
                 color="purple-7"
                 label="更多"
                 no-caps
@@ -168,6 +176,15 @@
         <q-card class="col-10" id="drugPoint"></q-card>
       </div>
     </page-base-scroll>
+    <q-dialog v-model="common.dialog.showDialog"
+      ><specificTable
+        @selectConfirm="selectConfirm"
+        url="/person/getPersonList"
+        :searchParam="searchParam"
+        :columns="common.dialog.columns"
+        title="参保人"
+        selection="single"
+    /></q-dialog>
   </q-page>
 </template>
 
@@ -180,6 +197,7 @@ import {
   Nation,
   jsGetAge
 } from "assets/js/util/common";
+import specificTable from "components/utils/specificTable";
 import { EleResize } from "assets/js/util/esresize";
 import {
   setPortraitMonthlyOption,
@@ -190,12 +208,13 @@ import {
   setDrugPointChartOption
 } from "assets/js/charts/portraitOptions";
 export default {
-  components: { pageBaseScroll: pageBaseScroll },
+  components: { specificTable, pageBaseScroll },
   data() {
     return {
       common: {
         isInitialize: true,
         pickerOptions: pickerOptions,
+        selectPortrait: false,
         typeOptions: [
           {
             label: "门诊费用",
@@ -224,7 +243,40 @@ export default {
             value: "totalCost"
           }
         ],
-        departmentsCostTemp: []
+        departmentsCostTemp: [],
+        dialog: {
+          showDialog: false,
+          columns: [
+            {
+              name: "no",
+              label: "序号",
+              field: "no",
+              align: "center",
+              sortable: true
+            },
+            {
+              name: "column",
+              label: "参保人",
+              field: "column",
+              sortable: true,
+              align: "center"
+            },
+            {
+              name: "sex",
+              label: "性别",
+              field: "sex",
+              sortable: true,
+              align: "center"
+            },
+            {
+              name: "name",
+              label: "姓名",
+              field: "name",
+              sortable: true,
+              align: "center"
+            }
+          ]
+        }
       },
       searchParam: {
         personId: "B4009B864068C706A0ED408167E7A03AFCCA8BF95E698A30",
@@ -396,6 +448,11 @@ export default {
         value
       );
       this.drawChart(departmentRingOption, "departmentsCost");
+    },
+    selectConfirm(data) {
+      this.common.dialog.showDialog = false;
+      this.searchParam.personId = data[0].column;
+      this.initialize();
     }
   },
   mounted() {

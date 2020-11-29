@@ -246,6 +246,7 @@
         :searchParam="searchParam"
         :columns="common.dialog.columns"
         title="参保人"
+        selection="multiple"
     /></q-dialog>
   </q-page>
 </template>

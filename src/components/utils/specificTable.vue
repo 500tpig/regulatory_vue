@@ -1,5 +1,5 @@
 <template>
-  <q-card class="q-pa-md row" style="max-width:1100px;">
+  <q-card class="q-pa-md row" style="max-width: 80vw;">
     <q-table
       title="选择科室"
       :data="data"
@@ -7,7 +7,7 @@
       row-key="no"
       :filter="filter"
       :selected-rows-label="getSelectedString"
-      selection="multiple"
+      selection="single"
       :selected.sync="selected"
       :rows-per-page-options="pageOptions"
       class="my-sticky-header-table"
@@ -31,7 +31,7 @@
       <div class="row justify-center q-pa-md">
         <div class="text-h6">已选{{ title }}</div>
       </div>
-      <q-scroll-area style="height: 400px;width:300px;">
+      <q-scroll-area style="height: 400px;width:400px;">
         <div style="width:100%;" class="row wrap justify-center">
           <q-chip
             v-for="(item, index) in selected"
@@ -42,6 +42,9 @@
             @remove="remove(index)"
           >
             {{ item.column }}
+            <q-tooltip content-class="bg-indigo" :offset="[10, 10]">
+              {{ item.column }}
+            </q-tooltip>
           </q-chip>
         </div>
       </q-scroll-area>
@@ -59,7 +62,14 @@
 </template>
 <script>
 export default {
-  props: ["url", "searchParam", "columns", "title"],
+  props: {
+    url: String,
+    searchParam: Object,
+    columns: Array,
+    title: String,
+    selection: String
+  },
+  // props: ["url", "searchParam", "columns", "title", selection:],
   data() {
     return {
       pageOptions: [10, 15, 20, 25, 50, 0],
