@@ -54,6 +54,11 @@ const routes = [
         path: "/portrait",
         meta: { requireAuth: true },
         component: () => import("pages/Portrait/portrait")
+      },
+      {
+        path: "/timeLine",
+        meta: { requireAuth: true },
+        component: () => import("pages/TimeLine/timeLine")
       }
     ]
   },

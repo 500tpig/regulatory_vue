@@ -136,8 +136,10 @@
             </q-item>
             <div style="height:4px;"></div>
           </q-expansion-item>
-          <!--  -->
           <!-- 下拉 -->
+          <!--  -->
+          <!-- 参保人画像 -->
+          <!--  -->
           <q-item
             class="GNL__drawer-item q-my-sm"
             v-ripple
@@ -159,6 +161,33 @@
               }}</q-item-label>
             </q-item-section>
           </q-item>
+          <!-- 参保人画像 -->
+          <!--  -->
+          <!-- 就医时间轴 -->
+          <!--  -->
+          <q-item
+            class="GNL__drawer-item q-my-sm"
+            v-ripple
+            v-for="link in drawers.timeLine"
+            :key="link.text"
+            clickable
+            :class="{ selectItem: link.select }"
+            @click="toPage(drawers.timeLine, 0)"
+          >
+            <q-item-section avatar>
+              <q-icon
+                :class="{ 'text-white': link.select }"
+                :name="link.icon"
+              />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label :class="{ 'text-white': link.select }">{{
+                link.text
+              }}</q-item-label>
+            </q-item-section>
+          </q-item>
+          <!-- 就医时间轴 -->
+          <!--  -->
           <div class="q-mt-md">
             <div class="flex flex-center q-gutter-xs">
               <a
@@ -292,6 +321,14 @@ export default {
             url: "/portrait",
             select: false
           }
+        ],
+        timeLine: [
+          {
+            icon: "icon-shijianzhou",
+            text: "就医时间轴",
+            url: "/timeLine",
+            select: false
+          }
         ]
       },
       titleIcon: require("../../public/icons/HFRS-256x256.png"),
@@ -312,6 +349,9 @@ export default {
     }
     if (currentPath === "/portrait") {
       this.drawers.portrait[0].select = true;
+    }
+    if (currentPath === "/timeLine") {
+      this.drawers.timeLine[0].select = true;
     }
     if (currentPath.startsWith("/foundation")) {
       this.expanded[0] = true;

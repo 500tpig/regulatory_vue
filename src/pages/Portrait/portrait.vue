@@ -274,6 +274,13 @@ export default {
               field: "name",
               sortable: true,
               align: "center"
+            },
+            {
+              name: "survival",
+              label: "生存状态",
+              field: "survival",
+              sortable: true,
+              align: "center"
             }
           ]
         }
