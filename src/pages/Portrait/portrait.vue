@@ -28,7 +28,7 @@
             <div class="row q-my-sm">
               <span class="col-3">公民身份号码:</span>
               <span class="col-4 subText hideText"
-                >1111111111111111234{{ portraitInfo.id0000 }}
+                >1111111111111111234{{ portraitInfo.sfzhao }}
                 <q-tooltip
                   content-class="bg-amber text-black shadow-4"
                   content-style="font-size: 13px"
@@ -51,24 +51,24 @@
         <q-card class="col-3 q-pa-md row mainText secondCard">
           <div class="col">
             <div class="row q-my-sm">
-              <span class="col-4">地区编号:</span>
-              <span class="col-1 subText">{{ portraitInfo.dqbhao }}</span>
-              <span class="col-3">邮政编码:</span>
-              <span class="col-4 subText">{{ portraitInfo.yzbma0 }}</span>
+              <span class="col-3">地区编号:</span>
+              <span class="col-2 subText">{{ portraitInfo.dqbhao }}</span>
+              <span class="col-3 offset-1">邮政编码:</span>
+              <span class="col-3 subText">{{ portraitInfo.yzbma0 }}</span>
             </div>
             <div class="row q-my-sm">
-              <span class="col-4">户口性质:</span>
-              <span class="col-1 subText">{{ portraitInfo.hkxzhi }}</span>
-              <span class="col-4">户口所在地:</span>
+              <span class="col-3">户口性质:</span>
+              <span class="col-2 subText">{{ portraitInfo.hkxzhi }}</span>
+              <span class="col-3 offset-1">户口所在地:</span>
               <span class="col-3 subText">{{ portraitInfo.hkszdi }}</span>
             </div>
             <div class="row q-my-sm">
-              <span class="col-4">联系电话:</span>
-              <span class="col-2 subText">{{ portraitInfo.lxdhua }}</span>
+              <span class="col-3">联系电话:</span>
+              <span class="col-4 subText">{{ portraitInfo.lxdhua }}</span>
             </div>
             <div class="row q-my-sm">
-              <span class="col-4">单位编号:</span>
-              <span class="col-8 subText">{{ portraitInfo.dwid00 }}</span>
+              <span class="col-3">单位编号:</span>
+              <span class="col-9 subText">{{ portraitInfo.dwid00 }}</span>
             </div>
           </div>
         </q-card>
@@ -195,7 +195,8 @@ import {
   shallowCopyObj,
   formatDate,
   Nation,
-  jsGetAge
+  jsGetAge,
+  getportraitPhoto
 } from "assets/js/util/common";
 import specificTable from "components/utils/specificTable";
 import { EleResize } from "assets/js/util/esresize";
@@ -312,12 +313,13 @@ export default {
         })
         .catch(e => {});
       this.portraitInfo = personData;
-      this.portraitInfo.photo = require("assets/image/portrait/childBoy.png");
       if (this.portraitInfo.xbie00 === 1) this.portraitInfo.sex = "男";
       else this.portraitInfo.sex = "女";
       this.portraitInfo.birthday = formatDate(this.portraitInfo.csrqi0);
       this.portraitInfo.nation = Nation(this.portraitInfo.mzu000);
       this.portraitInfo.age = jsGetAge(this.portraitInfo.birthday);
+      this.portraitInfo.photo = require("assets/image/portrait/" +
+        getportraitPhoto(this.portraitInfo.age, this.portraitInfo.xbie00));
 
       let optionData = [];
       await this.$http
@@ -338,7 +340,6 @@ export default {
           }
         })
         .catch(e => {});
-
       let departmentCostData = [];
       await this.$http
         .post("/person/PortraitByDepartment", param)
@@ -398,11 +399,21 @@ export default {
       );
       this.drawChart(departmentRingOption, "departmentsCost");
 
-      let drugCostChartOption = setDrugPointChartOption(
-        drugCostData[this.searchParam.type],
-        this.searchParam
-      );
-      this.drawChart(drugCostChartOption, "drugPoint");
+      if (drugCostData[this.searchParam.type].length > 0) {
+        let drugCostChartOption = setDrugPointChartOption(
+          drugCostData[this.searchParam.type],
+          this.searchParam
+        );
+        this.drawChart(drugCostChartOption, "drugPoint");
+      } else {
+        // 以下是暂无数据显示样式(样式根据本身需求进行调整)
+        var html =
+          '<div><span  style="position: absolute;margin-left:46%;top:45%;color:#868686; font-size: 20px;">暂无数据</span></div>';
+        document.getElementById("drugPoint").innerHTML = html;
+        document
+          .getElementById("drugPoint")
+          .removeAttribute("_echarts_instance_");
+      }
     },
     // 画图表
     drawChart(option, id) {

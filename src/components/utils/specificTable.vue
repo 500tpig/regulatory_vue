@@ -1,7 +1,7 @@
 <template>
   <q-card class="q-pa-md row" style="max-width: 80vw;">
     <q-table
-      title="选择科室"
+      :title="title"
       :data="data"
       :columns="columns"
       row-key="no"

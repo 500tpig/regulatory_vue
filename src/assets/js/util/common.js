@@ -266,6 +266,26 @@ function jsGetAge(strBirthday) {
 
   return returnAge; //返回周岁年龄
 }
+function getportraitPhoto(age, sex) {
+  let photo = "";
+  if (age >= 0 && age <= 6) {
+    photo += "baby";
+  } else if (age >= 7 && age <= 12) {
+    photo += "child";
+  } else if (age >= 13 && age <= 30) {
+    photo += "youth";
+  } else if (age >= 31 && age <= 69) {
+    photo += "wrinkly";
+  } else {
+    photo += "elderly";
+  }
+  if (sex === 1) {
+    photo += "Boy";
+  } else {
+    photo += "Girl";
+  }
+  return photo + ".png";
+}
 export {
   getMonthLastDay,
   accAdd,
@@ -274,5 +294,6 @@ export {
   shallowCopyObj,
   calculate,
   Nation,
-  jsGetAge
+  jsGetAge,
+  getportraitPhoto
 };

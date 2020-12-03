@@ -72,9 +72,9 @@
             @input="changeGroupDoubleHistogram"
             style="min-width: 150px; max-width: 200px"
           />
-          <q-card class="q-mt-sm">
+          <div class="q-mt-sm">
             <div id="byAgeGroupDoubleHistogram"></div>
-          </q-card>
+          </div>
         </q-card>
       </div>
       <div class="row q-mt-lg justify-center">
