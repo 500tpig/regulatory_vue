@@ -45,5 +45,15 @@ main {
   letter-spacing: 0.5px;
   word-spacing: 1.5px;
   height: auto;
+  .q-card {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
+  }
+  .el-range-editor.is-active,
+  .el-range-editor.is-active:hover {
+    border: 1px solid $primary;
+  }
+  .el-input__inner {
+    border: 1px solid rgba(0, 0, 0, 0.24);
+  }
 }
 </style>
