@@ -15,7 +15,7 @@
               <span class="col-4 subText hideText"
                 >1234567891011{{ portraitInfo.id0000 }}
                 <q-tooltip
-                  content-class="bg-amber text-black shadow-4"
+                  content-class="bg-white text-black shadow-4 text-weight-medium"
                   content-style="font-size: 13px"
                   :offset="[10, 10]"
                 >
@@ -30,7 +30,7 @@
               <span class="col-4 subText hideText"
                 >1111111111111111234{{ portraitInfo.sfzhao }}
                 <q-tooltip
-                  content-class="bg-amber text-black shadow-4"
+                  content-class="bg-white text-black shadow-4 text-weight-medium"
                   content-style="font-size: 13px"
                   :offset="[10, 10]"
                 >

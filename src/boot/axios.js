@@ -47,7 +47,7 @@ http.interceptors.response.use(
             message: data.data.msg
           });
         }
-        rt.push("/login").catch(e => {});
+        rt.replace("/login").catch(e => {});
         st.dispatch("user/userLogout");
         return;
       }

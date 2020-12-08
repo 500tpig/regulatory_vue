@@ -29,10 +29,10 @@
       />
     </q-tabs>
 
-    <q-tab-panels v-model="common.tab" animated>
+    <q-tab-panels v-model="common.tab" animated style="background: #FAFAFA;">
       <!-- 时间轴Tab页面 -->
-      <q-tab-panel name="timeLineTab">
-        <page-base-scroll content_class="q-mt-md">
+      <q-tab-panel class="timeLineTab" name="timeLineTab">
+        <page-base-scroll content_class="q-mt-md q-pb-xl">
           <div class="row q-pl-xl">
             <!-- 参保人基本信息 -->
             <q-card class="col-5 row q-pa-md q-mr-lg">
@@ -71,11 +71,7 @@
               <div class="timeLine-costInfo col">
                 <!-- 门诊费用 -->
                 <div class="row">
-                  <q-chip
-                    color="teal-5"
-                    text-color="white"
-                    icon-right="icon-menzhen"
-                  >
+                  <q-chip color="teal-5" text-color="white" icon="icon-menzhen">
                     门诊费用
                   </q-chip>
                 </div>
@@ -104,7 +100,7 @@
                   <q-chip
                     color="deep-orange"
                     text-color="white"
-                    icon-right="icon-yiyuan"
+                    icon="icon-yiyuan"
                   >
                     住院费用
                   </q-chip>
@@ -133,40 +129,232 @@
             </q-card>
           </div>
           <!-- 筛选 -->
-          <div class="row timeLine-select q-pl-xl row items-center q-mt-md">
-            <span class="q-mr-md text-weight-bold">参保人ID:</span>
-            <q-chip
-              outline
-              color="light-blue"
-              icon="icon-user"
-              :label="searchParam.personId"
-              class="q-pa-md q-mr-md"
-              clickable
-              @click="common.dialog.showDialog = true"
-            />
-            <div>
-              <span class="q-mr-md text-weight-bold">日期选择:</span>
-              <el-date-picker
-                align="center"
-                value-format="yyyyMMdd"
-                v-model="searchParam.chargingTime"
-                type="monthrange"
-                unlink-panels
-                clearable
-                start-placeholder="开始月份"
-                end-placeholder="结束月份"
-                :picker-options="common.pickerOptions"
-              >
-              </el-date-picker>
+          <div class="row q-pl-xl q-my-lg">
+            <div class="col-7">
+              <div class="timeLine-select q-py-md q-px-lg" style="width:90%;">
+                <div class="row items-center">
+                  <span class="q-mr-md text-weight-medium">日期选择:</span>
+                  <el-date-picker
+                    align="center"
+                    style="width:30%;"
+                    value-format="yyyyMMdd"
+                    v-model="searchParam.chargingTime"
+                    type="monthrange"
+                    unlink-panels
+                    clearable
+                    start-placeholder="开始月份"
+                    end-placeholder="结束月份"
+                    :picker-options="common.pickerOptions"
+                  >
+                  </el-date-picker>
+                  <div class="row items-center justify-between">
+                    <div class="row items-center">
+                      <span class="q-ml-lg q-mr-sm text-weight-medium"
+                        >类型:</span
+                      >
+                      <q-option-group
+                        v-model="searchParam.type"
+                        :options="common.typeOptions"
+                        color="primary"
+                        style="font-size:14px;"
+                        inline
+                        class="text-weight-medium subText"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="row q-mt-sm items-center justify-between">
+                  <div>
+                    <span class="text-weight-medium">参保人选择:</span>
+                    <q-chip
+                      outline
+                      color="light-blue"
+                      icon="icon-user"
+                      :label="searchParam.personId"
+                      class="q-pa-md q-ml-md"
+                      clickable
+                      @click="common.dialog.showDialog = true"
+                    />
+                  </div>
+                  <q-btn
+                    :ripple="{ center: true }"
+                    color="primary"
+                    label="确认"
+                    no-caps
+                    class="q-mr-md"
+                    @click="initialize"
+                  />
+                </div>
+              </div>
             </div>
-            <q-btn
-              :ripple="{ center: true }"
-              color="primary"
-              label="确认"
-              no-caps
-              @click="initialize"
-              class="q-ml-md"
-            />
+          </div>
+          <div class="row q-pl-xl timeLineTab-pagination q-mt-md">
+            <el-pagination
+              background
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+              :current-page.sync="common.timeLine.pageNum"
+              :page-sizes="[10, 15, 20, 30, 50]"
+              :page-size="common.timeLine.pageSize"
+              layout="total, sizes, prev, pager, next, jumper"
+              :total="common.timeLine.total"
+            >
+            </el-pagination>
+          </div>
+          <!-- 时间轴 -->
+          <div class="timeLineTab-timeLine">
+            <q-timeline layout="comfortable">
+              <q-timeline-entry heading :body="common.timeLine.title" />
+              <q-timeline-entry
+                v-for="(item, index) in common.timeLine.timeLineData"
+                :key="index"
+                :color="item.color"
+                :subtitle="item.month"
+                :icon="item.icon"
+              >
+                <q-card class="q-pa-md" style="width:85%;">
+                  <div class="row q-pl-md q-mt-sm">
+                    <span class="col-1">类型:</span>
+                    <span class="subText col-2">{{ item.title }}</span>
+                    <span class="col-1">科室:</span>
+                    <span class="subText col-2">{{ item.department }}</span>
+                    <span class="col-2">疾病编号:</span>
+                    <span class="subText  col-1">{{ item.disease }}</span>
+                  </div>
+                  <div class="row q-pl-md q-mt-sm">
+                    <span class="col-2">医生编号:</span>
+                    <span class="subText  col-1">{{ item.doctorId }}</span>
+                    <span class="col-2">单据流水号:</span>
+                    <span class="subText">{{ item.djlsh }}</span>
+                  </div>
+                  <div class="q-my-sm">
+                    <q-chip
+                      color="green-7"
+                      text-color="white"
+                      icon="icon-menzhenyaofei"
+                    >
+                      药品明细
+                    </q-chip>
+                  </div>
+                  <div class="row items-center">
+                    <div
+                      class="col-5 q-pl-md"
+                      v-for="(drugItem, drugIndex) in item.drugResult"
+                      :key="drugIndex"
+                    >
+                      <div v-for="(drugCost, drug) in drugItem" :key="drug">
+                        <div class="row items-center">
+                          <div class="col-5 hideText">
+                            <span
+                              >{{ drug }}
+                              <q-tooltip
+                                content-class="bg-white text-black shadow-4 text-weight-medium"
+                                content-style="font-size: 13px"
+                                :offset="[10, 10]"
+                              >
+                                {{ drug }}
+                              </q-tooltip>
+                            </span>
+                          </div>
+                          <span class="subText offset-1 col-4"
+                            >{{ drugCost }} 元</span
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="q-my-sm">
+                    <q-chip
+                      color="yellow-10"
+                      text-color="white"
+                      icon="icon-jiancha"
+                    >
+                      其他明细
+                    </q-chip>
+                  </div>
+                  <div class="row items-center">
+                    <div
+                      class="col-5 q-pl-md"
+                      v-for="(drugItem, drugIndex) in item.otherResult"
+                      :key="drugIndex"
+                    >
+                      <div v-for="(drugCost, drug) in drugItem" :key="drug">
+                        <div class="row items-center">
+                          <div class="col-5 hideText">
+                            <span
+                              >{{ drug }}
+                              <q-tooltip
+                                content-class="bg-white text-black shadow-4 text-weight-medium"
+                                content-style="font-size: 13px"
+                                :offset="[10, 10]"
+                              >
+                                {{ drug }}
+                              </q-tooltip>
+                            </span>
+                          </div>
+                          <span class="subText offset-1 col-4"
+                            >{{ drugCost }} 元</span
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="q-my-sm">
+                    <q-chip
+                      color="blue-6"
+                      text-color="white"
+                      icon="icon-feiyong"
+                    >
+                      费用明细:
+                    </q-chip>
+                  </div>
+                  <div class="row q-pl-md ">
+                    <div class="col-4">
+                      <span>
+                        药品总和:
+                      </span>
+                      <span class="subText  q-ml-md"
+                        >{{ item.drugSum }} 元</span
+                      >
+                    </div>
+                    <div class="col-4">
+                      <span>
+                        其他总和:
+                      </span>
+                      <span class="subText q-ml-md"
+                        >{{ item.otherSum }} 元</span
+                      >
+                    </div>
+                  </div>
+                  <div class="row q-pl-md ">
+                    <div class="col-4">
+                      <span>
+                        个人支付:
+                      </span>
+                      <span class="subText  q-ml-md"
+                        >{{ item.individualPay }} 元</span
+                      >
+                    </div>
+                    <div class="col-4">
+                      <span>
+                        医保支付:
+                      </span>
+                      <span class="subText q-ml-md"
+                        >{{ item.medicarePay }} 元</span
+                      >
+                    </div>
+                    <div class="col-4">
+                      <span>
+                        医疗费用:
+                      </span>
+                      <span class="subText q-ml-md "
+                        >{{ item.totalCost }} 元</span
+                      >
+                    </div>
+                  </div>
+                </q-card>
+              </q-timeline-entry>
+            </q-timeline>
           </div>
         </page-base-scroll>
       </q-tab-panel>
@@ -203,6 +391,7 @@ import {
   pickerOptions,
   shallowCopyObj,
   formatDate,
+  formatDateTime,
   Nation,
   jsGetAge,
   getportraitPhoto
@@ -215,7 +404,13 @@ export default {
     return {
       common: {
         tab: "timeLineTab",
-        splitterModel: 10,
+        timeLine: {
+          title: "",
+          timeLineData: [],
+          pageSize: 10,
+          pageNum: 1,
+          total: 0
+        },
         isInitialize: true,
         pickerOptions: pickerOptions,
         dialog: {
@@ -257,11 +452,27 @@ export default {
               align: "center"
             }
           ]
-        }
+        },
+        typeOptions: [
+          {
+            label: "门诊费用",
+            value: "OC"
+          },
+          {
+            label: "住院费用",
+            value: "HC"
+          },
+          {
+            label: "全部",
+            value: "OCAndHC"
+          }
+        ],
+        expanded: [false]
       },
       searchParam: {
         personId: "B4009B864068C706A0ED408167E7A03AFCCA8BF95E698A30",
-        chargingTime: ["20160701", "20161231"]
+        chargingTime: ["20160701", "20161231"],
+        type: "OCAndHC"
       },
       portraitInfo: {},
       portraitFee: {
@@ -278,7 +489,9 @@ export default {
       param.endDate = this.searchParam.chargingTime[1];
       this.getPersonInfo(param);
       this.getPortraitFee(param);
+      this.getTimeLineData(param);
     },
+    // 总费用
     async getPortraitFee(param) {
       let portraitFee = [];
       await this.$http
@@ -291,6 +504,26 @@ export default {
         .catch(e => {});
       this.portraitFee = portraitFee;
     },
+    // 时间轴数据
+    async getTimeLineData(param) {
+      let timeLineData = [];
+      param.produceCost = "day";
+      param.pageSize = this.common.timeLine.pageSize;
+      param.pageNum = this.common.timeLine.pageNum;
+      let total = 0;
+      await this.$http
+        .post("/person/timeLineData", param)
+        .then(res => {
+          if (res.status === 200) {
+            timeLineData = res.data.data.data;
+            total = res.data.data.total;
+          }
+        })
+        .catch(e => {});
+      this.common.timeLine.timeLineData = timeLineData;
+      this.common.timeLine.total = total;
+      console.log(this.common.timeLine.timeLineData);
+    },
     async getPersonInfo(param) {
       let personData = [];
       await this.$http
@@ -302,6 +535,7 @@ export default {
         })
         .catch(e => {});
       this.portraitInfo = personData;
+      this.common.timeLine.title = this.portraitInfo.xming0 + "就医轨迹";
       if (this.portraitInfo.xbie00 === 1) this.portraitInfo.sex = "男";
       else this.portraitInfo.sex = "女";
       this.portraitInfo.birthday = formatDate(this.portraitInfo.csrqi0);
@@ -313,6 +547,21 @@ export default {
     selectConfirm(data) {
       this.common.dialog.showDialog = false;
       this.searchParam.personId = data[0].column;
+    },
+    handleSizeChange(val) {
+      let param = {};
+      param = shallowCopyObj(this.searchParam, param);
+      param.startDate = this.searchParam.chargingTime[0];
+      param.endDate = this.searchParam.chargingTime[1];
+      this.common.timeLine.pageSize = val;
+      this.getTimeLineData(param);
+    },
+    handleCurrentChange(val) {
+      let param = {};
+      param = shallowCopyObj(this.searchParam, param);
+      param.startDate = this.searchParam.chargingTime[0];
+      param.endDate = this.searchParam.chargingTime[1];
+      this.getTimeLineData(param);
     }
   },
   mounted() {
@@ -323,51 +572,67 @@ export default {
 
 <style lang="scss" scoped>
 .timeLine {
-  .q-card {
-    box-shadow: $card-box-shadow-around;
+  color: #333160;
+  font-size: 16px;
+  .hideText {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
   .q-tab-panel {
     padding: 0;
+  }
+  .subText {
+    color: #838098;
+    font-size: 16px;
+    font-weight: 500;
   }
   .hideText {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
   }
-  .timeLine-info {
-    color: #333160;
-    font-size: 16px;
-    font-weight: 500;
-    .subText {
-      color: #838098;
+  .timeLineTab {
+    .timeLine-info {
+      color: #333160;
       font-size: 16px;
-    }
-    .timeLine-info-row {
-      margin: 12px 0 0 0;
-    }
-  }
-  .timeLine-costInfo {
-    color: #333160;
-    font-size: 16px;
-    font-weight: 500;
-    .timeLine-costInfo-OC {
-      .subText {
-        color: #4aa79c;
-        font-size: 16px;
-        margin-left: 16px;
+      font-weight: 500;
+      .timeLine-info-row {
+        margin: 12px 0 0 0;
       }
     }
-    .timeLine-costInfo-HC {
-      .subText {
-        color: #ed6237;
-        font-size: 16px;
-        margin-left: 16px;
+    .timeLine-costInfo {
+      color: #333160;
+      font-size: 16px;
+      font-weight: 500;
+      .timeLine-costInfo-OC {
+        .subText {
+          color: #4aa79c;
+          font-size: 16px;
+          margin-left: 16px;
+        }
+      }
+      .timeLine-costInfo-HC {
+        .subText {
+          color: #ed6237;
+          font-size: 16px;
+          margin-left: 16px;
+        }
       }
     }
-  }
-  .timeLine-select {
-    color: #333160;
-    font-size: 16px;
+    .timeLine-select {
+      color: #333160;
+      font-size: 16px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
+      border-radius: 0.5rem;
+      background: #fff;
+    }
+    .timeLineTab-timeLine {
+      color: #333160;
+      .q-card {
+        border-radius: 0.5rem;
+      }
+    }
   }
 }
 </style>

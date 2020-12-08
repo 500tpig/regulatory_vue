@@ -42,7 +42,10 @@
             @remove="remove(index)"
           >
             {{ item.column }}
-            <q-tooltip content-class="bg-indigo" :offset="[10, 10]">
+            <q-tooltip
+              content-class="bg-white text-black shadow-4 text-weight-medium"
+              :offset="[10, 10]"
+            >
               {{ item.column }}
             </q-tooltip>
           </q-chip>

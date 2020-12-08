@@ -224,7 +224,7 @@ export default {
               this.$q.notify({
                 message: "登录成功！"
               });
-              this.$router.push("/home");
+              this.$router.replace("/home");
             }, 1500);
           } else {
             this.submitting = false;

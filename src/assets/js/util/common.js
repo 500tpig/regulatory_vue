@@ -5,6 +5,35 @@ function getMonthLastDay(str) {
   return year + month + lastDay;
 }
 //字符串转日期格式，strDate要转为日期格式的字符串
+function formatDateTime(date, format) {
+  if (!date) return;
+  if (!format) format = "yyyy-MM-dd";
+  switch (typeof date) {
+    case "string":
+      date = new Date(date.replace(/-/, "/"));
+      break;
+    case "number":
+      date = new Date(date);
+      break;
+  }
+  if (!date instanceof Date) return;
+  let dict = {
+    yyyy: date.getFullYear(),
+    M: date.getMonth() + 1,
+    d: date.getDate(),
+    H: date.getHours(),
+    m: date.getMinutes(),
+    s: date.getSeconds(),
+    MM: ("" + (date.getMonth() + 101)).substr(1),
+    dd: ("" + (date.getDate() + 100)).substr(1),
+    HH: ("" + (date.getHours() + 100)).substr(1),
+    mm: ("" + (date.getMinutes() + 100)).substr(1),
+    ss: ("" + (date.getSeconds() + 100)).substr(1)
+  };
+  return format.replace(/(yyyy|MM?|dd?|HH?|ss?|mm?)/g, function() {
+    return dict[arguments[0]];
+  });
+}
 function formatDate(strDate) {
   let year = strDate.substring(0, 4);
   let month = strDate.substring(4, 6);
@@ -290,6 +319,7 @@ export {
   getMonthLastDay,
   accAdd,
   formatDate,
+  formatDateTime,
   pickerOptions,
   shallowCopyObj,
   calculate,
