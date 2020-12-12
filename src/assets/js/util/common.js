@@ -315,6 +315,45 @@ function getportraitPhoto(age, sex) {
   }
   return photo + ".png";
 }
+function getYearBetween(start, end) {
+  let result = [];
+  let startTime = new Date(start);
+  let endTime = new Date(end);
+  while (endTime - startTime >= 0) {
+    let year = startTime.getFullYear();
+    result.push(year);
+    startTime.setFullYear(startTime.getFullYear() + 1);
+  }
+  return result;
+}
+//获得某月的最后一天
+function getLastDay(year, month) {
+  let new_year = year; //取当前的年份
+  let new_month = month++; //取下一个月的第一天，方便计算（最后一天不固定）
+  if (month > 12) {
+    new_month -= 12; //月份减
+    new_year++; //年份增
+  }
+  let new_date = new Date(new_year, new_month, 1); //取当年当月中的第一天
+  return new Date(new_date.getTime() - 1000 * 60 * 60 * 24).getDate(); //获取当月最后一天日期
+}
+// 快排
+function quick(arr) {
+  if (arr.length <= 1) {
+    return arr;
+  }
+  var left = [],
+    right = [],
+    k = arr.splice(0, 1)[0];
+  for (var i = 0; i < arr.length; i++) {
+    if (arr[i] > k) {
+      right.push(arr[i]);
+    } else {
+      left.push(arr[i]);
+    }
+  }
+  return quick(left).concat([k], quick(right));
+}
 export {
   getMonthLastDay,
   accAdd,
@@ -325,5 +364,8 @@ export {
   calculate,
   Nation,
   jsGetAge,
-  getportraitPhoto
+  getportraitPhoto,
+  getYearBetween,
+  quick,
+  getLastDay
 };

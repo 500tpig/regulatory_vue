@@ -176,13 +176,15 @@
                       @click="common.dialog.showDialog = true"
                     />
                   </div>
+                </div>
+                <div class="row justify-end">
                   <q-btn
                     :ripple="{ center: true }"
                     color="primary"
                     label="确认"
                     no-caps
                     class="q-mr-md"
-                    @click="initialize"
+                    @click="initialize()"
                   />
                 </div>
               </div>
@@ -203,7 +205,15 @@
           </div>
           <!-- 时间轴 -->
           <div class="timeLineTab-timeLine">
-            <q-timeline layout="comfortable">
+            <div v-if="common.timeLine.timeLineData.length == 0">
+              <div class="row justify-center">
+                <div class="h3">暂无数据</div>
+              </div>
+            </div>
+            <q-timeline
+              layout="comfortable"
+              v-if="common.timeLine.timeLineData.length > 0"
+            >
               <q-timeline-entry heading :body="common.timeLine.title" />
               <q-timeline-entry
                 v-for="(item, index) in common.timeLine.timeLineData"
@@ -236,9 +246,10 @@
                       药品明细
                     </q-chip>
                   </div>
-                  <div class="row items-center">
+                  <div class="row items-center q-pl-md">
+                    <div v-if="item.drugResult.length == 0">无</div>
                     <div
-                      class="col-5 q-pl-md"
+                      class="col-5"
                       v-for="(drugItem, drugIndex) in item.drugResult"
                       :key="drugIndex"
                     >
@@ -265,16 +276,17 @@
                   </div>
                   <div class="q-my-sm">
                     <q-chip
-                      color="yellow-10"
+                      color="grey-8"
                       text-color="white"
                       icon="icon-jiancha"
                     >
                       其他明细
                     </q-chip>
                   </div>
-                  <div class="row items-center">
+                  <div class="row items-center q-pl-md">
+                    <div v-if="item.otherResult.length == 0">无</div>
                     <div
-                      class="col-5 q-pl-md"
+                      class="col-5"
                       v-for="(drugItem, drugIndex) in item.otherResult"
                       :key="drugIndex"
                     >
@@ -325,6 +337,21 @@
                         >{{ item.otherSum }} 元</span
                       >
                     </div>
+                    <div class="col-4">
+                      <span>
+                        医保支付占比:
+                      </span>
+                      <span class="subText q-ml-md"
+                        >{{
+                          common.calculate.Div(
+                            item.medicarePay * 100,
+                            item.totalCost,
+                            2
+                          )
+                        }}
+                        %</span
+                      >
+                    </div>
                   </div>
                   <div class="row q-pl-md ">
                     <div class="col-4">
@@ -360,9 +387,13 @@
       </q-tab-panel>
       <!-- 日历图Tab页面 -->
       <q-tab-panel name="calendarTab">
-        <page-base-scroll content_class="q-mt-md">
-          <div class="text-h6">Alarms</div>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit.
+        <page-base-scroll content_class="q-mt-md q-pl-xl">
+          <calendarTab
+            style="margin-bottom:100px;"
+            :common="common"
+            :searchParam="searchParam"
+            :portraitInfo="portraitInfo"
+          ></calendarTab>
         </page-base-scroll>
       </q-tab-panel>
       <!-- 就医对比Tab页面 -->
@@ -387,6 +418,7 @@
 
 <script>
 import pageBaseScroll from "components/utils/PageScroll";
+import calendarTab from "pages/TimeLine/calendarTab";
 import {
   pickerOptions,
   shallowCopyObj,
@@ -394,15 +426,17 @@ import {
   formatDateTime,
   Nation,
   jsGetAge,
+  calculate,
   getportraitPhoto
 } from "assets/js/util/common";
 import specificTable from "components/utils/specificTable";
 import { EleResize } from "assets/js/util/esresize";
 export default {
-  components: { pageBaseScroll, specificTable },
+  components: { pageBaseScroll, specificTable, calendarTab },
   data() {
     return {
       common: {
+        calculate: calculate,
         tab: "timeLineTab",
         timeLine: {
           title: "",
@@ -471,13 +505,19 @@ export default {
       },
       searchParam: {
         personId: "B4009B864068C706A0ED408167E7A03AFCCA8BF95E698A30",
-        chargingTime: ["20160701", "20161231"],
+        chargingTime: ["20160701", "20181231"],
         type: "OCAndHC"
       },
       portraitInfo: {},
       portraitFee: {
-        OC: [{}],
-        HC: [{}]
+        OC: [
+          {
+            totalCost: 0,
+            individualPay: 0,
+            medicarePay: 0
+          }
+        ],
+        HC: [{ totalCost: 0, individualPay: 0, medicarePay: 0 }]
       }
     };
   },
@@ -493,7 +533,7 @@ export default {
     },
     // 总费用
     async getPortraitFee(param) {
-      let portraitFee = [];
+      let portraitFee = {};
       await this.$http
         .post("/person/PortraitFee", param)
         .then(res => {
@@ -502,6 +542,16 @@ export default {
           }
         })
         .catch(e => {});
+      for (let key in portraitFee) {
+        let item = portraitFee[key];
+        if (item[0] == null) {
+          item[0] = {
+            totalCost: 0,
+            individualPay: 0,
+            medicarePay: 0
+          };
+        }
+      }
       this.portraitFee = portraitFee;
     },
     // 时间轴数据
@@ -522,7 +572,7 @@ export default {
         .catch(e => {});
       this.common.timeLine.timeLineData = timeLineData;
       this.common.timeLine.total = total;
-      console.log(this.common.timeLine.timeLineData);
+      console.log(timeLineData);
     },
     async getPersonInfo(param) {
       let personData = [];

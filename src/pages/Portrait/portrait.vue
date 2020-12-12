@@ -407,7 +407,7 @@ export default {
         this.drawChart(drugCostChartOption, "drugPoint");
       } else {
         // 以下是暂无数据显示样式(样式根据本身需求进行调整)
-        var html =
+        let html =
           '<div><span  style="position: absolute;margin-left:46%;top:45%;color:#868686; font-size: 20px;">暂无数据</span></div>';
         document.getElementById("drugPoint").innerHTML = html;
         document
@@ -456,7 +456,7 @@ export default {
           drugPointChart.resize();
         };
         EleResize.on(resizeDiv, linstener);
-        this.isInitialize = false;
+        this.common.isInitialize = false;
       }
     },
     changeCostType(value, evt) {
