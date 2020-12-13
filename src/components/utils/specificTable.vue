@@ -7,7 +7,7 @@
       row-key="no"
       :filter="filter"
       :selected-rows-label="getSelectedString"
-      selection="single"
+      :selection="selection"
       :selected.sync="selected"
       :rows-per-page-options="pageOptions"
       class="my-sticky-header-table"

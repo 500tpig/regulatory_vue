@@ -85,7 +85,6 @@
 </template>
 
 <script>
-import pageBaseScroll from "components/utils/PageScroll";
 import {
   setCalendarYearChartOption,
   setCalendarMonthChartOption,

@@ -6,7 +6,7 @@ function setPortraitMonthlyOption(chartData) {
   let medicarePay = [];
   let title = {};
   chartData.map(item => {
-    month.push(formatDate(item.month));
+    month.push(item.month);
     individualPay.push(item.individualPay);
     totalCost.push(item.totalCost);
     medicarePay.push(item.medicarePay);

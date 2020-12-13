@@ -28,7 +28,6 @@
         style="width:140px;"
       />
     </q-tabs>
-
     <q-tab-panels v-model="common.tab" animated style="background: #FAFAFA;">
       <!-- 时间轴Tab页面 -->
       <q-tab-panel class="timeLineTab" name="timeLineTab">
@@ -398,9 +397,12 @@
       </q-tab-panel>
       <!-- 就医对比Tab页面 -->
       <q-tab-panel name="comparisonTab">
-        <page-base-scroll content_class="q-mt-md">
-          <div class="text-h6">Movies</div>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit.
+        <page-base-scroll content_class="q-mt-md q-pl-xl">
+          <comparisonTab
+            style="margin-bottom:100px;"
+            :common="common"
+            :searchParam="searchParam"
+          ></comparisonTab>
         </page-base-scroll>
       </q-tab-panel>
     </q-tab-panels>
@@ -419,6 +421,7 @@
 <script>
 import pageBaseScroll from "components/utils/PageScroll";
 import calendarTab from "pages/TimeLine/calendarTab";
+import comparisonTab from "pages/TimeLine/comparison";
 import {
   pickerOptions,
   shallowCopyObj,
@@ -432,7 +435,7 @@ import {
 import specificTable from "components/utils/specificTable";
 import { EleResize } from "assets/js/util/esresize";
 export default {
-  components: { pageBaseScroll, specificTable, calendarTab },
+  components: { pageBaseScroll, specificTable, calendarTab, comparisonTab },
   data() {
     return {
       common: {
@@ -572,7 +575,6 @@ export default {
         .catch(e => {});
       this.common.timeLine.timeLineData = timeLineData;
       this.common.timeLine.total = total;
-      console.log(timeLineData);
     },
     async getPersonInfo(param) {
       let personData = [];

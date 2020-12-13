@@ -288,7 +288,7 @@ export default {
       },
       searchParam: {
         personId: "B4009B864068C706A0ED408167E7A03AFCCA8BF95E698A30",
-        chargingTime: ["20160701", "20161231"],
+        chargingTime: ["20160701", "20181231"],
         type: "OCAndHC",
         costType: "totalCost"
       },
