@@ -19,17 +19,21 @@
             class=" items-center q-px-lg cardSection row"
           >
             <div class="col row" v-if="comparisonParam.personIds.length > 0">
-              <q-chip
+              <div
                 v-for="(item, index) in comparisonParam.personIds"
                 :key="index"
-                removable
-                @remove="removePersonId(item, index)"
-                outline
-                color="light-blue"
-                icon="icon-user"
               >
-                {{ item }}
-              </q-chip>
+                <sapn class="q-mr-md">参保人{{ index + 1 }}:</sapn>
+                <q-chip
+                  removable
+                  @remove="removePersonId(item, index)"
+                  outline
+                  color="light-blue"
+                  icon="icon-user"
+                >
+                  {{ item }}
+                </q-chip>
+              </div>
             </div>
             <div v-else class="row  text-weight-medium col">
               <div class="offset-2">

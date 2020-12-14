@@ -1,4 +1,10 @@
-import { quick, calculate, getYearBetween, getLastDay } from "../util/common";
+import {
+  quick,
+  calculate,
+  getYearBetween,
+  getLastDay,
+  formatDate
+} from "../util/common";
 import echarts from "echarts";
 function getMedian(arr) {
   if (arr.length % 2 == 0) {
@@ -408,16 +414,80 @@ function setGinsengContrastChartOption(chartData, comparisonParam) {
     };
     serieData.push(serie);
   });
+  console.log(comparisonParam);
+  let startDate = formatDate(comparisonParam.chargingTime[0]);
+  let endDate = formatDate(comparisonParam.chargingTime[1]);
+
+  console.log(startDate);
   let option = {
     backgroundColor: "#fff",
     title: {
-      text: "就医轨迹对比",
+      text:
+        startDate +
+        "-" +
+        endDate +
+        " " +
+        comparisonParam.feeType.label +
+        "就医轨迹对比",
       textStyle: {
         fontSize: 14,
         fontWeight: 500
       },
       left: "center",
       top: "0%"
+    },
+    toolbox: {
+      //可视化的工具箱
+      show: true,
+      right: "5%",
+      top: "0%",
+      feature: {
+        dataView: {
+          //数据视图
+          show: true,
+          readOnly: true,
+          optionToContent: function(opt) {
+            let axisData = opt.xAxis[0].data;
+            let series = opt.series;
+            let tdHeaders = "<td>日期</td>"; //表头
+            series.forEach(function(item) {
+              tdHeaders += "<td>" + item.name + "</td>"; //组装表头
+            });
+            let table =
+              '<div class="table-responsive"><table class="table table-bordered table-striped table-hover" style="text-align:center;color:#222831;"><tbody><tr>' +
+              tdHeaders +
+              "</tr>";
+            let tdBodys = ""; //数据
+            for (let i = 0, l = axisData.length; i < l; i++) {
+              for (let j = 0; j < series.length; j++) {
+                tdBodys += "<td>" + series[j].data[i] + "元</td>"; //组装表数据
+              }
+              table +=
+                '<tr><td style="padding: 0 10px">' +
+                axisData[i] +
+                "</td>" +
+                tdBodys +
+                "</tr>";
+              tdBodys = "";
+            }
+
+            table += "</tbody></table></div>";
+            return table;
+          }
+        },
+        restore: {
+          //重置
+          show: true
+        },
+        saveAsImage: {
+          //保存图片
+          show: true
+        },
+        magicType: {
+          //动态类型切换
+          type: ["bar", "line"]
+        }
+      }
     },
     legend: {
       icon: "circle",
@@ -426,6 +496,7 @@ function setGinsengContrastChartOption(chartData, comparisonParam) {
       itemWidth: 6,
       itemGap: 20,
       textStyle: {
+        fontSize: 14,
         color: "#556677"
       }
     },
