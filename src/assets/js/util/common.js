@@ -354,6 +354,15 @@ function quick(arr) {
   }
   return quick(left).concat([k], quick(right));
 }
+function isObjArr(value) {
+  if (Object.prototype.toString.call(value) === "[object Array]") {
+    return "Array";
+  } else if (Object.prototype.toString.call(value) === "[object Object]") {
+    return "Object";
+  } else {
+    return "error";
+  }
+}
 export {
   getMonthLastDay,
   accAdd,
@@ -367,5 +376,6 @@ export {
   getportraitPhoto,
   getYearBetween,
   quick,
-  getLastDay
+  getLastDay,
+  isObjArr
 };

@@ -172,8 +172,13 @@
           <div id="departmentsCost"></div>
         </q-card>
       </div>
-      <div class="row q-mt-md justify-center">
-        <q-card class="col-10" id="drugPoint"></q-card>
+      <div class="row q-mt-md q-px-lg">
+        <div class="col-6 row justify-start">
+          <q-card id="drugChart"></q-card>
+        </div>
+        <div class="col-6 row justify-end">
+          <q-card id="otherDrugChart"></q-card>
+        </div>
       </div>
     </page-base-scroll>
     <q-dialog v-model="common.dialog.showDialog"
@@ -196,7 +201,8 @@ import {
   formatDate,
   Nation,
   jsGetAge,
-  getportraitPhoto
+  getportraitPhoto,
+  isObjArr
 } from "assets/js/util/common";
 import specificTable from "components/utils/specificTable";
 import { EleResize } from "assets/js/util/esresize";
@@ -206,7 +212,7 @@ import {
   setPortraitRingChartOption,
   setPortraitNumberOfDepartmentsOption,
   setDepartmentRingOption,
-  setDrugPointChartOption
+  setDrugChartOption
 } from "assets/js/charts/portraitOptions";
 export default {
   components: { specificTable, pageBaseScroll },
@@ -321,7 +327,7 @@ export default {
       this.portraitInfo.photo = require("assets/image/portrait/" +
         getportraitPhoto(this.portraitInfo.age, this.portraitInfo.xbie00));
 
-      let optionData = [];
+      let optionData = []; // 参保人每月费用
       await this.$http
         .post("/person/PortraitMonthlyFeeOCAndHC", param)
         .then(res => {
@@ -331,7 +337,7 @@ export default {
         })
         .catch(e => {});
 
-      let numberOfDepartments = [];
+      let numberOfDepartments = []; // 科室次数柱状图
       await this.$http
         .post("/person/PortraitNumberOfDepartments", param)
         .then(res => {
@@ -340,7 +346,8 @@ export default {
           }
         })
         .catch(e => {});
-      let departmentCostData = [];
+
+      let departmentCostData = []; // 科室消费柱状图
       await this.$http
         .post("/person/PortraitByDepartment", param)
         .then(res => {
@@ -351,112 +358,137 @@ export default {
         .catch(e => {});
       this.departmentsCostTemp = departmentCostData;
 
-      let drugCostData = [];
+      let drugData = [];
+
       await this.$http
         .post("/person/PortraitByDrug", param)
         .then(res => {
           if (res.status === 200) {
-            drugCostData = res.data.data;
+            drugData = res.data.data;
           }
         })
         .catch(e => {});
+      console.log(drugData);
 
       this.afterHttp(
         optionData,
         numberOfDepartments,
         departmentCostData,
-        drugCostData
+        drugData
       );
     },
-    afterHttp(
-      optionData,
-      numberOfDepartments,
-      departmentCostData,
-      drugCostData
-    ) {
+    afterHttp(optionData, numberOfDepartments, departmentCostData, drugData) {
       let histogramOption = setPortraitMonthlyOption(
         optionData[this.searchParam.type]
       );
-      this.drawChart(histogramOption, "portraitMonthly");
+      this.drawChart(
+        histogramOption,
+        "portraitMonthly",
+        optionData[this.searchParam.type]
+      );
 
       let proportionOfMedicalOption = setProportionOfMedicalOption(
         optionData[this.searchParam.type]
       );
-      this.drawChart(proportionOfMedicalOption, "proportionOfMedical");
+      this.drawChart(
+        proportionOfMedicalOption,
+        "proportionOfMedical",
+        optionData[this.searchParam.type]
+      );
       let portraitRingChartOption = setPortraitRingChartOption(optionData);
-      this.drawChart(portraitRingChartOption, "portraitRingChart");
+
+      this.drawChart(portraitRingChartOption, "portraitRingChart", optionData);
+
       let portraitNumberOfDepartmentsOption = setPortraitNumberOfDepartmentsOption(
         numberOfDepartments[this.searchParam.type]
       );
       this.drawChart(
         portraitNumberOfDepartmentsOption,
-        "portraitNumberOfDepartments"
+        "portraitNumberOfDepartments",
+        numberOfDepartments[this.searchParam.type]
       );
       let departmentRingOption = setDepartmentRingOption(
         departmentCostData[this.searchParam.type],
         this.searchParam.type,
         this.searchParam.costType
       );
-      this.drawChart(departmentRingOption, "departmentsCost");
-
-      if (drugCostData[this.searchParam.type].length > 0) {
-        let drugCostChartOption = setDrugPointChartOption(
-          drugCostData[this.searchParam.type],
-          this.searchParam
-        );
-        this.drawChart(drugCostChartOption, "drugPoint");
-      } else {
+      this.drawChart(
+        departmentRingOption,
+        "departmentsCost",
+        departmentCostData[this.searchParam.type]
+      );
+    },
+    // 画图表
+    drawChart(option, id, chartData) {
+      let judge = isObjArr(chartData);
+      let isEmpty = false;
+      if (judge !== "error") {
+        if (judge === "Array") {
+          if (chartData.length === 0) isEmpty = true;
+        }
+        if (judge === "Object") {
+          let count = 0;
+          for (let key in chartData) {
+            if (chartData[key].length === 0) {
+              count++;
+            }
+          }
+          if (count === 3) isEmpty = true;
+        }
+      }
+      if (isEmpty) {
         // 以下是暂无数据显示样式(样式根据本身需求进行调整)
         let html =
           '<div><span  style="position: absolute;margin-left:46%;top:45%;color:#868686; font-size: 20px;">暂无数据</span></div>';
-        document.getElementById("drugPoint").innerHTML = html;
-        document
-          .getElementById("drugPoint")
-          .removeAttribute("_echarts_instance_");
-      }
-    },
-    // 画图表
-    drawChart(option, id) {
-      // 基于准备好的dom，初始化echarts实例
-      let myChart = this.$echarts.init(document.getElementById(id));
-      let resizeDiv = document.getElementById(id);
-      // 指定图表的配置项和数据
-      // 使用刚指定的配置项和数据显示图表。
-      myChart.setOption(option, true);
-      let that = this;
-      if (this.common.isInitialize) {
-        let histogram = this.$echarts.init(
-          document.getElementById("portraitMonthly")
-        );
-        let proportionOfMedical = this.$echarts.init(
-          document.getElementById("proportionOfMedical")
-        );
-        let portraitRingChart = this.$echarts.init(
-          document.getElementById("portraitRingChart")
-        );
-        let portraitNumberOfDepartmentsChart = this.$echarts.init(
-          document.getElementById("portraitNumberOfDepartments")
-        );
+        document.getElementById(id).innerHTML = html;
+        document.getElementById(id).removeAttribute("_echarts_instance_");
+      } else {
+        // 基于准备好的dom，初始化echarts实例
+        let myChart = this.$echarts.init(document.getElementById(id));
+        // 指定图表的配置项和数据
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option, true);
+        let that = this;
+        if (this.common.isInitialize) {
+          let resizeDiv = document.getElementById(id);
+          let histogram = this.$echarts.init(
+            document.getElementById("portraitMonthly")
+          );
+          let proportionOfMedical = this.$echarts.init(
+            document.getElementById("proportionOfMedical")
+          );
+          let portraitRingChart = this.$echarts.init(
+            document.getElementById("portraitRingChart")
+          );
+          let portraitNumberOfDepartmentsChart = this.$echarts.init(
+            document.getElementById("portraitNumberOfDepartments")
+          );
 
-        let departmentsCostChart = this.$echarts.init(
-          document.getElementById("departmentsCost")
-        );
+          let departmentsCostChart = this.$echarts.init(
+            document.getElementById("departmentsCost")
+          );
 
-        let drugPointChart = this.$echarts.init(
-          document.getElementById("drugPoint")
-        );
+          let drugChart = this.$echarts.init(
+            document.getElementById("drugChart")
+          );
 
-        let histogramDiv = document.getElementById("portraitMonthly");
-        let linstener = function() {
-          histogram.resize();
-          proportionOfMedical.resize();
-          portraitRingChart.resize();
-          portraitNumberOfDepartmentsChart.resize();
-          departmentsCostChart.resize();
-          drugPointChart.resize();
-        };
-        EleResize.on(resizeDiv, linstener);
-        this.common.isInitialize = false;
+          let otherDrugChart = this.$echarts.init(
+            document.getElementById("otherDrugChart")
+          );
+
+          let histogramDiv = document.getElementById("portraitMonthly");
+          let linstener = function() {
+            histogram.resize();
+            proportionOfMedical.resize();
+            portraitRingChart.resize();
+            portraitNumberOfDepartmentsChart.resize();
+            departmentsCostChart.resize();
+            drugChart.resize();
+            otherDrugChart.resize();
+          };
+          EleResize.on(resizeDiv, linstener);
+          this.common.isInitialize = false;
+        }
       }
     },
     changeCostType(value, evt) {
@@ -562,8 +594,13 @@ export default {
     height: 500px;
     width: 100%;
   }
-  #drugPoint {
+  #drugChart {
     height: 500px;
+    width: 98%;
+  }
+  #otherDrugChart {
+    height: 500px;
+    width: 98%;
   }
 }
 </style>
