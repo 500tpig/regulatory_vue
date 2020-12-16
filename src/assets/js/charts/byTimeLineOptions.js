@@ -186,6 +186,7 @@ function setCalendarMonthChartOption(chartData, feeType, calendarParam) {
   let option = {
     toolbox: {
       show: true,
+      left: 0,
       feature: {
         saveAsImage: {
           show: true
@@ -414,11 +415,8 @@ function setGinsengContrastChartOption(chartData, comparisonParam) {
     };
     serieData.push(serie);
   });
-  console.log(comparisonParam);
   let startDate = formatDate(comparisonParam.chargingTime[0]);
   let endDate = formatDate(comparisonParam.chargingTime[1]);
-
-  console.log(startDate);
   let option = {
     backgroundColor: "#fff",
     title: {

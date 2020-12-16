@@ -174,10 +174,10 @@
       </div>
       <div class="row q-mt-md q-px-lg">
         <div class="col-6 row justify-start">
-          <q-card id="drugChart"></q-card>
+          <q-card class="q-pa-sm" id="drugChart"></q-card>
         </div>
         <div class="col-6 row justify-end">
-          <q-card id="otherDrugChart"></q-card>
+          <q-card class="q-pa-sm" id="otherDrugChart"></q-card>
         </div>
       </div>
     </page-base-scroll>
@@ -358,7 +358,7 @@ export default {
         .catch(e => {});
       this.departmentsCostTemp = departmentCostData;
 
-      let drugData = [];
+      let drugData = []; //  药品费用占比情况数据
 
       await this.$http
         .post("/person/PortraitByDrug", param)
@@ -368,7 +368,6 @@ export default {
           }
         })
         .catch(e => {});
-      console.log(drugData);
 
       this.afterHttp(
         optionData,
@@ -378,6 +377,7 @@ export default {
       );
     },
     afterHttp(optionData, numberOfDepartments, departmentCostData, drugData) {
+      //  每月费用柱状图
       let histogramOption = setPortraitMonthlyOption(
         optionData[this.searchParam.type]
       );
@@ -387,6 +387,7 @@ export default {
         optionData[this.searchParam.type]
       );
 
+      // 医保个人支付占比环状图
       let proportionOfMedicalOption = setProportionOfMedicalOption(
         optionData[this.searchParam.type]
       );
@@ -395,10 +396,12 @@ export default {
         "proportionOfMedical",
         optionData[this.searchParam.type]
       );
-      let portraitRingChartOption = setPortraitRingChartOption(optionData);
 
+      // 门诊住院费用占比图
+      let portraitRingChartOption = setPortraitRingChartOption(optionData);
       this.drawChart(portraitRingChartOption, "portraitRingChart", optionData);
 
+      // 科室次数柱状图
       let portraitNumberOfDepartmentsOption = setPortraitNumberOfDepartmentsOption(
         numberOfDepartments[this.searchParam.type]
       );
@@ -407,6 +410,8 @@ export default {
         "portraitNumberOfDepartments",
         numberOfDepartments[this.searchParam.type]
       );
+
+      // 科室消费环状图
       let departmentRingOption = setDepartmentRingOption(
         departmentCostData[this.searchParam.type],
         this.searchParam.type,
@@ -417,6 +422,17 @@ export default {
         "departmentsCost",
         departmentCostData[this.searchParam.type]
       );
+
+      // 药品消费环状图
+      let drugOption = setDrugChartOption(drugData.drug, "部分药品费用占比");
+      this.drawChart(drugOption, "drugChart");
+
+      // 其他药品消费环状图
+      let otherDrugOption = setDrugChartOption(
+        drugData.otherDrug,
+        "部分其他药品费用占比"
+      );
+      this.drawChart(otherDrugOption, "otherDrugChart");
     },
     // 画图表
     drawChart(option, id, chartData) {
@@ -595,11 +611,11 @@ export default {
     width: 100%;
   }
   #drugChart {
-    height: 500px;
+    height: 540px;
     width: 98%;
   }
   #otherDrugChart {
-    height: 500px;
+    height: 540px;
     width: 98%;
   }
 }
