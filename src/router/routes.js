@@ -59,6 +59,11 @@ const routes = [
         path: "/timeLine",
         meta: { requireAuth: true },
         component: () => import("pages/TimeLine/timeLine")
+      },
+      {
+        path: "/knowledgeGraph",
+        meta: { requireAuth: true },
+        component: () => import("pages/KnowledgeGraph/knowledgeGraph")
       }
     ]
   },
