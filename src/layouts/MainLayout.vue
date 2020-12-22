@@ -374,6 +374,7 @@ export default {
       ]
     };
   },
+
   mounted() {
     let currentPath = this.$route.path;
     let that = this;
@@ -381,12 +382,24 @@ export default {
       this.drawers.homeDrawer[0].select = true;
     }
     if (currentPath === "/portrait") {
+      this.breadcrumbs.push({
+        label: "参保人画像",
+        icon: "icon-huaxiangduibifenxi"
+      });
       this.drawers.portrait[0].select = true;
     }
     if (currentPath === "/timeLine") {
+      this.breadcrumbs.push({
+        label: "就医时间轴",
+        icon: "icon-shijianzhou"
+      });
       this.drawers.timeLine[0].select = true;
     }
     if (currentPath === "/knowledgeGraph") {
+      this.breadcrumbs.push({
+        label: "就医轨迹",
+        icon: "icon-guanxitu"
+      });
       this.drawers.knowledgeGraph[0].select = true;
     }
     if (currentPath.startsWith("/foundation")) {
