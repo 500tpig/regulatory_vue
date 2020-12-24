@@ -23,7 +23,7 @@
                 v-for="(item, index) in comparisonParam.personIds"
                 :key="index"
               >
-                <sapn class="q-mr-md">参保人{{ index + 1 }}:</sapn>
+                <span class="q-mr-md">参保人{{ index + 1 }}:</span>
                 <q-chip
                   removable
                   @remove="removePersonId(item, index)"
