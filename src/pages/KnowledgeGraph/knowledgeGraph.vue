@@ -2,7 +2,11 @@
   <q-page class="knowledgeGraph">
     <page-base-scroll content_class="q-mt-md q-px-md">
       <div class="row ">
-        <q-card class="container col-8 q-mr-md" ref="containerRef"></q-card>
+        <q-card
+          class=" col-8 q-mr-md"
+          id="container"
+          ref="containerRef"
+        ></q-card>
         <q-card class="col q-py-md">
           <div class="text-h6 q-pl-md">参数设置</div>
           <!-- 类型选择 -->
@@ -135,6 +139,7 @@ import * as d3 from "d3";
 import pageBaseScroll from "components/utils/PageScroll";
 import { pickerOptions, shallowCopyObj } from "assets/js/util/common";
 import specificTable from "components/utils/specificTable";
+import { generateR, generateColor } from "assets/js/util/knowledgeGraph";
 const leng = [
   { group: "Person" },
   { group: "DiagnosticEventsOC" },
@@ -213,7 +218,12 @@ export default {
             label: "全部",
             value: "OCAndHC"
           }
-        ]
+        ],
+        image: {
+          Person: require("src/assets/image/knowledgeGraph/Person.png"),
+          DiagnosticEventsOC: require("src/assets/image/knowledgeGraph/DiagnosticEventsOC.png"),
+          DiagnosticEventsHC: require("src/assets/image/knowledgeGraph/DiagnosticEventsHC.png")
+        }
       }
     };
   },
@@ -241,70 +251,18 @@ export default {
       if (svg1) {
         svg1.remove();
       }
-      // 新建一个力导向图
-      this.forceSimulation = d3
-        .forceSimulation()
-        .force(
-          "link",
-          d3.forceLink().id(d => d.id)
-        )
-        .force("charge", d3.forceManyBody())
-        .force("center", d3.forceCenter());
+      let containerWidth = this.$refs.containerRef.$el.offsetWidth;
+      let containerHeight = this.$refs.containerRef.$el.offsetHeight;
 
       let nodes = personData.nodes;
       let edges = personData.edges;
 
-      let widthSVG = 380;
-      let heightSVG = 300; //设置绘制范围的宽高
+      const svg = this.setVis();
+      this.setForce(containerWidth, containerHeight);
 
-      const svg = d3
-        .select(".container")
-        .append("svg")
-        .attr("preserveAspectRatio", "xMidYMid meet")
-        .attr("viewBox", "0 0 380 300")
-        .attr("preserveAspectRatio", "none");
+      const g = d3.select("g");
 
-      const width = svg.attr("width");
-      const height = svg.attr("height");
-      const g = svg.append("g");
-      svg
-        .call(
-          d3
-            .zoom()
-            .scaleExtent([0.1, 4])
-            .on("zoom", () => {
-              g.attr("transform", d3.event.transform);
-            })
-        )
-        .on("dblclick.zoom", null); // 关闭双击缩放功能
-
-      // 设置lengend
-      // svg
-      //   .selectAll("rect")
-      //   .data(leng)
-      //   .enter()
-      //   .append("rect")
-      //   .attr("x", (d, i) => i * 70)
-      //   .attr("y", 20)
-      //   .attr("class", "legend")
-      //   .attr("width", 25)
-      //   .attr("height", 15)
-      //   .attr("rx", 4)
-      //   .attr("ry", 4)
-      //   .style("fill", d => colorScale(d.group));
-
-      // svg
-      //   .selectAll(".text")
-      //   .data(leng)
-      //   .enter()
-      //   .append("text")
-      //   .attr("class", "Text")
-      //   .attr("x", (d, i) => 25 + i * 75)
-      //   .attr("y", 32)
-      //   .attr("transform", "translate(5)")
-      //   .text(d => d.group);
-
-      this.forceSimulation.nodes(nodes).on("tick", this.ticked); // 这个函数很重要，后面给出具体实现和说明
+      this.forceSimulation.nodes(nodes).on("tick", this.ticked);
       // 生成边数据
       this.forceSimulation
         .force("link")
@@ -313,8 +271,8 @@ export default {
       // 设置图形的中心位置
       this.forceSimulation
         .force("center")
-        .x(width / 2)
-        .y(height / 2);
+        .x(containerWidth / 2)
+        .y(containerHeight / 2);
       // 在浏览器的控制台输出
 
       // 有了节点和边的数据后，我们开始绘制
@@ -327,49 +285,11 @@ export default {
         .append("line")
         .attr("stroke", "#ccc")
         .attr("stroke-width", 1);
-      // 绘制节点
-      // 老规矩，先为节点和节点上的文字分组
-      this.gs = g
-        .selectAll(".circleText")
-        .data(nodes)
-        .enter()
-        .append("g")
-        .attr("transform", d => {
-          const cirX = d.x;
-          const cirY = d.y;
-          return `translate(${cirX},${cirY})`;
-        })
-        .call(
-          d3
-            .drag()
-            .on("start", this.started)
-            .on("drag", this.dragged)
-            .on("end", this.ended)
-        );
-
-      //添加提示框的div
-      let tooltip = d3.select(".tooltip");
 
       // 绘制节点
-      this.gs
-        .append("circle")
-        .attr("r", 15)
-        .attr("fill", d => colorScale(d.group))
-        .on("mouseover", this.showTooltip);
-      //--鼠标移出事件
-      // .on("mouseout", function(d) {
-      //   tooltip.style("opacity", 0.0);
-      // });
-
-      // 文字
-      // this.gs
-      //   .append("text")
-      //   .attr("x", -15)
-      //   .attr("y", -28)
-      //   .attr("dy", 10)
-      //   .attr("fill", d => colorScale(d.group))
-      //   .text(d => d.group);
+      this.generateNodes(nodes, g);
     },
+    // 展示函数
     showTooltip(d) {
       //添加提示框的div
       let tooltip = d3.select(".tooltip");
@@ -444,6 +364,120 @@ export default {
         tooltip.html(htmlStr).style("opacity", 1.0);
       }
     },
+    // 创建svg视图
+    setVis() {
+      let svg = d3
+        .select("#container")
+        .append("svg")
+        .attr("preserveAspectRatio", "xMidYMid meet")
+        .attr("viewBox", "0 0 950 950")
+        .attr("preserveAspectRatio", "none")
+        .style("max-height", "950px")
+        .call(
+          d3
+            .zoom()
+            .scaleExtent([0.01, 10])
+            .on("zoom", () => {
+              g.attr("transform", d3.event.transform);
+            })
+        )
+        .on("dblclick.zoom", null);
+
+      const g = svg.append("g");
+
+      let defs = d3
+        .select("#container")
+        .select("svg")
+        .append("defs");
+      //patient节点图片
+      defs
+        .append("pattern")
+        .attr("id", "Person")
+        .attr("patternContentUnits", "objectBoundingBox")
+        .attr("width", "100%")
+        .attr("height", "100%")
+        .append("image")
+        .attr("width", "1")
+        .attr("height", "1")
+        .attr("xlink:href", this.common.image.Person);
+
+      defs
+        .append("pattern")
+        .attr("id", "DiagnosticEventsOC")
+        .attr("patternContentUnits", "objectBoundingBox")
+        .attr("width", "100%")
+        .attr("height", "100%")
+        .append("image")
+        .attr("width", "1")
+        .attr("height", "1")
+        .attr("xlink:href", this.common.image.DiagnosticEventsOC);
+
+      defs
+        .append("pattern")
+        .attr("id", "DiagnosticEventsHC")
+        .attr("patternContentUnits", "objectBoundingBox")
+        .attr("width", "100%")
+        .attr("height", "100%")
+        .append("image")
+        .attr("width", "1")
+        .attr("height", "1")
+        .attr("xlink:href", this.common.image.DiagnosticEventsHC);
+
+      return svg;
+    },
+    // 力导向图布局
+    setForce(containerWidth, containerHeight) {
+      // 新建一个力导向图
+      this.forceSimulation = d3
+        .forceSimulation()
+        .force(
+          "link",
+          d3.forceLink().id(d => d.id)
+        )
+        .force(
+          "collision",
+          d3.forceCollide(d => generateR(d) + 0.5).strength(1)
+        )
+        .force("charge", d3.forceManyBody())
+        .force(
+          "center",
+          d3.forceCenter(containerWidth / 2, containerHeight / 2)
+        );
+    },
+    // 绘制节点
+    generateNodes(nodes, g) {
+      this.gs = g
+        .selectAll(".circleText")
+        .data(nodes)
+        .enter()
+        .append("g")
+        .attr("id", d => "node-" + d.id)
+        .attr("transform", d => {
+          const cirX = d.x;
+          const cirY = d.y;
+          return `translate(${cirX},${cirY})`;
+        })
+        .call(
+          d3
+            .drag()
+            .on("start", this.started)
+            .on("drag", this.dragged)
+            .on("end", this.ended)
+        );
+      g.selectAll(".circleText")
+        .selectAll(".node-bg")
+        .remove();
+      this.gs
+        .append("svg:circle")
+        .attr("class", "node-bg")
+        .attr("r", d => generateR(d))
+        .attr("fill", d => generateColor(d))
+        .attr("stroke", "#999")
+        .attr("stroke-opacity", 0.6)
+        .attr("group", d => d.group)
+        .attr("name", d => d.id)
+        .on("mouseover", this.showTooltip);
+    },
     ticked() {
       this.links
         .attr("x1", d => d.source.x)
@@ -487,6 +521,9 @@ export default {
 .knowledgeGraph {
   color: #333160;
   font-size: 16px;
+  #container {
+    height: 950px;
+  }
   .subText {
     color: #838098;
     font-size: 16px;
