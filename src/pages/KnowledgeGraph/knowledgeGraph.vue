@@ -158,10 +158,10 @@ export default {
         type: "OCAndHC"
       },
       links: "",
-      linksText: "",
       gs: "",
       d3: {
-        forceSimulation: ""
+        forceSimulation: "",
+        dragging: false
       },
       common: {
         dialog: {
@@ -222,7 +222,8 @@ export default {
         image: {
           Person: require("src/assets/image/knowledgeGraph/Person.png"),
           DiagnosticEventsOC: require("src/assets/image/knowledgeGraph/DiagnosticEventsOC.png"),
-          DiagnosticEventsHC: require("src/assets/image/knowledgeGraph/DiagnosticEventsHC.png")
+          DiagnosticEventsHC: require("src/assets/image/knowledgeGraph/DiagnosticEventsHC.png"),
+          Date: require("src/assets/image/knowledgeGraph/Date.png")
         }
       }
     };
@@ -247,10 +248,7 @@ export default {
       this.graphInit(personData);
     },
     graphInit(personData) {
-      let svg1 = d3.select("svg");
-      if (svg1) {
-        svg1.remove();
-      }
+      this.removeSVG();
       let containerWidth = this.$refs.containerRef.$el.offsetWidth;
       let containerHeight = this.$refs.containerRef.$el.offsetHeight;
 
@@ -260,109 +258,42 @@ export default {
       const svg = this.setVis();
       this.setForce(containerWidth, containerHeight);
 
+      this.forceSimulation.alphaTarget(0.1);
+      this.forceSimulation.restart();
+
       const g = d3.select("g");
 
+      let simulation = d3
+        .forceSimulation(personData.nodes)
+        // 阿尔法衰变，为0表示没有衰减，模拟将不会停止
+        // 模拟开始时为1，默认情况下经过300次迭代后衰减为0
+        .alphaDecay(0.05)
+        .velocityDecay(0.1)
+        // .force("link", d3.forceLink(edges).id(d => d.id))
+        .force(
+          "link",
+          d3
+            .forceLink(personData.edges)
+            .id(d => d.id)
+            .distance(100)
+        )
+        .force("charge", d3.forceManyBody())
+        .force(
+          "center",
+          d3.forceCenter(containerWidth / 2, containerHeight / 2)
+        )
+        .force(
+          "collision",
+          d3.forceCollide(d => generateR(d) + 0.5).strength(1)
+        )
+        .force("x", d3.forceX())
+        .force("y", d3.forceY());
+
       this.forceSimulation.nodes(nodes).on("tick", this.ticked);
-      // 生成边数据
-      this.forceSimulation
-        .force("link")
-        .links(edges)
-        .distance(() => 200);
-      // 设置图形的中心位置
-      this.forceSimulation
-        .force("center")
-        .x(containerWidth / 2)
-        .y(containerHeight / 2);
-      // 在浏览器的控制台输出
-
-      // 有了节点和边的数据后，我们开始绘制
-      // 绘制边
-      this.links = g
-        .append("g")
-        .selectAll("line")
-        .data(edges)
-        .enter()
-        .append("line")
-        .attr("stroke", "#ccc")
-        .attr("stroke-width", 1);
-
+      // 绘制连线
+      this.generateLinks(edges, g);
       // 绘制节点
       this.generateNodes(nodes, g);
-    },
-    // 展示函数
-    showTooltip(d) {
-      //添加提示框的div
-      let tooltip = d3.select(".tooltip");
-      // console.log(d);
-      let htmlStr = "";
-      let classStr =
-        "<span style='color: #838098;font-size: 16px;font-weight: 500;'>";
-      let spanClass = "<span style='font-weight: 500;'>";
-      tooltip.html(htmlStr);
-
-      htmlStr +=
-        spanClass +
-        "节点类型： </span>" +
-        classStr +
-        d.properties.nodeName +
-        "</span><br/>";
-      htmlStr +=
-        spanClass + "图谱ID： </span>" + classStr + d.id + "</span><br/>";
-
-      if (d.group === "Person") {
-        htmlStr +=
-          spanClass +
-          "姓名 ：</span>" +
-          classStr +
-          d.properties.name +
-          "</span><br/>";
-        htmlStr +=
-          spanClass +
-          "性别 ：</span>" +
-          classStr +
-          d.properties.sex +
-          "</span>" +
-          "<br/>";
-        htmlStr +=
-          "<div style='max-width: 300px;overflow: hidden;white-space: nowrap;" +
-          "text-overflow: ellipsis;font-weight: 500;'>参保人ID ：" +
-          classStr +
-          d.properties.id +
-          "</span>" +
-          "</div>";
-        htmlStr +=
-          spanClass +
-          "出生日期 ：</span>" +
-          classStr +
-          d.properties.birthday +
-          "</span>" +
-          "<br/>";
-        //设置tooltip文字
-        tooltip.html(htmlStr).style("opacity", 1.0);
-      }
-      if (d.group === "Date") {
-        htmlStr +=
-          spanClass +
-          "日期：</span>" +
-          classStr +
-          d.properties.date +
-          "</span>";
-        //设置tooltip文字
-        tooltip.html(htmlStr).style("opacity", 1.0);
-      }
-      if (
-        d.group === "DiagnosticEventsOC" ||
-        d.group === "DiagnosticEventsHC"
-      ) {
-        htmlStr +=
-          spanClass +
-          "费用日期：</span>" +
-          classStr +
-          d.properties.date +
-          "</span>";
-        //设置tooltip文字
-        tooltip.html(htmlStr).style("opacity", 1.0);
-      }
     },
     // 创建svg视图
     setVis() {
@@ -423,16 +354,38 @@ export default {
         .attr("height", "1")
         .attr("xlink:href", this.common.image.DiagnosticEventsHC);
 
+      defs
+        .append("pattern")
+        .attr("id", "Date")
+        .attr("patternContentUnits", "objectBoundingBox")
+        .attr("width", "100%")
+        .attr("height", "100%")
+        .append("image")
+        .attr("width", "1")
+        .attr("height", "1")
+        .attr("xlink:href", this.common.image.Date);
+
       return svg;
+    },
+    // 清空svg
+    removeSVG() {
+      d3.selectAll("svg > *").remove();
     },
     // 力导向图布局
     setForce(containerWidth, containerHeight) {
       // 新建一个力导向图
       this.forceSimulation = d3
-        .forceSimulation()
+        .forceSimulation([])
+        // 阿尔法衰变，为0表示没有衰减，模拟将不会停止
+        // 模拟开始时为1，默认情况下经过300次迭代后衰减为0
+        .alphaDecay(0.05)
+        .velocityDecay(0.1)
         .force(
           "link",
-          d3.forceLink().id(d => d.id)
+          d3
+            .forceLink([])
+            .id(d => d.id)
+            .distance(() => 200)
         )
         .force(
           "collision",
@@ -442,7 +395,25 @@ export default {
         .force(
           "center",
           d3.forceCenter(containerWidth / 2, containerHeight / 2)
-        );
+        )
+        .force("x", d3.forceX())
+        .force("y", d3.forceY());
+    },
+    // 生成力导向图的线段
+    generateLinks(edges, g) {
+      // 生成边数据
+      this.forceSimulation.force("link").links(edges);
+      // 在浏览器的控制台输出
+
+      // 有了节点和边的数据后，我们开始绘制
+      // 绘制边
+      this.links = g
+        .append("g")
+        .selectAll("line")
+        .data(edges)
+        .enter()
+        .append("line")
+        .attr("stroke-width", 1);
     },
     // 绘制节点
     generateNodes(nodes, g) {
@@ -451,6 +422,7 @@ export default {
         .data(nodes)
         .enter()
         .append("g")
+        .attr("class", "nodes")
         .attr("id", d => "node-" + d.id)
         .attr("transform", d => {
           const cirX = d.x;
@@ -464,9 +436,7 @@ export default {
             .on("drag", this.dragged)
             .on("end", this.ended)
         );
-      g.selectAll(".circleText")
-        .selectAll(".node-bg")
-        .remove();
+
       this.gs
         .append("svg:circle")
         .attr("class", "node-bg")
@@ -476,7 +446,8 @@ export default {
         .attr("stroke-opacity", 0.6)
         .attr("group", d => d.group)
         .attr("name", d => d.id)
-        .on("mouseover", this.showTooltip);
+        .on("mouseover", this.mouseover)
+        .on("mouseout", this.mouseout);
     },
     ticked() {
       this.links
@@ -486,31 +457,146 @@ export default {
         .attr("y2", d => d.target.y);
       this.gs.attr("transform", d => `translate(${d.x},${d.y})`);
     },
+    // 开始拖动
     started(d) {
+      this.d3.dragging = true;
       if (!d3.event.active) {
-        this.forceSimulation.alphaTarget(0.8).restart();
+        this.forceSimulation.alphaTarget(0.3).restart();
       }
-      d.fx = d.x;
-      d.fy = d.y;
+      d3.event.subject.fx = d3.event.subject.x;
+      d3.event.subject.fy = d3.event.subject.y;
+      // d.fx = d.x;
+      // d.fy = d.y;
     },
+    // 拖动中
     dragged(d) {
-      d.fx = d3.event.x;
-      d.fy = d3.event.y;
+      d3.event.subject.fx = d3.event.x;
+      d3.event.subject.fy = d3.event.y;
+      // d.fx = d3.event.x;
+      // d.fy = d3.event.y;
     },
+    // 拖动停止
     ended(d) {
       if (!d3.event.active) {
         this.forceSimulation.alphaTarget(0);
       }
-      d.fx = null;
-      d.fy = null;
+      d3.event.subject.fx = d3.event.x;
+      d3.event.subject.fy = d3.event.y;
+      this.d3.dragging = false;
+      // d.fx = null;
+      // d.fy = null;
     },
+    // 展示函数
+    mouseover(d) {
+      if (!this.d3.dragging) {
+        const id = d.id;
+        const svg = d3.select("#container").select("svg");
+        // 处理连接line, 不相连的line不显示
+        svg.selectAll("line").attr("class", function(data) {
+          if (data.source.id === id || data.target.id === id) {
+            return "active";
+          } else {
+            return "inactive";
+          }
+        });
+      }
+      //添加提示框的div
+      let tooltip = d3.select(".tooltip");
+      // console.log(d);
+      let htmlStr = "";
+      // 关键字段样式
+      let classStr =
+        "<span style='color: #838098;font-size: 16px;font-weight: 500;'>";
+      // 字段类型样式
+      let spanClass = "<span style='font-weight: 500;'>";
+      tooltip.html(htmlStr);
+
+      htmlStr +=
+        spanClass +
+        "节点类型： </span>" +
+        classStr +
+        d.properties.nodeName +
+        "</span><br/>";
+      htmlStr +=
+        spanClass + "图谱ID： </span>" + classStr + d.id + "</span><br/>";
+
+      if (d.group === "Person") {
+        htmlStr +=
+          spanClass +
+          "姓名 ：</span>" +
+          classStr +
+          d.properties.name +
+          "</span><br/>";
+        htmlStr +=
+          spanClass +
+          "性别 ：</span>" +
+          classStr +
+          d.properties.sex +
+          "</span>" +
+          "<br/>";
+        htmlStr +=
+          "<div style='max-width: 300px;overflow: hidden;white-space: nowrap;" +
+          "text-overflow: ellipsis;font-weight: 500;'>参保人ID ：" +
+          classStr +
+          d.properties.id +
+          "</span>" +
+          "</div>";
+        htmlStr +=
+          spanClass +
+          "出生日期 ：</span>" +
+          classStr +
+          d.properties.birthday +
+          "</span>" +
+          "<br/>";
+        tooltip.html(htmlStr).style("opacity", 1.0);
+      }
+      if (d.group === "Date") {
+        htmlStr +=
+          spanClass +
+          "日期：</span>" +
+          classStr +
+          d.properties.date +
+          "</span>";
+        tooltip.html(htmlStr).style("opacity", 1.0);
+      }
+      if (
+        d.group === "DiagnosticEventsOC" ||
+        d.group === "DiagnosticEventsHC"
+      ) {
+        htmlStr +=
+          spanClass +
+          "费用日期：</span>" +
+          classStr +
+          d.properties.date +
+          "</span>";
+        tooltip.html(htmlStr).style("opacity", 1.0);
+      }
+    },
+    mouseout() {
+      if (!this.d3.dragging) {
+        const svg = d3.select("#container").select("svg");
+        svg.selectAll("text").attr("class", "");
+        svg
+          .selectAll(".nodes")
+          .selectAll("circle")
+          .attr("class", "");
+        svg
+          .selectAll("line")
+          .selectAll("line")
+          .attr("class", "");
+      }
+    },
+    // 确认选择参保人
     selectConfirm(data) {
       this.common.dialog.showDialog = false;
       for (let i = 0; i < data.length; i++) {
         let temp = data[i];
-        this.searchParam.personList.push(temp.column);
+        if (this.searchParam.personList.indexOf(temp.column)) {
+          this.searchParam.personList.push(temp.column);
+        }
       }
     },
+    // 删除参保人
     removePersonId(obj, index) {
       this.searchParam.personList.splice(index, 1);
     }
@@ -523,27 +609,32 @@ export default {
   font-size: 16px;
   #container {
     height: 950px;
+    background-color: #272b30;
   }
   .subText {
     color: #838098;
     font-size: 16px;
     font-weight: 500;
   }
-  .title {
-    background: red;
-  }
-  .text {
-    font-size: 12px;
-  }
-  .legend {
-    position: fixed;
-    font: 10px sans-serif;
-    box-shadow: 2px 2px 1px #888;
-  }
   .hideText {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
   }
+}
+</style>
+<style>
+line {
+  stroke: rgb(240, 240, 240); /*线的颜色*/
+  stroke-opacity: 0.3; /*线的透明度*/
+}
+line.inactive {
+  /*display: none !important;*/
+  stroke-opacity: 0.1;
+}
+line.active {
+  /*display: none !important;*/
+  stroke-opacity: 1;
+  stroke: yellow;
 }
 </style>

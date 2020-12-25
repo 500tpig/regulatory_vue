@@ -45,6 +45,9 @@ function generateColor(d) {
     case "DiagnosticEventsHC": {
       return "url(#DiagnosticEventsHC)";
     }
+    case "Date": {
+      return "url(#Date)";
+    }
     default: {
       return colorList[10];
     }
