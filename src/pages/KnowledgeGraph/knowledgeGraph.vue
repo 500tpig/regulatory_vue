@@ -1,13 +1,13 @@
 <template>
   <q-page class="knowledgeGraph">
-    <page-base-scroll content_class="q-mt-md q-px-md">
+    <page-base-scroll content_class="q-pt-md q-px-md">
       <div class="row ">
         <q-card
           class="col-8 q-mr-md"
           id="container"
           ref="containerRef"
         ></q-card>
-        <q-card class="col q-py-md">
+        <q-card class="col q-py-md" style="height:100%;">
           <div class="text-h6 q-pl-md">
             <q-icon name="icon-canshushezhi" style="font-size: 1.5em"></q-icon
             >设置
@@ -24,7 +24,7 @@
                 >
                   <q-separator />
                   <!-- 类型选择 -->
-                  <div class="row items-center q-pl-md">
+                  <!-- <div class="row items-center q-pl-md">
                     <span class="q-mr-lg text-weight-medium">类型:</span>
                     <q-option-group
                       v-model="searchParam.type"
@@ -34,10 +34,12 @@
                       inline
                       class="text-weight-medium subText"
                     />
-                  </div>
+                  </div> -->
                   <!-- 日期 -->
                   <div class="row items-center q-pl-md q-mt-md">
-                    <span class="q-mr-md text-weight-medium">日期选择:</span>
+                    <span class="q-mr-md text-weight-medium col-3"
+                      >日期选择:</span
+                    >
                     <el-date-picker
                       align="center"
                       style="width:50%;"
@@ -54,7 +56,9 @@
                   </div>
                   <!-- 参保人选择 -->
                   <div class="row items-center q-pl-md q-my-md">
-                    <span class="q-mr-md text-weight-medium">参保人选择:</span>
+                    <span class="q-mr-md text-weight-medium col-3"
+                      >参保人选择:</span
+                    >
                     <q-btn
                       color="secondary"
                       @click="common.dialog.showDialog = true"
@@ -85,7 +89,9 @@
                             v-for="(item, index) in searchParam.personList"
                             :key="index"
                           >
-                            <span class="q-mr-md">参保人{{ index + 1 }}:</span>
+                            <span class="q-mr-md text-weight-medium"
+                              >参保人{{ index + 1 }}:</span
+                            >
                             <q-chip
                               removable
                               @remove="removePersonId(item, index)"
@@ -124,6 +130,19 @@
                   label="节点类型"
                 >
                   <q-separator />
+                  <div class="row justify-center">
+                    <q-toggle
+                      v-for="(value, key, index) in d3.showNode"
+                      :key="index"
+                      v-model="value.value"
+                      :color="value.color"
+                      :icon="value.icon"
+                      size="lg"
+                      :label="value.label"
+                      class="col-5"
+                      @input="switchShow(key)"
+                    />
+                  </div>
                 </q-expansion-item>
                 <!-- 节点信息 -->
                 <q-expansion-item
@@ -133,23 +152,45 @@
                   label="节点信息"
                 >
                   <q-separator />
-                  <div class="tooltip q-py-sm q-px-md"></div>
+                  <div class="q-py-sm q-px-md">
+                    <div
+                      v-for="(item, index) in d3.tooltipData"
+                      :key="index"
+                      class="row q-my-xs"
+                    >
+                      <div class="col-3 text-weight-medium">
+                        {{ item.label }}:
+                      </div>
+                      <div class="col hideText subText">
+                        {{ item.value }}
+                        <q-tooltip
+                          v-if="item.label === '参保人ID'"
+                          content-class="bg-white text-black shadow-4 text-weight-medium"
+                          content-style="font-size: 13px"
+                          :offset="[10, 10]"
+                        >
+                          {{ item.value }}
+                        </q-tooltip>
+                      </div>
+                    </div>
+                  </div>
                 </q-expansion-item>
               </q-list>
             </div>
           </div>
         </q-card>
       </div>
-      <q-dialog v-model="common.dialog.showDialog"
-        ><specificTable
-          @selectConfirm="selectConfirm"
-          url="/person/getPersonList"
-          :searchParam="searchParam"
-          :columns="common.dialog.columns"
-          title="参保人"
-          selection="multiple"
-      /></q-dialog>
     </page-base-scroll>
+    <!-- 选择参保人 -->
+    <q-dialog v-model="common.dialog.showDialog"
+      ><specificTable
+        @selectConfirm="selectConfirm"
+        url="/person/getPersonList"
+        :searchParam="searchParam"
+        :columns="common.dialog.columns"
+        title="参保人"
+        selection="multiple"
+    /></q-dialog>
   </q-page>
 </template>
 <script>
@@ -158,7 +199,11 @@ import * as d3 from "d3";
 import pageBaseScroll from "components/utils/PageScroll";
 import { pickerOptions, shallowCopyObj } from "assets/js/util/common";
 import specificTable from "components/utils/specificTable";
-import { generateR, generateColor } from "assets/js/util/knowledgeGraph";
+import {
+  generateR,
+  generateColor,
+  generateTooltip
+} from "assets/js/util/knowledgeGraph";
 const leng = [
   { group: "Person" },
   { group: "DiagnosticEventsOC" },
@@ -182,7 +227,48 @@ export default {
         nodes: "",
         links: "",
         nodeData: [],
-        linkData: []
+        linkData: [],
+        sourceNodeList: [],
+        sourceLinkList: [],
+        tooltipData: [],
+        showNode: {
+          Person: {
+            label: "参保人",
+            value: true,
+            icon: "icon-user",
+            color: "primary"
+          },
+          DiagnosticEventsOC: {
+            label: "门诊就诊",
+            value: true,
+            icon: "icon-menzhen",
+            color: "OC"
+          },
+          DiagnosticEventsHC: {
+            label: "住院就诊",
+            value: true,
+            icon: "icon-yiyuan",
+            color: "HC"
+          },
+          Date: {
+            label: "日期",
+            value: true,
+            icon: "icon-rili",
+            color: "Date"
+          },
+          knowledgeGraphDrug: {
+            label: "药品",
+            value: true,
+            icon: "icon-menzhenyaofei",
+            color: "knowledgeGraphDrug"
+          },
+          knowledgeGraphMoney: {
+            label: "费用详情",
+            value: true,
+            icon: "icon-feiyong",
+            color: "knowledgeGraphMoney"
+          }
+        }
       },
       common: {
         dialog: {
@@ -244,7 +330,9 @@ export default {
           Person: require("src/assets/image/knowledgeGraph/Person.png"),
           DiagnosticEventsOC: require("src/assets/image/knowledgeGraph/DiagnosticEventsOC.png"),
           DiagnosticEventsHC: require("src/assets/image/knowledgeGraph/DiagnosticEventsHC.png"),
-          Date: require("src/assets/image/knowledgeGraph/Date.png")
+          Date: require("src/assets/image/knowledgeGraph/Date.png"),
+          knowledgeGraphMoney: require("src/assets/image/knowledgeGraph/knowledgeGraphMoney.png"),
+          knowledgeGraphDrug: require("src/assets/image/knowledgeGraph/knowledgeGraphDrug.png")
         }
       }
     };
@@ -252,31 +340,30 @@ export default {
   mounted() {},
   methods: {
     async query() {
-      this.removeSVG();
       let param = {};
       param = shallowCopyObj(this.searchParam, param);
       param.startDate = this.searchParam.chargingTime[0];
       param.endDate = this.searchParam.chargingTime[1];
-      let personData = [];
+      let graphData = [];
       await this.$http
         .post("/knowledgeGraph/query", param)
         .then(res => {
           if (res.status === 200) {
-            personData = res.data.data;
+            graphData = res.data.data;
           }
         })
         .catch(e => {});
-      this.d3.nodeData = personData.nodes;
-      this.d3.linkData = personData.edges;
+      this.d3.nodeData = graphData.nodes.slice();
+      this.d3.linkData = graphData.edges.slice();
 
-      this.graphInit(personData);
+      this.graphInit(graphData);
     },
-    graphInit(personData) {
+    graphInit(graphData) {
       let containerWidth = this.$refs.containerRef.$el.offsetWidth;
       let containerHeight = this.$refs.containerRef.$el.offsetHeight;
 
-      let nodes = personData.nodes;
-      let edges = personData.edges;
+      let nodes = graphData.nodes;
+      let links = graphData.edges;
 
       const svg = this.setVis();
       this.setForce(containerWidth, containerHeight);
@@ -288,12 +375,13 @@ export default {
 
       this.forceSimulation.nodes(nodes).on("tick", this.ticked);
       // 绘制连线
-      this.generateLinks(edges, g);
+      this.generateLinks(links, g);
       // 绘制节点
       this.generateNodes(nodes, g);
     },
     // 创建svg视图
     setVis() {
+      this.removeSVG();
       let svg = d3
         .select("#container")
         .append("div")
@@ -367,14 +455,37 @@ export default {
         .attr("height", "1")
         .attr("xlink:href", this.common.image.Date);
 
+      defs
+        .append("pattern")
+        .attr("id", "knowledgeGraphDrug")
+        .attr("patternContentUnits", "objectBoundingBox")
+        .attr("width", "100%")
+        .attr("height", "100%")
+        .append("image")
+        .attr("width", "1")
+        .attr("height", "1")
+        .attr("xlink:href", this.common.image.knowledgeGraphDrug);
+
+      defs
+        .append("pattern")
+        .attr("id", "knowledgeGraphMoney")
+        .attr("patternContentUnits", "objectBoundingBox")
+        .attr("width", "100%")
+        .attr("height", "100%")
+        .append("image")
+        .attr("width", "1")
+        .attr("height", "1")
+        .attr("xlink:href", this.common.image.knowledgeGraphMoney);
+
       return svg;
     },
     // 清空svg
     removeSVG() {
+      d3.select("svg-container").remove();
       d3.selectAll("#container > *").remove();
-      d3.select("svg").remove();
     },
     // 力导向图布局
+    // https://blog.csdn.net/weixin_34236869/article/details/91432941
     setForce(containerWidth, containerHeight) {
       // 新建一个力导向图
       this.forceSimulation = d3
@@ -445,7 +556,6 @@ export default {
             .on("drag", this.dragged)
             .on("end", this.ended)
         );
-
       this.d3.nodes
         .append("svg:circle")
         .attr("class", "node-bg")
@@ -456,7 +566,8 @@ export default {
         .attr("group", d => d.group)
         .attr("name", d => d.id)
         .on("mouseover", this.mouseover)
-        .on("mouseout", this.mouseout);
+        .on("mouseout", this.mouseout)
+        .on("dblclick", this.dbclickHandler);
     },
     ticked() {
       this.d3.links
@@ -538,111 +649,10 @@ export default {
             return "inactive";
           }
         });
-      }
-      //添加提示框的div
-      let tooltip = d3.select(".tooltip");
-      // console.log(d);
-      let htmlStr = "";
-      // 关键字段样式
-      let classStr =
-        "<span style='color: #838098;font-size: 16px;font-weight: 500;'>";
-      // 字段类型样式
-      let spanClass = "<span style='font-weight: 500;margin-right:5px;'>";
-      tooltip.html(htmlStr);
 
-      htmlStr +=
-        spanClass +
-        "节点类型： </span>" +
-        classStr +
-        d.properties.nodeName +
-        "</span><br/>";
-      htmlStr +=
-        spanClass + "图谱ID： </span>" + classStr + d.id + "</span><br/>";
-
-      if (d.group === "Person") {
-        htmlStr +=
-          spanClass +
-          "姓名 ：</span>" +
-          classStr +
-          d.properties.name +
-          "</span><br/>";
-        htmlStr +=
-          spanClass +
-          "性别 ：</span>" +
-          classStr +
-          d.properties.sex +
-          "</span>" +
-          "<br/>";
-        htmlStr +=
-          "<div style='max-width: 300px;overflow: hidden;white-space: nowrap;" +
-          "text-overflow: ellipsis;font-weight: 500;'>参保人ID ：" +
-          classStr +
-          d.properties.id +
-          "</span>" +
-          "</div>";
-        htmlStr +=
-          spanClass +
-          "出生日期 ：</span>" +
-          classStr +
-          d.properties.birthday +
-          "</span>" +
-          "<br/>";
-        tooltip.html(htmlStr).style("opacity", 1.0);
-      }
-      if (d.group === "Date") {
-        htmlStr +=
-          spanClass +
-          "日期：</span>" +
-          classStr +
-          d.properties.date +
-          "</span>";
-        tooltip.html(htmlStr).style("opacity", 1.0);
-      }
-      if (
-        d.group === "DiagnosticEventsOC" ||
-        d.group === "DiagnosticEventsHC"
-      ) {
-        htmlStr +=
-          "<div style='max-width: 300px;overflow: hidden;white-space: nowrap;" +
-          "text-overflow: ellipsis;font-weight: 500;'>参保人ID ：" +
-          classStr +
-          d.properties.personId +
-          "</span>" +
-          "</div>";
-        htmlStr +=
-          spanClass +
-          "医院ID：</span>" +
-          classStr +
-          d.properties.hospitalID +
-          "</span><br/>";
-        htmlStr +=
-          spanClass +
-          "单据流水号：</span>" +
-          classStr +
-          d.properties.documentSerialNumber +
-          "</span><br/>";
-        if (d.group === "DiagnosticEventsOC") {
-          htmlStr +=
-            spanClass +
-            "门诊流水号：</span>" +
-            classStr +
-            d.properties.serialNumber +
-            "</span><br/>";
-        } else {
-          htmlStr +=
-            spanClass +
-            "住院流水号：</span>" +
-            classStr +
-            d.properties.serialNumber +
-            "</span><br/>";
-        }
-        htmlStr +=
-          spanClass +
-          "费用日期：</span>" +
-          classStr +
-          d.properties.date +
-          "</span><br/>";
-        tooltip.html(htmlStr).style("opacity", 1.0);
+        //添加提示框的div
+        let tooltip = d3.select(".tooltip");
+        this.d3.tooltipData = generateTooltip(d);
       }
     },
     // 鼠标离开
@@ -660,6 +670,51 @@ export default {
           .attr("class", "");
       }
     },
+    // 双击实现
+    async dbclickHandler(that) {
+      let id = that.id;
+      let node = this.d3.nodeData.find(v => v.id === id);
+      //如果节点未展开
+
+      if (!node.isExpand) {
+        node.isExpand = true;
+        if (
+          node.group === "DiagnosticEventsOC" ||
+          node.group === "DiagnosticEventsHC"
+        ) {
+          let param = {
+            type: node.group.substring(
+              node.group.length - 2,
+              node.group.length
+            ),
+            documentSerialNumber: node.properties.documentSerialNumber,
+            target: id
+          };
+          let result = [];
+          await this.$http
+            .post("/knowledgeGraph/getKnowledgeGraphDrugMoney", param)
+            .then(res => {
+              if (res.status === 200) {
+                result = res.data.data;
+              }
+            })
+            .catch(e => {});
+          // console.log(result);
+          let that = this;
+          let nodeData = [];
+          result.nodes.map(item => {
+            that.d3.nodeData.push(item);
+          });
+          result.edges.map(item => {
+            that.d3.linkData.push(item);
+          });
+          this.graphInit({
+            nodes: that.d3.nodeData.slice(),
+            edges: that.d3.linkData.slice()
+          });
+        }
+      }
+    },
     // 确认选择参保人
     selectConfirm(data) {
       this.common.dialog.showDialog = false;
@@ -673,6 +728,68 @@ export default {
     // 删除参保人
     removePersonId(obj, index) {
       this.searchParam.personList.splice(index, 1);
+    },
+    // 显示与隐藏节点
+    switchShow(nodeType) {
+      if (!this.d3.showNode[nodeType].value) {
+        window[`node${nodeType}Show_checked`] = false;
+
+        // 选中所有节点
+        const nodes = d3.select("svg").selectAll("circle");
+        // 选中所有线段
+        const edges = d3.select("svg").selectAll("line");
+
+        const texts = d3.selectAll("text");
+        // 用filter筛选出节点属性group为nodeType的节点
+        nodes
+          .filter(d => d.group === nodeType)
+          // 举例：三元表达式，根据nodePatientShow_checked的值设置颜色display为none隐藏
+          .style("display", "none")
+          // 遍历所有筛选出的节点
+          .each(node => {
+            // 筛选出线段的sourceId或者targetId为nodeId的线段，即找出有连接之前‘筛选出的节点’的线段
+            edges
+              .filter(
+                link => link.source.id === node.id || link.target.id === node.id
+              )
+              // 设置线段隐藏
+              .style("display", "none");
+          });
+      } else {
+        // 举例：比如输入的参数nodeType为'Patient'，实际情况可以是'Patient','DiagnosisEvent','Date','Hospital'等
+        // 举例：下面这句就会变为window[`nodePatientShow_checked`] = !window[`nodePatientShow_checked`]
+        // 举例：就变成把全局作用域下的nodePatientShow_checked变量赋予相反值
+        window[`node${nodeType}Show_checked`] = !window[
+          `node${nodeType}Show_checked`
+        ];
+        // 选中所有节点
+        const nodes = d3.select("svg").selectAll("circle");
+        // 选中所有线段
+        const edges = d3.select("svg").selectAll("line");
+
+        const texts = d3.selectAll("text");
+        // 用filter筛选出节点属性group为nodeType的节点
+        nodes
+          .filter(d => d.group === nodeType)
+          // 举例：三元表达式，根据nodePatientShow_checked的值设置颜色display为block显示或none隐藏
+          .style(
+            "display",
+            window[`node${nodeType}Show_checked`] ? "block" : "none"
+          )
+          // 遍历所有筛选出的节点
+          .each(node => {
+            // 筛选出线段的sourceId或者targetId为nodeId的线段，即找出有连接之前‘筛选出的节点’的线段
+            edges
+              .filter(
+                link => link.source.id === node.id || link.target.id === node.id
+              )
+              // 设置线段显示或者隐藏
+              .style(
+                "display",
+                window[`node${nodeType}Show_checked`] ? "block" : "none"
+              );
+          });
+      }
     }
   }
 };
@@ -697,6 +814,21 @@ export default {
 }
 </style>
 <style>
+.text-OC {
+  color: #4aa79c;
+}
+.text-HC {
+  color: #e64b2a;
+}
+.text-Date {
+  color: #cd4a43;
+}
+.text-knowledgeGraphDrug {
+  color: #699759;
+}
+.text-knowledgeGraphMoney {
+  color: #5996e5;
+}
 .svg-container {
   display: inline-block;
   position: relative;
