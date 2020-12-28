@@ -45,6 +45,21 @@ main {
   letter-spacing: 0.5px;
   word-spacing: 1.5px;
   height: auto;
+  .text-OC {
+    color: #4aa79c;
+  }
+  .text-HC {
+    color: #e64b2a;
+  }
+  .text-Date {
+    color: #cd4a43;
+  }
+  .text-knowledgeGraphDrug {
+    color: #699759;
+  }
+  .text-knowledgeGraphMoney {
+    color: #5996e5;
+  }
   .q-card {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
   }

@@ -2,29 +2,30 @@
   <q-page class="knowledgeGraph">
     <page-base-scroll content_class="q-pt-md q-px-md">
       <div class="row ">
-        <q-card
-          class="col-8 q-mr-md"
-          id="container"
-          ref="containerRef"
-        ></q-card>
-        <q-card class="col q-py-md" style="height:100%;">
-          <div class="text-h6 q-pl-md">
-            <q-icon name="icon-canshushezhi" style="font-size: 1.5em"></q-icon
-            >设置
-          </div>
-          <div class="row justify-center">
-            <div class="col-11">
-              <q-list>
-                <!-- 参数设置 -->
-                <q-expansion-item
-                  popup
-                  default-opened
-                  icon="icon-_canshu_xiugaicanshudingyi"
-                  label="参数设置"
-                >
-                  <q-separator />
-                  <!-- 类型选择 -->
-                  <!-- <div class="row items-center q-pl-md">
+        <!-- 就医轨迹卡 -->
+        <q-card class="col-8 q-mr-md" id="container" ref="containerRef">
+          <div class="svg-container"></div>
+        </q-card>
+        <!-- 设置卡 -->
+        <q-card class="col q-pt-md q-pb-sm">
+          <q-scroll-area style="height: 900px;">
+            <div class="text-h6 q-pl-md">
+              <q-icon name="icon-canshushezhi" style="font-size: 1.5em"></q-icon
+              >设置
+            </div>
+            <div class="row justify-center">
+              <div class="col-11">
+                <q-list>
+                  <!-- 参数设置 -->
+                  <q-expansion-item
+                    popup
+                    default-opened
+                    icon="icon-_canshu_xiugaicanshudingyi"
+                    label="参数设置"
+                  >
+                    <q-separator />
+                    <!-- 类型选择 -->
+                    <!-- <div class="row items-center q-pl-md">
                     <span class="q-mr-lg text-weight-medium">类型:</span>
                     <q-option-group
                       v-model="searchParam.type"
@@ -35,149 +36,185 @@
                       class="text-weight-medium subText"
                     />
                   </div> -->
-                  <!-- 日期 -->
-                  <div class="row items-center q-pl-md q-mt-md">
-                    <span class="q-mr-md text-weight-medium col-3"
-                      >日期选择:</span
-                    >
-                    <el-date-picker
-                      align="center"
-                      style="width:50%;"
-                      value-format="yyyyMMdd"
-                      v-model="searchParam.chargingTime"
-                      type="monthrange"
-                      unlink-panels
-                      clearable
-                      start-placeholder="开始月份"
-                      end-placeholder="结束月份"
-                      :picker-options="common.pickerOptions"
-                    >
-                    </el-date-picker>
-                  </div>
-                  <!-- 参保人选择 -->
-                  <div class="row items-center q-pl-md q-my-md">
-                    <span class="q-mr-md text-weight-medium col-3"
-                      >参保人选择:</span
-                    >
-                    <q-btn
-                      color="secondary"
-                      @click="common.dialog.showDialog = true"
-                      >参保人选择</q-btn
-                    >
-                    <q-btn @click="query()" color="primary" class="q-ml-md"
-                      >查询</q-btn
-                    >
-                  </div>
-                  <q-separator />
-                </q-expansion-item>
-                <!-- 已选参保人 -->
-                <q-expansion-item
-                  popup
-                  default-opened
-                  icon="icon-user-group-fill"
-                  label="已选参保人"
-                >
-                  <q-separator />
-                  <q-card>
-                    <q-card-section>
-                      <div>
-                        <div
-                          class="col row"
-                          v-if="searchParam.personList.length > 0"
-                        >
+                    <div class="row items-center q-pl-md q-mt-sm">
+                      <span class="q-mr-md text-weight-medium col-5"
+                        >是否展示节点提示框:</span
+                      >
+                      <q-toggle
+                        v-model="d3.isShowTooltip"
+                        checked-icon="check"
+                        color="green"
+                        @input="isShowTooltip"
+                        unchecked-icon="clear"
+                      />
+                    </div>
+                    <!-- 日期 -->
+                    <div class="row items-center q-pl-md q-mt-sm">
+                      <span class="q-mr-md text-weight-medium col-3"
+                        >日期选择:</span
+                      >
+                      <el-date-picker
+                        align="center"
+                        style="width:50%;"
+                        value-format="yyyyMMdd"
+                        v-model="searchParam.chargingTime"
+                        type="monthrange"
+                        unlink-panels
+                        clearable
+                        start-placeholder="开始月份"
+                        end-placeholder="结束月份"
+                        :picker-options="common.pickerOptions"
+                      >
+                      </el-date-picker>
+                    </div>
+                    <!-- 参保人选择 -->
+                    <div class="row items-center q-pl-md q-my-md">
+                      <span class="q-mr-md text-weight-medium col-3"
+                        >参保人选择:</span
+                      >
+                      <q-btn
+                        color="secondary"
+                        @click="common.dialog.showDialog = true"
+                        >参保人选择</q-btn
+                      >
+                      <q-btn @click="query()" color="primary" class="q-ml-md"
+                        >查询</q-btn
+                      >
+                    </div>
+                    <q-separator />
+                  </q-expansion-item>
+                  <!-- 已选参保人 -->
+                  <q-expansion-item
+                    popup
+                    default-opened
+                    icon="icon-user-group-fill"
+                    label="已选参保人"
+                  >
+                    <q-separator />
+                    <q-card>
+                      <q-card-section>
+                        <div>
                           <div
-                            v-for="(item, index) in searchParam.personList"
-                            :key="index"
+                            class="col row"
+                            v-if="searchParam.personList.length > 0"
                           >
-                            <span class="q-mr-md text-weight-medium"
-                              >参保人{{ index + 1 }}:</span
+                            <div
+                              v-for="(item, index) in searchParam.personList"
+                              :key="index"
                             >
-                            <q-chip
-                              removable
-                              @remove="removePersonId(item, index)"
-                              outline
-                              color="light-blue"
-                              icon="icon-user"
-                              style="max-width: 300px"
-                            >
-                              <div class="hideText">
-                                {{ item }}
-                                <q-tooltip
-                                  content-class="bg-white text-black shadow-4 text-weight-medium"
-                                  content-style="font-size: 13px"
-                                  :offset="[10, 10]"
-                                >
+                              <span class="q-mr-md text-weight-medium"
+                                >参保人{{ index + 1 }}:</span
+                              >
+                              <q-chip
+                                removable
+                                @remove="removePersonId(item, index)"
+                                outline
+                                color="light-blue"
+                                icon="icon-user"
+                                style="max-width: 300px"
+                              >
+                                <div class="hideText">
                                   {{ item }}
-                                </q-tooltip>
-                              </div>
-                            </q-chip>
+                                  <q-tooltip
+                                    content-class="bg-white text-black shadow-4 text-weight-medium"
+                                    content-style="font-size: 13px"
+                                    :offset="[10, 10]"
+                                  >
+                                    {{ item }}
+                                  </q-tooltip>
+                                </div>
+                              </q-chip>
+                            </div>
+                          </div>
+                          <div v-else class="row  text-weight-medium col">
+                            <div class="offset-2">
+                              无
+                            </div>
                           </div>
                         </div>
-                        <div v-else class="row  text-weight-medium col">
-                          <div class="offset-2">
-                            无
-                          </div>
+                      </q-card-section>
+                    </q-card>
+                  </q-expansion-item>
+                  <!-- 节点类型 -->
+                  <q-expansion-item
+                    popup
+                    default-opened
+                    icon="icon-jiediancuxiao"
+                    label="节点类型"
+                  >
+                    <q-separator />
+                    <div class="row justify-center">
+                      <q-toggle
+                        v-for="(value, key, index) in d3.showNode"
+                        :key="index"
+                        v-model="value.value"
+                        :color="value.color"
+                        :icon="value.icon"
+                        size="lg"
+                        :label="value.label"
+                        class="col-5"
+                        @input="switchShow(key)"
+                      />
+                    </div>
+                  </q-expansion-item>
+                  <!-- 搜索节点 -->
+                  <q-expansion-item
+                    popup
+                    default-opened
+                    icon="icon-sousuo"
+                    label="搜索"
+                  >
+                    <q-separator />
+                    <div class="row q-pa-md items-center">
+                      <span class="q-mr-lg text-weight-medium">搜索节点:</span>
+                      <q-input
+                        outlined
+                        v-model="d3.search"
+                        @input="searchNode"
+                        clearable
+                        dense
+                      >
+                        <template v-slot:append>
+                          <q-icon name="search" />
+                        </template>
+                      </q-input>
+                    </div>
+                  </q-expansion-item>
+                  <!-- 节点信息 -->
+                  <q-expansion-item
+                    popup
+                    default-opened
+                    icon="icon-xinxi1"
+                    label="节点信息"
+                  >
+                    <q-separator />
+                    <div class="q-py-sm q-px-md">
+                      <div
+                        v-for="(item, index) in d3.tooltipData"
+                        :key="index"
+                        class="row q-my-xs"
+                      >
+                        <div class="col-3 text-weight-medium">
+                          {{ item.label }}:
                         </div>
-                      </div>
-                    </q-card-section>
-                  </q-card>
-                </q-expansion-item>
-                <!-- 节点类型 -->
-                <q-expansion-item
-                  popup
-                  default-opened
-                  icon="icon-jiediancuxiao"
-                  label="节点类型"
-                >
-                  <q-separator />
-                  <div class="row justify-center">
-                    <q-toggle
-                      v-for="(value, key, index) in d3.showNode"
-                      :key="index"
-                      v-model="value.value"
-                      :color="value.color"
-                      :icon="value.icon"
-                      size="lg"
-                      :label="value.label"
-                      class="col-5"
-                      @input="switchShow(key)"
-                    />
-                  </div>
-                </q-expansion-item>
-                <!-- 节点信息 -->
-                <q-expansion-item
-                  popup
-                  default-opened
-                  icon="icon-xinxi1"
-                  label="节点信息"
-                >
-                  <q-separator />
-                  <div class="q-py-sm q-px-md">
-                    <div
-                      v-for="(item, index) in d3.tooltipData"
-                      :key="index"
-                      class="row q-my-xs"
-                    >
-                      <div class="col-3 text-weight-medium">
-                        {{ item.label }}:
-                      </div>
-                      <div class="col hideText subText">
-                        {{ item.value }}
-                        <q-tooltip
-                          v-if="item.label === '参保人ID'"
-                          content-class="bg-white text-black shadow-4 text-weight-medium"
-                          content-style="font-size: 13px"
-                          :offset="[10, 10]"
-                        >
+                        <div class="col hideText subText">
                           {{ item.value }}
-                        </q-tooltip>
+                          <q-tooltip
+                            v-if="item.label === '参保人ID'"
+                            content-class="bg-white text-black shadow-4 text-weight-medium"
+                            content-style="font-size: 13px"
+                            :offset="[10, 10]"
+                          >
+                            {{ item.value }}
+                          </q-tooltip>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </q-expansion-item>
-              </q-list>
+                  </q-expansion-item>
+                </q-list>
+              </div>
             </div>
-          </div>
+          </q-scroll-area>
         </q-card>
       </div>
     </page-base-scroll>
@@ -268,7 +305,9 @@ export default {
             icon: "icon-feiyong",
             color: "knowledgeGraphMoney"
           }
-        }
+        },
+        search: "",
+        isShowTooltip: true
       },
       common: {
         dialog: {
@@ -359,13 +398,15 @@ export default {
       this.graphInit(graphData);
     },
     graphInit(graphData) {
+      this.d3.tooltipData = [];
+      // 获取容器宽高
       let containerWidth = this.$refs.containerRef.$el.offsetWidth;
       let containerHeight = this.$refs.containerRef.$el.offsetHeight;
 
       let nodes = graphData.nodes;
       let links = graphData.edges;
 
-      const svg = this.setVis();
+      const svg = this.setVis(containerWidth, containerHeight);
       this.setForce(containerWidth, containerHeight);
 
       this.forceSimulation.alphaTarget(0.1);
@@ -380,20 +421,29 @@ export default {
       this.generateNodes(nodes, g);
     },
     // 创建svg视图
-    setVis() {
+    setVis(containerWidth, containerHeight) {
       this.removeSVG();
+      let tooltip = d3
+        .select("body")
+        .append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0.0);
+
+      // 加500的原因是修复全屏模式画布大小不够的问题
+      let svg_width = window.screen.width;
+      let svg_height = window.screen.height;
+
       let svg = d3
         .select("#container")
-        .append("div")
-        .classed("svg-container", true)
-        .append("svg")
+        .append("svg:svg")
+        .attr("id", "J_SvgView")
         // Responsive SVG needs these 2 attributes and no width and height attr.
         .attr("preserveAspectRatio", "xMidYMid meet")
         .attr("viewBox", "0 0 1000 1000")
-        .attr("preserveAspectRatio", "none")
         // Class to make it responsive.
         .classed("svg-content-responsive", true)
-        // .style("max-height", "950px")
+        .attr("width", containerWidth)
+        .attr("height", containerHeight)
         .call(
           d3
             .zoom()
@@ -404,7 +454,11 @@ export default {
         )
         .on("dblclick.zoom", null);
 
-      const g = svg.append("g");
+      const g = svg
+        .append("g")
+        .attr("class", "all")
+        .attr("data-width", 1000)
+        .attr("data-height", 1000);
 
       let defs = d3
         .select("#container")
@@ -481,8 +535,9 @@ export default {
     },
     // 清空svg
     removeSVG() {
-      d3.select("svg-container").remove();
-      d3.selectAll("#container > *").remove();
+      d3.selectAll("svg > *").remove();
+      d3.select("#J_SvgView").remove();
+      d3.select(".tooltip").remove();
     },
     // 力导向图布局
     // https://blog.csdn.net/weixin_34236869/article/details/91432941
@@ -537,6 +592,7 @@ export default {
     },
     // 绘制节点
     generateNodes(nodes, g) {
+      let tooltip = d3.select(".tooltip");
       this.d3.nodes = g
         .selectAll(".circleText")
         .data(nodes)
@@ -566,6 +622,13 @@ export default {
         .attr("group", d => d.group)
         .attr("name", d => d.id)
         .on("mouseover", this.mouseover)
+        .on("mousemove", function(d) {
+          /* 鼠标移动时，更改样式 left 和 top 来改变提示框的位置 */
+
+          tooltip
+            .style("left", d3.event.pageX + "px")
+            .style("top", d3.event.pageY + 20 + "px");
+        })
         .on("mouseout", this.mouseout)
         .on("dblclick", this.dbclickHandler);
     },
@@ -652,12 +715,23 @@ export default {
 
         //添加提示框的div
         let tooltip = d3.select(".tooltip");
+        let htmlStr = "";
+        for (let key in d.properties) {
+          htmlStr += key + " : ";
+          htmlStr += d.properties[key] + "<br/>";
+        }
+        tooltip
+          .html(htmlStr)
+          .style("left", d3.event.pageX + "px")
+          .style("top", d3.event.pageY + 20 + "px")
+          .style("opacity", 1.0);
+
         this.d3.tooltipData = generateTooltip(d);
       }
     },
     // 鼠标离开
     mouseout() {
-      if (!this.d3.dragging) {
+      if (!this.d3.dragging && this.d3.search == "") {
         const svg = d3.select("#container").select("svg");
         svg.selectAll("text").attr("class", "");
         svg
@@ -668,6 +742,8 @@ export default {
           .selectAll("line")
           .selectAll("line")
           .attr("class", "");
+        let tooltip = d3.select(".tooltip");
+        tooltip.style("opacity", 0.0);
       }
     },
     // 双击实现
@@ -699,7 +775,6 @@ export default {
               }
             })
             .catch(e => {});
-          // console.log(result);
           let that = this;
           let nodeData = [];
           result.nodes.map(item => {
@@ -790,6 +865,66 @@ export default {
               );
           });
       }
+    },
+    searchNode(node) {
+      // 如果输入为空，全部显示出来
+      const svg = d3.select("#container").select("svg");
+
+      if (node === "") {
+        svg.selectAll("text").attr("class", "");
+        svg
+          .selectAll(".nodes")
+          .selectAll("circle")
+          .attr("class", "");
+        svg.selectAll("line").attr("class", "");
+      } else {
+        // 筛选，判断这三个东西里的元素是否包含输入的东西
+        //筛选然后设置class，样式在/knowledgeGraph/css/medicalTrack.css
+        svg
+          .selectAll(".nodes")
+          .selectAll("circle")
+          .attr("class", function(d) {
+            let isContain = false;
+            for (let key in d.properties) {
+              let item = d.properties[key];
+              if (d.properties[key].indexOf(node) != -1) {
+                isContain = true;
+                break;
+              }
+            }
+            if (isContain) {
+              return "";
+            } else {
+              return "inactive";
+            }
+            // if (d.properties.AAC001 !== null && (d.properties.AAC001 + '').indexOf(name.toLowerCase()) >= 0) {
+            //     return '';
+            // } else if (d.properties.aac001 !== null && (d.properties.aac001 + '').indexOf(name.toLowerCase()) >= 0) {
+            //     return '';
+            // } else if (d.properties.date !== null && (d.properties.date + '').indexOf(name.toLowerCase()) >= 0) {
+            //     return '';
+            // } else if (d.properties.AAC003 !== null && (d.properties.AAC003 + '').indexOf(name.toLowerCase()) >= 0) {
+            //     return '';
+            // } else if (d.properties.AAZ107 !== null && (d.properties.AAZ107 + '').indexOf(name.toLowerCase()) >= 0) {
+            //     return '';
+            // } else {
+            //     return 'inactive';
+            // }
+          });
+        svg.selectAll("line").attr("class", "inactive");
+        // d3.select("#svg1 .linetexts").selectAll('text').attr('fill-opacity', 0);
+      }
+    },
+    isShowTooltip(bool) {
+      if (bool) {
+        let tooltip = d3
+          .select("body")
+          .append("div")
+          .attr("class", "tooltip")
+          .style("opacity", 0.0);
+      } else {
+        d3.select(".tooltip").remove();
+      }
     }
   }
 };
@@ -814,35 +949,7 @@ export default {
 }
 </style>
 <style>
-.text-OC {
-  color: #4aa79c;
-}
-.text-HC {
-  color: #e64b2a;
-}
-.text-Date {
-  color: #cd4a43;
-}
-.text-knowledgeGraphDrug {
-  color: #699759;
-}
-.text-knowledgeGraphMoney {
-  color: #5996e5;
-}
-.svg-container {
-  display: inline-block;
-  position: relative;
-  width: 100%;
-  padding-bottom: 70%; /* aspect ratio */
-  vertical-align: top;
-  overflow: hidden;
-}
-.svg-content-responsive {
-  display: inline-block;
-  position: absolute;
-  top: 10px;
-  left: 0;
-}
+/* d3有些样式不能写在scoped里 */
 line {
   stroke: rgb(240, 240, 240); /*线的颜色*/
   stroke-opacity: 0.4; /*线的透明度*/
@@ -867,5 +974,17 @@ line.active {
   /*display: none !important;*/
   fill-opacity: 0.2;
   stroke-width: 0;
+}
+.tooltip {
+  position: absolute;
+  width: auto;
+  height: auto;
+  font-family: simsun;
+  font-size: 14px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
+  background-color: white;
+  border-radius: 5px;
+  padding: 10px;
 }
 </style>
