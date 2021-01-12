@@ -9,7 +9,7 @@
             <q-input
               class="inputs"
               rounded
-              standout="bg-primary text-white"
+              outlined
               bottom-slots
               label="UserName"
               clearable
@@ -25,7 +25,7 @@
             <q-input
               class="inputs"
               rounded
-              standout="bg-primary text-white"
+              outlined
               bottom-slots
               label="Password"
               :type="isPwd ? 'password' : 'text'"
@@ -46,7 +46,7 @@
             </q-input>
           </div>
           <q-btn
-            class="button "
+            class="button"
             :loading="submitting"
             color="secondary"
             @click="simulateProgress"
@@ -60,7 +60,7 @@
             <q-input
               class="inputs"
               rounded
-              standout="bg-primary text-white"
+              outlined
               bottom-slots
               label="UserName"
               clearable
@@ -76,7 +76,7 @@
             <q-input
               class="inputs"
               rounded
-              standout="bg-primary text-white"
+              outlined
               bottom-slots
               label="Email"
               clearable
@@ -93,7 +93,7 @@
             <q-input
               class="inputs"
               rounded
-              standout="bg-primary text-white"
+              outlined
               bottom-slots
               label="Password"
               :type="isPwd ? 'password' : 'text'"
@@ -295,7 +295,7 @@ export default {
         }
       }
       .button {
-        width: 180px;
+        width: 20%;
         height: 50px;
         border-radius: 25px;
         margin-top: 10px;

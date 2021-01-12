@@ -423,11 +423,13 @@ export default {
     // 创建svg视图
     setVis(containerWidth, containerHeight) {
       this.removeSVG();
-      let tooltip = d3
-        .select("body")
-        .append("div")
-        .attr("class", "tooltip")
-        .style("opacity", 0.0);
+      if (this.d3.isShowTooltip) {
+        let tooltip = d3
+          .select("body")
+          .append("div")
+          .attr("class", "tooltip")
+          .style("opacity", 0.0);
+      }
 
       // 加500的原因是修复全屏模式画布大小不够的问题
       let svg_width = window.screen.width;
