@@ -1,4 +1,4 @@
-import { image } from "d3";
+import { maxIndex } from "d3";
 import echarts from "echarts";
 import { calculate } from "../util/common";
 function setLineChartOption(chartData, searchParam) {
@@ -186,7 +186,6 @@ function setLineChartOption(chartData, searchParam) {
   return option;
 }
 function setdrugRadarChartOption(radarData) {
-  console.log(radarData);
   let max1 = 0;
   let max2 = 0;
   let temp = radarData.data[0];
@@ -388,4 +387,225 @@ function setdrugRadarChartOption(radarData) {
   };
   return option;
 }
-export { setLineChartOption, setdrugRadarChartOption };
+function setoVerallPlanningOption(overallPlanning, searchParam) {
+  let dashedPic =
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAM8AAAAOBAMAAAB6G1V9AAAAD1BMVEX////Kysrk5OTj4+TJycoJ0iFPAAAAG0lEQVQ4y2MYBaNgGAMTQQVFOiABhlEwCugOAMqzCykGOeENAAAAAElFTkSuQmCC";
+  let colorArr = ["#ff4343", "#f69846", "#f6d54a", "#45dbf7", "#44aff0"];
+  let color = ["", "", "", "", ""];
+  console.log(overallPlanning);
+  let temp = overallPlanning.data[0];
+  let chartData = [];
+  let name = [
+    "统筹一段费用",
+    "统筹二段费用",
+    "统筹三段费用",
+    "统筹四段费用",
+    "统筹五段费用"
+  ];
+  let sortArr = [];
+
+  for (let index = 0; index < name.length; index++) {
+    const element = name[index];
+    sortArr.push(temp[element]);
+    chartData.push({
+      name: element,
+      value: temp[element],
+      unit: "元"
+    });
+  }
+  // sortArr.sort();
+  console.log(sortArr);
+
+  let colorTemp = [1, 1, 1, 1, 1];
+
+  for (let index = 0; index < sortArr.length; index++) {
+    let max = 0;
+    let maxIndex = 0;
+    for (let i = 0; i < sortArr.length; i++) {
+      if (max <= sortArr[i] && colorTemp[i] === 1) {
+        max = sortArr[i];
+        maxIndex = i;
+      }
+    }
+    colorTemp[maxIndex] = 0;
+    console.log(maxIndex);
+    // console.log(maxIndex);
+    color[maxIndex] = colorArr[index];
+  }
+
+  let arrName = [];
+  let arrValue = [];
+  let sum = 0;
+  let pieSeries = [],
+    lineYAxis = [];
+
+  // 数据处理
+  chartData.forEach((v, i) => {
+    arrName.push(v.name);
+    arrValue.push(v.value);
+    sum = sum + v.value;
+  });
+
+  // 图表option整理
+  chartData.forEach((v, i) => {
+    pieSeries.push({
+      name: "统筹费用情况",
+      type: "pie",
+      clockWise: false,
+      hoverAnimation: false,
+      radius: [75 - i * 15 + "%", 67 - i * 15 + "%"],
+      center: ["40%", "50%"],
+      label: {
+        show: false
+      },
+      data: [
+        {
+          value: v.value,
+          name: v.name
+        },
+        {
+          value: sum - v.value,
+          name: "",
+          itemStyle: {
+            color: "rgba(0,0,0,0)"
+          }
+        }
+      ]
+    });
+    pieSeries.push({
+      name: "",
+      type: "pie",
+      silent: true,
+      z: 1,
+      clockWise: false, //顺时加载
+      hoverAnimation: false, //鼠标移入变大
+      radius: [75 - i * 15 + "%", 67 - i * 15 + "%"],
+      center: ["40%", "50%"],
+      label: {
+        show: false
+      },
+      data: [
+        {
+          value: 7.5,
+          itemStyle: {
+            color: "#E3F0FF"
+          }
+        },
+        {
+          value: 2.5,
+          name: "",
+          itemStyle: {
+            color: "rgba(0,0,0,0)"
+          }
+        }
+      ]
+    });
+    v.percent = ((v.value / sum) * 100).toFixed(1) + "%";
+    lineYAxis.push({
+      value: i,
+      textStyle: {
+        rich: {
+          circle: {
+            color: color[i],
+            padding: [0, 5]
+          }
+        }
+      }
+    });
+  });
+
+  let option = {
+    // title: {
+    //   text: "统筹费用情况",
+    //   textStyle: {
+    //     fontSize: 20,
+    //     fontWeight: 500
+    //   },
+    //   left: "center",
+    //   top: "4%"
+    // },
+    backgroundColor: "#fff",
+    color: color,
+    grid: {
+      top: "12%",
+      bottom: "54%",
+      left: "40%",
+      containLabel: false
+    },
+    yAxis: [
+      {
+        type: "category",
+        inverse: true,
+        axisLine: {
+          show: false
+        },
+        axisTick: {
+          show: false
+        },
+        axisLabel: {
+          formatter: function(params) {
+            let item = chartData[params];
+            return (
+              "{line|}{circle|●}{name|" +
+              item.name +
+              "}{bd||}{percent|" +
+              item.percent +
+              "}{value|" +
+              item.value +
+              "}{unit|  元}"
+            );
+          },
+          interval: 0,
+          inside: true,
+          textStyle: {
+            color: "#333",
+            fontSize: 14,
+            rich: {
+              line: {
+                width: 100,
+                height: 10,
+                backgroundColor: { image: dashedPic }
+              },
+              name: {
+                color: "#666",
+                fontSize: 14
+              },
+              bd: {
+                color: "#ccc",
+                padding: [0, 5],
+                fontSize: 14
+              },
+              percent: {
+                color: "#333",
+                fontSize: 14
+              },
+              value: {
+                color: "#333",
+                fontSize: 16,
+                fontWeight: 500,
+                padding: [0, 0, 0, 20]
+              },
+              unit: {
+                fontSize: 14
+              }
+            }
+          },
+          show: true
+        },
+        data: lineYAxis
+      }
+    ],
+    xAxis: [
+      {
+        show: false
+      }
+    ],
+    series: pieSeries
+  };
+  return option;
+}
+export {
+  setLineChartOption,
+  setdrugRadarChartOption,
+  setoVerallPlanningOption
+};

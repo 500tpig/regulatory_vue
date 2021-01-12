@@ -66,7 +66,7 @@
           <q-card class="col-12" id="drugRadar"></q-card>
         </div>
         <div class="col-6 row justify-center q-px-md">
-          <q-card class="col-12" id="asAWhole"></q-card>
+          <q-card class="col-12" id="overallPlanning"></q-card>
         </div>
       </div>
     </page-base-scroll>
@@ -80,7 +80,8 @@ import specificTable from "components/utils/specificTable";
 import { EleResize } from "assets/js/util/esresize";
 import {
   setLineChartOption,
-  setdrugRadarChartOption
+  setdrugRadarChartOption,
+  setoVerallPlanningOption
 } from "assets/js/charts/overviewOptions";
 export default {
   components: { pageBaseScroll },
@@ -121,7 +122,17 @@ export default {
         })
         .catch(() => {});
 
-      this.afterHttp(optionData, drugRadarData);
+      let overallPlanning = [];
+      await this.$http
+        .post("/fundUse/overallPlanning", param)
+        .then(res => {
+          if (res.status === 200) {
+            overallPlanning = res.data.data;
+          }
+        })
+        .catch(() => {});
+
+      this.afterHttp(optionData, drugRadarData, overallPlanning);
     },
     // 画图表
     drawChart(option, id) {
@@ -142,17 +153,21 @@ export default {
         let drugRadarChart = this.$echarts.init(
           document.getElementById("drugRadar")
         );
+        let overallPlanningChart = this.$echarts.init(
+          document.getElementById("overallPlanning")
+        );
 
         let linstener = function() {
           lineChart.resize();
           drugRadarChart.resize();
+          overallPlanningChart.resize();
         };
         EleResize.on(resizeDiv, linstener);
         this.common.isInitialize = false;
       }
     },
     // 处理请求后的结果
-    afterHttp(optionData, drugRadarData) {
+    afterHttp(optionData, drugRadarData, overallPlanning) {
       let lineChartOption = setLineChartOption(optionData, this.searchParam);
       this.drawChart(lineChartOption, "lineChart");
 
@@ -161,6 +176,12 @@ export default {
         this.searchParam
       );
       this.drawChart(drugRadarOption, "drugRadar");
+
+      let overallPlanningOption = setoVerallPlanningOption(
+        overallPlanning,
+        this.searchParam
+      );
+      this.drawChart(overallPlanningOption, "overallPlanning");
     }
   },
   mounted() {
