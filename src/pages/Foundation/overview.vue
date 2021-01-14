@@ -69,19 +69,32 @@
           <q-card class="col-12" id="overallPlanning"></q-card>
         </div>
       </div>
+      <div class="row justify-center q-mt-md">
+        <div class="col-6 row justify-center q-px-md">
+          <q-card class="col-12" id="subsidyChart"></q-card>
+        </div>
+        <div class="col-6 row justify-center q-px-md">
+          <q-card class="col-12"></q-card>
+        </div>
+      </div>
     </page-base-scroll>
   </q-page>
 </template>
 
 <script>
 import pageBaseScroll from "components/utils/PageScroll";
-import { pickerOptions, shallowCopyObj } from "assets/js/util/common";
+import {
+  pickerOptions,
+  shallowCopyObj,
+  getMonthLastDay
+} from "assets/js/util/common";
 import specificTable from "components/utils/specificTable";
 import { EleResize } from "assets/js/util/esresize";
 import {
   setLineChartOption,
   setdrugRadarChartOption,
-  setoVerallPlanningOption
+  setoVerallPlanningOption,
+  setSubsidyChartOption
 } from "assets/js/charts/overviewOptions";
 export default {
   components: { pageBaseScroll },
@@ -102,6 +115,7 @@ export default {
       param = shallowCopyObj(this.searchParam, param);
       param.startDate = this.searchParam.chargingTime[0];
       param.endDate = this.searchParam.chargingTime[1];
+      param.endDate = getMonthLastDay(param.endDate);
       let optionData = [];
       await this.$http
         .post("/fundUse/monthlyFee", param)
@@ -132,7 +146,20 @@ export default {
         })
         .catch(() => {});
 
-      this.afterHttp(optionData, drugRadarData, overallPlanning);
+      let subsidyData = [];
+
+      await this.$http
+        .post("/fundUse/subsidy", param)
+        .then(res => {
+          if (res.status === 200) {
+            subsidyData = res.data.data;
+          }
+        })
+        .catch(() => {});
+
+      console.log(subsidyData);
+
+      this.afterHttp(optionData, drugRadarData, overallPlanning, subsidyData);
     },
     // 画图表
     drawChart(option, id) {
@@ -157,17 +184,22 @@ export default {
           document.getElementById("overallPlanning")
         );
 
+        let subsidyChart = this.$echarts.init(
+          document.getElementById("subsidyChart")
+        );
+
         let linstener = function() {
           lineChart.resize();
           drugRadarChart.resize();
           overallPlanningChart.resize();
+          subsidyChart.resize();
         };
         EleResize.on(resizeDiv, linstener);
         this.common.isInitialize = false;
       }
     },
     // 处理请求后的结果
-    afterHttp(optionData, drugRadarData, overallPlanning) {
+    afterHttp(optionData, drugRadarData, overallPlanning, subsidyData) {
       let lineChartOption = setLineChartOption(optionData, this.searchParam);
       this.drawChart(lineChartOption, "lineChart");
 
@@ -182,6 +214,9 @@ export default {
         this.searchParam
       );
       this.drawChart(overallPlanningOption, "overallPlanning");
+
+      let subsidyChartOption = setSubsidyChartOption(subsidyData);
+      this.drawChart(subsidyChartOption, "subsidyChart");
     }
   },
   mounted() {
@@ -197,6 +232,9 @@ export default {
   }
   #drugRadar {
     height: 550px;
+  }
+  #subsidyChart {
+    height: 600px;
   }
 }
 </style>

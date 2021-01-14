@@ -1,4 +1,3 @@
-import { maxIndex } from "d3";
 import echarts from "echarts";
 import { calculate } from "../util/common";
 function setLineChartOption(chartData, searchParam) {
@@ -44,6 +43,59 @@ function setLineChartOption(chartData, searchParam) {
       // y: 40,
       // x2: 40,
       // y2: 20
+    },
+    toolbox: {
+      //可视化的工具箱
+      show: true,
+      right: "5%",
+      top: "0%",
+      feature: {
+        dataView: {
+          //数据视图
+          show: true,
+          readOnly: true,
+          optionToContent: function(opt) {
+            let axisData = opt.xAxis[0].data;
+            let series = opt.series;
+            let tdHeaders = "<td>日期</td>"; //表头
+            series.forEach(function(item) {
+              tdHeaders += "<td>" + item.name + "</td>"; //组装表头
+            });
+            let table =
+              '<div class="table-responsive"><table class="table table-bordered table-striped table-hover" style="text-align:center;color:#222831;"><tbody><tr>' +
+              tdHeaders +
+              "</tr>";
+            let tdBodys = ""; //数据
+            for (let i = 0, l = axisData.length; i < l; i++) {
+              for (let j = 0; j < series.length; j++) {
+                tdBodys += "<td>" + series[j].data[i] + "元</td>"; //组装表数据
+              }
+              table +=
+                '<tr><td style="padding: 0 10px">' +
+                axisData[i] +
+                "</td>" +
+                tdBodys +
+                "</tr>";
+              tdBodys = "";
+            }
+
+            table += "</tbody></table></div>";
+            return table;
+          }
+        },
+        restore: {
+          //重置
+          show: true
+        },
+        saveAsImage: {
+          //保存图片
+          show: true
+        },
+        magicType: {
+          //动态类型切换
+          type: ["bar", "line"]
+        }
+      }
     },
     dataZoom: [
       {
@@ -351,6 +403,15 @@ function setdrugRadarChartOption(radarData) {
           shadowOffsetY: 20
         }
       },
+      toolbox: {
+        show: true,
+        right: "3%",
+        feature: {
+          saveAsImage: {
+            show: true
+          }
+        }
+      },
       splitLine: {
         show: false
       },
@@ -360,6 +421,7 @@ function setdrugRadarChartOption(radarData) {
       axisLabel: {
         show: false
       },
+
       name: {
         textStyle: {
           rich: {
@@ -392,7 +454,7 @@ function setoVerallPlanningOption(overallPlanning, searchParam) {
     "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAM8AAAAOBAMAAAB6G1V9AAAAD1BMVEX////Kysrk5OTj4+TJycoJ0iFPAAAAG0lEQVQ4y2MYBaNgGAMTQQVFOiABhlEwCugOAMqzCykGOeENAAAAAElFTkSuQmCC";
   let colorArr = ["#ff4343", "#f69846", "#f6d54a", "#45dbf7", "#44aff0"];
   let color = ["", "", "", "", ""];
-  console.log(overallPlanning);
+
   let temp = overallPlanning.data[0];
   let chartData = [];
   let name = [
@@ -414,7 +476,6 @@ function setoVerallPlanningOption(overallPlanning, searchParam) {
     });
   }
   // sortArr.sort();
-  console.log(sortArr);
 
   let colorTemp = [1, 1, 1, 1, 1];
 
@@ -428,8 +489,7 @@ function setoVerallPlanningOption(overallPlanning, searchParam) {
       }
     }
     colorTemp[maxIndex] = 0;
-    console.log(maxIndex);
-    // console.log(maxIndex);
+
     color[maxIndex] = colorArr[index];
   }
 
@@ -525,6 +585,15 @@ function setoVerallPlanningOption(overallPlanning, searchParam) {
     //   top: "4%"
     // },
     backgroundColor: "#fff",
+    toolbox: {
+      show: true,
+      right: "3%",
+      feature: {
+        saveAsImage: {
+          show: true
+        }
+      }
+    },
     color: color,
     grid: {
       top: "12%",
@@ -604,8 +673,158 @@ function setoVerallPlanningOption(overallPlanning, searchParam) {
   };
   return option;
 }
+
+function setSubsidyChartOption(subsidyData) {
+  let data = [];
+  let xdata = [];
+  let temp = subsidyData.data[0];
+  for (const key in temp) {
+    if (Object.hasOwnProperty.call(temp, key)) {
+      const element = temp[key];
+      data.push(element);
+      xdata.push(key);
+    }
+  }
+  let option = {
+    backgroundColor: "#00265f",
+    toolbox: {
+      show: true,
+      right: "3%",
+      feature: {
+        saveAsImage: {
+          show: true
+        }
+      }
+    },
+    title: {
+      text: "补贴额度",
+      x: "center",
+      y: "4%",
+      textStyle: {
+        color: "#fff",
+        fontSize: "22"
+      },
+      subtextStyle: {
+        color: "#90979c",
+        fontSize: "16"
+      }
+    },
+    tooltip: {
+      trigger: "axis",
+      axisPointer: {
+        type: "shadow"
+      }
+    },
+    grid: {
+      top: "15%",
+      right: "8%",
+      left: "8%",
+      bottom: "12%"
+    },
+    xAxis: [
+      {
+        type: "category",
+        data: xdata,
+        axisLine: {
+          lineStyle: {
+            color: "rgba(255,255,255,0.12)"
+          }
+        },
+        axisLabel: {
+          margin: 10,
+          color: "#e2e9ff",
+          textStyle: {
+            fontSize: 14
+          }
+        }
+      }
+    ],
+    yAxis: [
+      {
+        name: "单位：元",
+        axisLabel: {
+          formatter: "{value}",
+          color: "#e2e9ff"
+        },
+        axisLine: {
+          show: false,
+          lineStyle: {
+            color: "rgba(255,255,255,1)"
+          }
+        },
+        splitLine: {
+          lineStyle: {
+            color: "rgba(255,255,255,0.12)"
+          }
+        }
+      }
+    ],
+    series: [
+      {
+        type: "bar",
+        data: data,
+        barWidth: "20px",
+        itemStyle: {
+          normal: {
+            color: new echarts.graphic.LinearGradient(
+              0,
+              0,
+              0,
+              1,
+              [
+                {
+                  offset: 0,
+                  color: "rgba(0,244,255,1)" // 0% 处的颜色
+                },
+                {
+                  offset: 1,
+                  color: "rgba(0,77,167,1)" // 100% 处的颜色
+                }
+              ],
+              false
+            ),
+            barBorderRadius: [30, 30, 30, 30],
+            shadowColor: "rgba(0,160,221,1)",
+            shadowBlur: 4
+          }
+        },
+        label: {
+          normal: {
+            show: true,
+            lineHeight: 30,
+            width: 100,
+            height: 30,
+            backgroundColor: "rgba(0,160,221,0.1)",
+            borderRadius: 200,
+            position: ["-8", "-60"],
+            distance: 1,
+            formatter: ["    {d|●}", " {a|{c}}     \n", "    {b|}"].join(","),
+            rich: {
+              d: {
+                color: "#3CDDCF"
+              },
+              a: {
+                color: "#fff",
+                align: "center"
+              },
+              b: {
+                width: 1,
+                height: 30,
+                borderWidth: 1,
+                borderColor: "#234e6c",
+                align: "left"
+              }
+            }
+          }
+        }
+      }
+    ]
+  };
+  return option;
+}
 export {
   setLineChartOption,
   setdrugRadarChartOption,
-  setoVerallPlanningOption
+  setoVerallPlanningOption,
+  setSubsidyChartOption
 };
