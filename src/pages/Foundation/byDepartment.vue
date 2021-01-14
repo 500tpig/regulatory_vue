@@ -680,8 +680,8 @@ export default {
   /* height or max-height is important */
   height: 450px !important
 
-  // .q-table__middle::-webkit-scrollbar
-  //   display: none
+  .q-table__middle::-webkit-scrollbar
+    display: none
 
   .q-table__title
     font-size: 20px

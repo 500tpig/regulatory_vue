@@ -123,6 +123,9 @@ export default {
   max-height: 508px
   min-width: 550px
 
+  .q-table__middle::-webkit-scrollbar
+    display: none
+
   .q-table__top,
   thead tr:first-child th
     /* bg color is important for th; just specify one */
