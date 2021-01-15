@@ -74,7 +74,7 @@
           <q-card class="col-12" id="subsidyChart"></q-card>
         </div>
         <div class="col-6 row justify-center q-px-md">
-          <q-card class="col-12"></q-card>
+          <q-card class="col-12" id="drugRanking"></q-card>
         </div>
       </div>
     </page-base-scroll>
@@ -94,7 +94,8 @@ import {
   setLineChartOption,
   setdrugRadarChartOption,
   setoVerallPlanningOption,
-  setSubsidyChartOption
+  setSubsidyChartOption,
+  setDrugRankingChartOption
 } from "assets/js/charts/overviewOptions";
 export default {
   components: { pageBaseScroll },
@@ -157,9 +158,25 @@ export default {
         })
         .catch(() => {});
 
-      console.log(subsidyData);
+      let drugRanking = [];
 
-      this.afterHttp(optionData, drugRadarData, overallPlanning, subsidyData);
+      await this.$http
+        .post("/fundUse/drugRanking", param)
+        .then(res => {
+          if (res.status === 200) {
+            drugRanking = res.data.data;
+          }
+        })
+        .catch(() => {});
+      console.log(drugRanking);
+
+      this.afterHttp(
+        optionData,
+        drugRadarData,
+        overallPlanning,
+        subsidyData,
+        drugRanking
+      );
     },
     // 画图表
     drawChart(option, id) {
@@ -188,18 +205,29 @@ export default {
           document.getElementById("subsidyChart")
         );
 
+        let drugRankingChart = this.$echarts.init(
+          document.getElementById("drugRanking")
+        );
+
         let linstener = function() {
           lineChart.resize();
           drugRadarChart.resize();
           overallPlanningChart.resize();
           subsidyChart.resize();
+          drugRankingChart.resize();
         };
         EleResize.on(resizeDiv, linstener);
         this.common.isInitialize = false;
       }
     },
     // 处理请求后的结果
-    afterHttp(optionData, drugRadarData, overallPlanning, subsidyData) {
+    afterHttp(
+      optionData,
+      drugRadarData,
+      overallPlanning,
+      subsidyData,
+      drugRanking
+    ) {
       let lineChartOption = setLineChartOption(optionData, this.searchParam);
       this.drawChart(lineChartOption, "lineChart");
 
@@ -217,6 +245,9 @@ export default {
 
       let subsidyChartOption = setSubsidyChartOption(subsidyData);
       this.drawChart(subsidyChartOption, "subsidyChart");
+
+      let drugRankingChartOption = setDrugRankingChartOption(drugRanking);
+      this.drawChart(drugRankingChartOption, "drugRanking");
     }
   },
   mounted() {
