@@ -202,7 +202,8 @@ import {
   Nation,
   jsGetAge,
   getportraitPhoto,
-  isObjArr
+  isObjArr,
+  getMonthLastDay
 } from "assets/js/util/common";
 import specificTable from "components/utils/specificTable";
 import { EleResize } from "assets/js/util/esresize";
@@ -309,6 +310,7 @@ export default {
       param = shallowCopyObj(this.searchParam, param);
       param.startDate = this.searchParam.chargingTime[0];
       param.endDate = this.searchParam.chargingTime[1];
+      param.endDate = getMonthLastDay(param.endDate);
       let personData = [];
       await this.$http
         .post("/person/getPersonInfo", param)

@@ -130,7 +130,8 @@
 import {
   shallowCopyObj,
   getYearBetween,
-  getLastDay
+  getLastDay,
+  getMonthLastDay
 } from "assets/js/util/common";
 import { setGinsengContrastChartOption } from "assets/js/charts/byTimeLineOptions";
 import { EleResize } from "assets/js/util/esresize";
@@ -222,6 +223,7 @@ export default {
       param = shallowCopyObj(this.comparisonParam, param);
       param.startDate = this.comparisonParam.chargingTime[0];
       param.endDate = this.comparisonParam.chargingTime[1];
+      param.endDate = getMonthLastDay(param.endDate);
       await this.getChartData(param);
       this.afterHttp();
     },

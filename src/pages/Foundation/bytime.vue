@@ -235,6 +235,7 @@ export default {
         startDate: this.searchParam.chargingTime[0],
         endDate: this.searchParam.chargingTime[1]
       };
+      param.endDate = getMonthLastDay(param.endDate);
       let optionData = [];
       await this.$http
         .post("/fundUse/monthlyFee", param)

@@ -93,7 +93,8 @@ import {
 import {
   shallowCopyObj,
   getYearBetween,
-  getLastDay
+  getLastDay,
+  getMonthLastDay
 } from "assets/js/util/common";
 import { EleResize } from "assets/js/util/esresize";
 export default {
@@ -152,6 +153,7 @@ export default {
       if (this.calendarParam.showType === "byYear") {
         param.startDate = this.calendarParam.chargingTime[0];
         param.endDate = this.calendarParam.chargingTime[1];
+        param.endDate = getMonthLastDay(param.endDate);
         let yearArr = getYearBetween(
           this.calendarParam.chargingTime[0].substring(0, 4),
           this.calendarParam.chargingTime[1].substring(0, 4)

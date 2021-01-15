@@ -430,7 +430,8 @@ import {
   Nation,
   jsGetAge,
   calculate,
-  getportraitPhoto
+  getportraitPhoto,
+  getMonthLastDay
 } from "assets/js/util/common";
 import specificTable from "components/utils/specificTable";
 import { EleResize } from "assets/js/util/esresize";
@@ -530,6 +531,7 @@ export default {
       param = shallowCopyObj(this.searchParam, param);
       param.startDate = this.searchParam.chargingTime[0];
       param.endDate = this.searchParam.chargingTime[1];
+      param.endDate = getMonthLastDay(param.endDate);
       this.getPersonInfo(param);
       this.getPortraitFee(param);
       this.getTimeLineData(param);

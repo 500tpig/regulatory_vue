@@ -234,7 +234,11 @@
 /* eslint-disable  no-param-reassign */
 import * as d3 from "d3";
 import pageBaseScroll from "components/utils/PageScroll";
-import { pickerOptions, shallowCopyObj } from "assets/js/util/common";
+import {
+  pickerOptions,
+  shallowCopyObj,
+  getMonthLastDay
+} from "assets/js/util/common";
 import specificTable from "components/utils/specificTable";
 import {
   generateR,
@@ -383,6 +387,7 @@ export default {
       param = shallowCopyObj(this.searchParam, param);
       param.startDate = this.searchParam.chargingTime[0];
       param.endDate = this.searchParam.chargingTime[1];
+      param.endDate = getMonthLastDay(param.endDate);
       let graphData = [];
       await this.$http
         .post("/knowledgeGraph/query", param)
