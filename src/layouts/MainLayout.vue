@@ -213,6 +213,41 @@
           </q-item>
           <!--  -->
           <!-- 就医轨迹 -->
+          <!-- 审核反馈 -->
+          <!--  -->
+          <q-expansion-item
+            expand-separator
+            v-model="expanded[1]"
+            icon="icon-jiaohusuijichaxun"
+            label="审核反馈"
+          >
+            <q-item
+              class="GNL__drawer-item"
+              v-ripple
+              v-for="(link, index) in cuttingArr(
+                drawers.auditingFeedbackDrawer
+              )"
+              :key="index"
+              clickable
+              @click="toPage(drawers.auditingFeedbackDrawer, index + 1)"
+              :class="{ selectItem: link.select }"
+            >
+              <q-item-section avatar>
+                <q-icon
+                  :class="{ 'text-white': link.select }"
+                  :name="link.icon"
+                />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label :class="{ 'text-white': link.select }">{{
+                  link.text
+                }}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <div style="height:4px;"></div>
+          </q-expansion-item>
+          <!--  -->
+          <!-- 审核反馈 -->
           <div class="q-mt-md">
             <div class="flex flex-center q-gutter-xs">
               <a
@@ -279,23 +314,35 @@ export default {
   data() {
     return {
       currentTab: "/home",
-      tabs: [
-        {
-          name: "/home",
-          icon: "home",
-          label: "首页"
-        },
-        {
-          name: "/foundation/by_time",
-          icon: "icon-rili",
-          label: "按时间分析"
-        }
-      ],
+      // tabs: [
+      //   {
+      //     name: "/home",
+      //     icon: "home",
+      //     label: "首页"
+      //   },
+      //   {
+      //     name: "/foundation/by_time",
+      //     icon: "icon-rili",
+      //     label: "按时间分析"
+      //   }
+      // ],
       leftDrawerOpen: true,
-      expanded: [false],
+      expanded: [false, false],
       drawers: {
         homeDrawer: [
           { icon: "home", text: "首页", url: "/home", select: false }
+        ],
+        auditingFeedbackDrawer: [
+          {
+            text: "审核反馈",
+            icon: "icon-jiaohusuijichaxun"
+          },
+          {
+            text: "数据导入",
+            url: "/AuditingFeedback/ImportData",
+            select: false,
+            icon: "icon-shangchuan2"
+          }
         ],
         fundUseDrawer: [
           {
@@ -409,7 +456,23 @@ export default {
           item.select = true;
           that.breadcrumbs.push({
             label: "基金使用概况",
-            icon: "icon-neibujijin"
+            icon: "icon-jiaohusuijichaxun"
+          });
+          that.breadcrumbs.push({
+            label: item.text,
+            icon: item.icon
+          });
+        }
+      });
+    }
+    if (currentPath.startsWith("/AuditingFeedback")) {
+      this.expanded[1] = true;
+      this.drawers.auditingFeedbackDrawer.map(item => {
+        if (currentPath === item.url) {
+          item.select = true;
+          that.breadcrumbs.push({
+            label: "审核反馈",
+            icon: "icon-jiaohusuijichaxun"
           });
           that.breadcrumbs.push({
             label: item.text,
