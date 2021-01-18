@@ -1,92 +1,198 @@
 <template>
   <q-page class="overview">
-    <page-base-scroll content_class="q-mt-md q-px-md q-pb-lg">
-      <div class="row justify-center">
-        <div class="col-6 row q-pa-sm">
-          <q-card class="col-12 q-pa-md">
-            <div class="row justify-center">
-              <div class="text-h5 text-primary q-mb-md text-weight-medium">
-                数据导入
-              </div>
+    <q-tabs
+      v-model="common.tab"
+      align="left"
+      inline-label
+      class="bg-grey-1 text-weight-bold"
+    >
+      <q-tab
+        name="update"
+        icon="icon-shangchuan"
+        label="数据上传"
+        class="text-orange"
+        style="width:140px;"
+      />
+      <q-tab
+        name="record"
+        icon="icon-jilu"
+        label="上传记录"
+        class="text-indigo"
+        style="width:140px;"
+      />
+    </q-tabs>
+    <q-tab-panels v-model="common.tab" animated style="background: #FAFAFA;">
+      <q-tab-panel name="update">
+        <page-base-scroll content_class="q-px-md q-pb-lg">
+          <div class="row justify-center" style="margin-top:4%;">
+            <div class="col-9 row">
+              <q-card class="col-12 q-pa-lg">
+                <div class="row justify-center">
+                  <div class="text-h5 text-primary q-mb-md text-weight-medium">
+                    数据导入
+                  </div>
+                </div>
+                <div class="col-12 row justify-center q-mb-md">
+                  <el-upload
+                    drag
+                    ref="upload"
+                    accept="xls,xlsx"
+                    :auto-upload="false"
+                    :multiple="false"
+                    action=""
+                    :on-change="fileOnChange"
+                  >
+                    <i class="el-icon-upload"></i>
+                    <div class="el-upload__text">
+                      将文件拖到此处，或<em>点击上传</em>
+                    </div>
+                    <div class="el-upload__tip" slot="tip">
+                      只能上传xls/xlsx文件，一次只处理一个文件。
+                    </div>
+                    <div class="el-upload__tip" slot="tip">
+                      文件过大时会出现卡顿现象，请耐心等待。
+                    </div>
+                  </el-upload>
+                </div>
+                <div class="row q-mb-md">
+                  <div class=" offset-2 row">
+                    <q-input
+                      color="primary"
+                      v-model="uploadParam.operator"
+                      label="操作人"
+                      outlined
+                      ref="operator"
+                      clearable
+                      :input-style="{ fontSize: '16px' }"
+                      :rules="[val => !!val || 'Field is required']"
+                    >
+                      <template v-slot:prepend>
+                        <q-icon name="icon-user" />
+                      </template>
+                    </q-input>
+                  </div>
+                </div>
+                <div class="row q-mb-md">
+                  <div class="offset-2 row col-12">
+                    <q-input
+                      class="col-8"
+                      v-model="uploadParam.operatingInstructions"
+                      ref="operatingInstructions"
+                      label="操作说明"
+                      hint="输入本次数据导入的相关描述"
+                      outlined
+                      autogrow
+                      clearable
+                      type="textarea"
+                      :input-style="{ fontSize: '16px' }"
+                      :rules="[val => !!val || 'Field is required']"
+                    />
+                  </div>
+                </div>
+                <div class="row justify-center">
+                  <q-btn
+                    :loading="loading"
+                    color="orange"
+                    text-color="black"
+                    @click="simulateProgress()"
+                    icon="cloud_upload"
+                    style="width: 120px"
+                    size="16px"
+                  >
+                    <template v-slot:loading>
+                      <q-spinner-gears class="on-left" />
+                      更新中...
+                    </template></q-btn
+                  >
+                </div>
+              </q-card>
             </div>
-            <div class="col-12 row justify-center q-mb-md">
-              <el-upload
-                drag
-                ref="upload"
-                accept="xls,xlsx"
-                :auto-upload="false"
-                :multiple="false"
-                action=""
-                :on-change="fileOnChange"
-              >
-                <i class="el-icon-upload"></i>
-                <div class="el-upload__text">
-                  将文件拖到此处，或<em>点击上传</em>
-                </div>
-                <div class="el-upload__tip" slot="tip">
-                  只能上传xls/xlsx文件，一次只处理一个文件。
-                </div>
-                <div class="el-upload__tip" slot="tip">
-                  文件过大时会出现卡顿现象，请耐心等待。
-                </div>
-              </el-upload>
-            </div>
-            <div class="row q-mb-md">
-              <div class=" offset-2 row">
-                <q-input
-                  color="primary"
-                  v-model="uploadParam.operator"
-                  label="操作人"
-                  ref="operator"
-                  clearable
-                  :input-style="{ fontSize: '16px' }"
-                  :rules="[val => !!val || 'Field is required']"
+          </div>
+        </page-base-scroll>
+      </q-tab-panel>
+      <q-tab-panel name="record">
+        <page-base-scroll content_class="q-px-md q-pb-lg">
+          <div class="row justify-center" style="margin-top:4%;">
+            <div class="col-9 row">
+              <q-card class="col-12">
+                <q-table
+                  title="数据上传记录"
+                  class="updateDataTable"
+                  :data="table.data"
+                  :columns="table.columns"
+                  row-key="id"
+                  :rows-per-page-options="[10, 20, 30, 50, 100]"
+                  :visible-columns="table.visibleColumns"
+                  :filter="table.filter"
+                  flat
+                  bordered
                 >
-                  <template v-slot:prepend>
-                    <q-icon name="icon-user" />
+                  <template v-slot:top-right>
+                    <q-input
+                      borderless
+                      dense
+                      debounce="300"
+                      v-model="table.filter"
+                      placeholder="Search"
+                      :input-style="{ padding: '8px' }"
+                      bg-color="white"
+                      :rows-per-page-options="[10, 20, 30, 50, 100]"
+                    >
+                      <template v-slot:append>
+                        <q-icon name="search" />
+                      </template>
+                    </q-input>
                   </template>
-                </q-input>
-              </div>
+                  <template v-slot:header="props">
+                    <q-tr :props="props">
+                      <q-th auto-width />
+                      <q-th
+                        v-for="col in props.cols"
+                        :key="col.name"
+                        :props="props"
+                      >
+                        {{ col.label }}
+                      </q-th>
+                    </q-tr>
+                  </template>
+                  <template v-slot:body="props">
+                    <q-tr :props="props">
+                      <q-td auto-width>
+                        <q-btn
+                          size="sm"
+                          color="primary"
+                          round
+                          dense
+                          @click="props.expand = !props.expand"
+                          :icon="props.expand ? 'remove' : 'add'"
+                        />
+                      </q-td>
+                      <q-td
+                        v-for="col in props.cols"
+                        :key="col.name"
+                        :props="props"
+                      >
+                        {{ col.value }}
+                      </q-td>
+                    </q-tr>
+                    <q-tr v-show="props.expand" :props="props">
+                      <q-td colspan="100%" style="font-size:16px;">
+                        <div class="text-left">
+                          本次数据上传说明:
+                        </div>
+                        <div style="text-indent:2em">
+                          {{ props.row.operatingInstructions }}
+                        </div>
+                      </q-td>
+                    </q-tr>
+                  </template>
+                </q-table>
+              </q-card>
             </div>
-            <div class="row q-mb-md">
-              <div class="offset-2 row col-12">
-                <q-input
-                  class="col-8"
-                  v-model="uploadParam.operatingInstructions"
-                  ref="operatingInstructions"
-                  label="操作说明"
-                  hint="输入本次数据导入的相关描述"
-                  outlined
-                  autogrow
-                  clearable
-                  type="textarea"
-                  :input-style="{ fontSize: '16px' }"
-                  :rules="[val => !!val || 'Field is required']"
-                />
-              </div>
-            </div>
-            <div class="row justify-center">
-              <q-btn
-                :loading="loading"
-                color="orange"
-                text-color="black"
-                @click="simulateProgress()"
-                icon="cloud_upload"
-                style="width: 120px"
-              >
-                <template v-slot:loading>
-                  <q-spinner-gears class="on-left" />
-                  更新中...
-                </template></q-btn
-              >
-            </div>
-          </q-card>
-        </div>
-        <div class="col-6 row q-pa-sm">
-          <q-card class="col-12"> </q-card>
-        </div>
-      </div>
-    </page-base-scroll>
+          </div>
+        </page-base-scroll>
+      </q-tab-panel>
+    </q-tab-panels>
   </q-page>
 </template>
 
@@ -103,17 +209,95 @@ export default {
         fileName: "test.xml",
         data: []
       },
-      loading: false
+      loading: false,
+      table: {
+        visibleColumns: [
+          "index",
+          "operator",
+          "operationTime",
+          "state",
+          "updateUser",
+          "fileName"
+        ],
+        filter: "",
+        columns: [
+          {
+            name: "index",
+            label: "#",
+            field: "id",
+            align: "center",
+            sortable: true
+          },
+          {
+            name: "operator",
+            label: "操作人",
+            field: "operator",
+            sortable: true,
+            align: "center",
+            format: val => `${val}`
+          },
+          {
+            name: "operationTime",
+            label: "操作时间",
+            field: "operationTime",
+            align: "center",
+            sortable: true
+          },
+          {
+            name: "updateUser",
+            label: "操作用户",
+            field: "updateUser",
+            align: "center",
+            sortable: true
+          },
+          {
+            name: "operatingInstructions",
+            label: "操作说明",
+            field: "operatingInstructions",
+            align: "center",
+            sortable: true
+          },
+          {
+            name: "fileName",
+            label: "文件名",
+            field: "fileName",
+            align: "center",
+            sortable: true
+          },
+          {
+            name: "state",
+            align: "center",
+            label: "状态",
+            field: "state",
+            format: val => {
+              if (val === 0) {
+                return "进行中";
+              } else if (val === 1) {
+                return "成功";
+              } else {
+                return "失败";
+              }
+            },
+            sortable: true
+          }
+        ],
+        data: []
+      },
+      common: {
+        tab: "update"
+      }
     };
   },
   methods: {
-    upload() {},
+    // 传入文件
     fileOnChange(file, fileList) {
       this.uploadParam.fileName = file.name;
       let files = { 0: file.raw };
       this.readExcel(files);
     },
+    // 开始上传
     async simulateProgress() {
+      // 开始加载
       this.loading = true;
       let result = [];
       this.uploadParam.updateUser = this.$store.getters["user/userInfo"][
@@ -150,6 +334,7 @@ export default {
         .catch(e => {});
       this.loading = false;
     },
+    // 处理文件
     readExcel(files) {
       //表格导入
       let that = this;
@@ -206,10 +391,52 @@ export default {
         }
       };
       fileReader.readAsBinaryString(files[0]);
+    },
+    async getTableData() {
+      let result = [];
+      await this.$http
+        .post("/auditingFeedback/getUpdateDataList")
+        .then(res => {
+          if (res.status === 200) {
+            result = res.data.data;
+          }
+        })
+        .catch(e => {});
+      this.table.data = result;
     }
   },
-  mounted() {}
+  mounted() {
+    this.getTableData();
+  }
 };
 </script>
 
-<style></style>
+<style lang="sass">
+.updateDataTable
+  /* height or max-height is important */
+  height: 580px !important
+
+  .q-table__middle::-webkit-scrollbar
+    display: none
+
+  .q-table__title
+    font-size: 1.4rem
+
+  .q-table__top,
+  thead tr:first-child th
+    /* bg color is important for th; just specify one */
+    background-color: #018DA7
+    color: #FFFFFF
+    font-size: 14px
+
+  thead tr th
+    position: sticky
+    z-index: 1
+  thead tr:first-child th
+    top: 0
+
+  /* this is when the loading indicator appears */
+  &.q-table--loading thead tr:last-child th
+    /* height of all previous header rows */
+    top: 48px
+</style>
