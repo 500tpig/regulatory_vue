@@ -339,7 +339,7 @@ export default {
           },
           {
             text: "数据导入",
-            url: "/AuditingFeedback/ImportData",
+            url: "/auditingFeedback/ImportData",
             select: false,
             icon: "icon-shangchuan2"
           }

@@ -66,7 +66,7 @@ const routes = [
         component: () => import("pages/KnowledgeGraph/knowledgeGraph")
       },
       {
-        path: "/AuditingFeedback/ImportData",
+        path: "/auditingFeedback/ImportData",
         meta: { requireAuth: true },
         component: () => import("pages/AuditingFeedback/ImportData")
       }
