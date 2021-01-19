@@ -32,6 +32,34 @@
                     数据导入
                   </div>
                 </div>
+                <div class="row items-center q-mb-md">
+                  <div
+                    class="offset-2 q-mr-sm text-black "
+                    style="font-size:16px;"
+                  >
+                    类型选择:
+                  </div>
+                  <div class="text-grey-8" style="font-size:16px;">
+                    <q-radio
+                      v-model="uploadParam.type"
+                      val="documents"
+                      label="单据"
+                      @input="changeType"
+                    />
+                    <q-radio
+                      v-model="uploadParam.type"
+                      val="details"
+                      label="单据明细"
+                      @input="changeType"
+                    />
+                    <q-radio
+                      v-model="uploadParam.type"
+                      val="DAndD"
+                      label="全选"
+                      @input="changeType"
+                    />
+                  </div>
+                </div>
                 <div class="col-12 row justify-center q-mb-md">
                   <el-upload
                     drag
@@ -208,7 +236,11 @@ export default {
         operator: "test",
         operatingInstructions: "test",
         fileName: "test.xml",
-        data: []
+        data: {
+          documents: [],
+          details: []
+        },
+        type: "documents"
       },
       table: {
         visibleColumns: [
@@ -218,7 +250,8 @@ export default {
           "stopTime",
           "state",
           "updateUser",
-          "fileName"
+          "fileName",
+          "type"
         ],
         filter: "",
         columns: [
@@ -267,6 +300,13 @@ export default {
             sortable: true
           },
           {
+            name: "type",
+            label: "类型",
+            field: "type",
+            align: "center",
+            sortable: true
+          },
+          {
             name: "fileName",
             label: "文件名",
             field: "fileName",
@@ -297,7 +337,8 @@ export default {
         loading: false,
         percentage: 0,
         interval: "",
-        percentageId: ""
+        percentageId: "",
+        file: ""
       }
     };
   },
@@ -317,45 +358,66 @@ export default {
       ) {
         return;
       }
-      if (this.uploadParam.data.length <= 0) {
-        this.$q.notify({
-          icon: "warning",
-          color: "warning",
-          message: "请添加要上传的文件！"
-        });
-        return;
-      } else {
-        await this.$http
-          .post("/auditingFeedback/insertRecord", this.uploadParam)
-          .then(res => {
-            if (res.status === 200) {
-              result = res.data.data;
-            }
-          })
-          .catch(e => {});
-        if (result.length !== 0) {
-          this.$q.notify({
-            icon: "done",
-            color: "positive",
-            message: "导入中，请稍后。。"
-          });
-          this.common.percentageId = result;
-          // 开始加载
-          this.getUpdatePercentage();
-        } else {
-          this.$q.notify({
-            icon: "error",
-            color: "negative",
-            message: "导入失败"
-          });
+      if (this.uploadParam.type !== "DAndD") {
+        let msg = "";
+        if (this.uploadParam.type === "documents") {
+          msg = "单据";
+        } else if (this.uploadParam.type === "details") {
+          msg = "单据明细";
         }
-        this.getTableData();
+        if (this.uploadParam.data[this.uploadParam.type].length <= 0) {
+          this.$q.notify({
+            icon: "warning",
+            color: "warning",
+            message: "上传文件的" + msg + "为空！"
+          });
+          return;
+        }
+      } else {
+        if (
+          this.uploadParam.dat.documents.length <= 0 ||
+          this.uploadParam.dat.details.length <= 0
+        ) {
+          this.$q.notify({
+            icon: "warning",
+            color: "warning",
+            message: "上传文件的单据或单据明细为空！"
+          });
+          return;
+        }
       }
+      console.log(this.uploadParam);
+      await this.$http
+        .post("/auditingFeedback/insertRecord", this.uploadParam)
+        .then(res => {
+          if (res.status === 200) {
+            result = res.data.data;
+          }
+        })
+        .catch(e => {});
+      if (result.length !== 0) {
+        this.$q.notify({
+          icon: "done",
+          color: "positive",
+          message: "导入中，请稍后。。"
+        });
+        this.common.percentageId = result;
+        // 开始加载
+        this.getUpdatePercentage();
+      } else {
+        this.$q.notify({
+          icon: "error",
+          color: "negative",
+          message: "导入失败"
+        });
+      }
+      this.getTableData();
     },
     // 传入文件
     fileOnChange(file, fileList) {
       this.uploadParam.fileName = file.name;
       let files = { 0: file.raw };
+      this.common.file = files;
       this.readExcel(files);
     },
     // 处理文件
@@ -390,31 +452,68 @@ export default {
               detailIndex = index;
             }
           }
-          if (documentsIndex === -1) {
-            that.$q.notify({
-              icon: "error",
-              color: "negative",
-              message: "上传文件找不到单据"
-            });
-            this.$refs["upload"].clearFiles();
-            return false;
-          } else if (detailIndex === -1) {
-            that.$q.notify({
-              icon: "error",
-              color: "negative",
-              message: "上传文件找不到单据明细"
-            });
-            this.$refs["upload"].clearFiles();
-            return false;
+          if (that.uploadParam.type === "documents") {
+            if (documentsIndex === -1) {
+              that.$q.notify({
+                icon: "error",
+                color: "negative",
+                message: "上传文件找不到单据"
+              });
+              that.$refs["upload"].clearFiles();
+              return false;
+            }
+          } else if (that.uploadParam.type === "details") {
+            if (detailIndex === -1) {
+              that.$q.notify({
+                icon: "error",
+                color: "negative",
+                message: "上传文件找不到单据明细"
+              });
+              that.$refs["upload"].clearFiles();
+              return false;
+            }
+          } else {
+            if (documentsIndex === -1) {
+              that.$q.notify({
+                icon: "error",
+                color: "negative",
+                message: "上传文件找不到单据"
+              });
+              that.$refs["upload"].clearFiles();
+              return false;
+            }
+            if (detailIndex === -1) {
+              that.$q.notify({
+                icon: "error",
+                color: "negative",
+                message: "上传文件找不到单据明细"
+              });
+              that.$refs["upload"].clearFiles();
+              return false;
+            }
           }
-          const wsname1 = workbook.SheetNames[documentsIndex]; //取第n张表
-          const ws1 = XLSX.utils.sheet_to_json(workbook.Sheets[wsname1]); //生成表的json表格内容
-          that.uploadParam.data = ws1;
+          if (that.uploadParam.type === "documents") {
+            const wsname1 = workbook.SheetNames[documentsIndex]; //取第n张表
+            const ws1 = XLSX.utils.sheet_to_json(workbook.Sheets[wsname1]); //生成表的json表格内容
+            that.uploadParam.data.documents = ws1;
+          } else if (that.uploadParam.type === "details") {
+            const wsname1 = workbook.SheetNames[detailIndex]; //取第n张表
+            const ws1 = XLSX.utils.sheet_to_json(workbook.Sheets[wsname1]); //生成表的json表格内容
+            that.uploadParam.data.details = ws1;
+          } else {
+            const wsname1 = workbook.SheetNames[documentsIndex]; //取第n张表
+            const ws1 = XLSX.utils.sheet_to_json(workbook.Sheets[wsname1]); //生成表的json表格内容
+            that.uploadParam.data.documents = ws1;
+            const wsname2 = workbook.SheetNames[detailIndex]; //取第n张表
+            const ws2 = XLSX.utils.sheet_to_json(workbook.Sheets[wsname2]); //生成表的json表格内容
+            that.uploadParam.data.details = ws2;
+          }
         } catch (e) {
           return false;
         }
       };
       fileReader.readAsBinaryString(files[0]);
+      return true;
     },
     // 获取导入进度
     getUpdatePercentage() {
@@ -470,7 +569,8 @@ export default {
         item.index = i++;
       });
       this.table.data = result;
-    }
+    },
+    changeType(value) {}
   },
   mounted() {
     this.getTableData();

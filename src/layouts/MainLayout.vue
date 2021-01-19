@@ -465,7 +465,7 @@ export default {
         }
       });
     }
-    if (currentPath.startsWith("/AuditingFeedback")) {
+    if (currentPath.startsWith("/auditingFeedback")) {
       this.expanded[1] = true;
       this.drawers.auditingFeedbackDrawer.map(item => {
         if (currentPath === item.url) {
@@ -537,9 +537,6 @@ export default {
       this.$router.push(arr[index].url).catch(err => {
         console.log("输出报错", err);
       });
-    },
-    closeTab(url) {
-      console.log(12);
     },
     logout() {
       this.$store.dispatch("user/userLogout");
