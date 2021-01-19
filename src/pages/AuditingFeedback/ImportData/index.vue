@@ -215,6 +215,7 @@ export default {
           "index",
           "operator",
           "operationTime",
+          "stopTime",
           "state",
           "updateUser",
           "fileName"
@@ -236,10 +237,18 @@ export default {
             align: "center",
             format: val => `${val}`
           },
+
           {
             name: "operationTime",
             label: "操作时间",
             field: "operationTime",
+            align: "center",
+            sortable: true
+          },
+          {
+            name: "stopTime",
+            label: "结束时间",
+            field: "stopTime",
             align: "center",
             sortable: true
           },
@@ -407,6 +416,7 @@ export default {
       };
       fileReader.readAsBinaryString(files[0]);
     },
+    // 获取导入进度
     getUpdatePercentage() {
       let that = this;
       this.common.loading = true;
@@ -428,12 +438,23 @@ export default {
                   color: "positive",
                   message: "导入完成！"
                 });
+                that.getTableData();
               }
             }
           })
-          .catch(e => {});
+          .catch(e => {
+            clearInterval(that.common.interval);
+            that.common.loading = false;
+            that.$q.notify({
+              icon: "error",
+              color: "negative",
+              message: "导入失败"
+            });
+            that.getTableData();
+          });
       }, 1000);
     },
+    // 获取导入记录
     async getTableData() {
       let result = [];
       await this.$http
