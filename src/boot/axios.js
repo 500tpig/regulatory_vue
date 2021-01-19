@@ -14,6 +14,7 @@ const http = axios.create({
   baseURL: "http://localhost:8090",
   timeout: 100000
 });
+const aLoadingWhiteList = ["/auditingFeedback/getUpdatePercentage"];
 // http request 拦截器
 http.interceptors.request.use(
   config => {
@@ -21,12 +22,15 @@ http.interceptors.request.use(
     if (token) {
       config.headers["u-token"] = token;
     }
-    Loading.show({
-      spinner: QSpinnerGears,
-      spinnerColor: "primary",
-      backgroundColor: "white"
-      // 其它属性
-    });
+    //开始动画
+    if (aLoadingWhiteList.indexOf(config.url) === -1) {
+      Loading.show({
+        spinner: QSpinnerGears,
+        spinnerColor: "primary",
+        backgroundColor: "white"
+        // 其它属性
+      });
+    }
     return config;
   },
   err => {
@@ -43,6 +47,7 @@ http.interceptors.response.use(
       if (data.data.code === "4301") {
         if (sessionStorage.getItem("token") !== null) {
           Notify.create({
+            icon: "error",
             color: "negative",
             message: data.data.msg
           });
@@ -52,6 +57,7 @@ http.interceptors.response.use(
         return;
       }
       Notify.create({
+        icon: "error",
         color: "negative",
         message: data.data.msg
       });
@@ -72,6 +78,7 @@ http.interceptors.response.use(
     }
     Loading.hide();
     Notify.create({
+      icon: "error",
       color: "negative",
       message: errMsg
     });

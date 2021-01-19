@@ -91,12 +91,13 @@
                 </div>
                 <div class="row justify-center">
                   <q-btn
-                    :loading="loading"
+                    :loading="common.loading"
                     color="orange"
                     text-color="black"
+                    :percentage="common.percentage"
                     @click="simulateProgress()"
                     icon="cloud_upload"
-                    style="width: 120px"
+                    style="width: 130px"
                     size="16px"
                   >
                     <template v-slot:loading>
@@ -209,7 +210,6 @@ export default {
         fileName: "test.xml",
         data: []
       },
-      loading: false,
       table: {
         visibleColumns: [
           "index",
@@ -224,7 +224,7 @@ export default {
           {
             name: "index",
             label: "#",
-            field: "id",
+            field: "index",
             align: "center",
             sortable: true
           },
@@ -284,21 +284,18 @@ export default {
         data: []
       },
       common: {
-        tab: "update"
+        tab: "update",
+        loading: false,
+        percentage: 0,
+        interval: "",
+        percentageId: ""
       }
     };
   },
   methods: {
-    // 传入文件
-    fileOnChange(file, fileList) {
-      this.uploadParam.fileName = file.name;
-      let files = { 0: file.raw };
-      this.readExcel(files);
-    },
     // 开始上传
     async simulateProgress() {
-      // 开始加载
-      this.loading = true;
+      let that = this;
       let result = [];
       this.uploadParam.updateUser = this.$store.getters["user/userInfo"][
         "userName"
@@ -317,22 +314,40 @@ export default {
           color: "warning",
           message: "请添加要上传的文件！"
         });
+        return;
       } else {
-        this.$q.notify({
-          icon: "done",
-          color: "positive",
-          message: "提交成功，请等待..."
-        });
+        await this.$http
+          .post("/auditingFeedback/insertRecord", this.uploadParam)
+          .then(res => {
+            if (res.status === 200) {
+              result = res.data.data;
+            }
+          })
+          .catch(e => {});
+        if (result.length !== 0) {
+          this.$q.notify({
+            icon: "done",
+            color: "positive",
+            message: "导入中，请稍后。。"
+          });
+          this.common.percentageId = result;
+          // 开始加载
+          this.getUpdatePercentage();
+        } else {
+          this.$q.notify({
+            icon: "error",
+            color: "negative",
+            message: "导入失败"
+          });
+        }
+        this.getTableData();
       }
-      await this.$http
-        .post("/auditingFeedback/insertRecord", this.uploadParam)
-        .then(res => {
-          if (res.status === 200) {
-            result = res.data.data;
-          }
-        })
-        .catch(e => {});
-      this.loading = false;
+    },
+    // 传入文件
+    fileOnChange(file, fileList) {
+      this.uploadParam.fileName = file.name;
+      let files = { 0: file.raw };
+      this.readExcel(files);
     },
     // 处理文件
     readExcel(files) {
@@ -392,6 +407,33 @@ export default {
       };
       fileReader.readAsBinaryString(files[0]);
     },
+    getUpdatePercentage() {
+      let that = this;
+      this.common.loading = true;
+      this.common.percentage = 0;
+      this.common.interval = setInterval(() => {
+        let percentage = 0;
+        let param = { id: that.common.percentageId };
+        that.$http
+          .post("/auditingFeedback/getUpdatePercentage", param)
+          .then(res => {
+            if (res.status === 200) {
+              percentage = res.data.data;
+              that.common.percentage = percentage;
+              if (that.common.percentage >= 100) {
+                clearInterval(that.common.interval);
+                that.common.loading = false;
+                that.$q.notify({
+                  icon: "done",
+                  color: "positive",
+                  message: "导入完成！"
+                });
+              }
+            }
+          })
+          .catch(e => {});
+      }, 1000);
+    },
     async getTableData() {
       let result = [];
       await this.$http
@@ -402,6 +444,10 @@ export default {
           }
         })
         .catch(e => {});
+      let i = 1;
+      result.map(item => {
+        item.index = i++;
+      });
       this.table.data = result;
     }
   },
