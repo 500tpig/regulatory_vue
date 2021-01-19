@@ -91,6 +91,21 @@
             :rows-per-page-options="[10, 20, 30, 50, 100]"
           >
             <template v-slot:top-right>
+              <q-btn
+                color="accent"
+                icon-right="archive"
+                no-caps
+                @click="exportTableHC"
+                class="q-mr-sm"
+              >
+                <q-tooltip
+                  transition-show="rotate"
+                  transition-hide="rotate"
+                  content-class="bg-white text-black shadow-4 text-weight-medium"
+                >
+                  导出csv
+                </q-tooltip>
+              </q-btn>
               <q-input
                 borderless
                 dense
@@ -120,6 +135,21 @@
             :rows-per-page-options="[10, 20, 30, 50, 100]"
           >
             <template v-slot:top-right>
+              <q-btn
+                color="accent"
+                icon-right="archive"
+                no-caps
+                @click="exportTableHC"
+                class="q-mr-sm"
+              >
+                <q-tooltip
+                  transition-show="rotate"
+                  transition-hide="rotate"
+                  content-class="bg-white text-black shadow-4 text-weight-medium"
+                >
+                  导出csv
+                </q-tooltip>
+              </q-btn>
               <q-input
                 borderless
                 dense
@@ -150,7 +180,8 @@ import {
   pickerOptions,
   shallowCopyObj,
   formatDate,
-  calculate
+  calculate,
+  exportTable
 } from "assets/js/util/common";
 import { EleResize } from "assets/js/util/esresize";
 export default {
@@ -381,6 +412,18 @@ export default {
         HC: optionData.HC
       };
       this.afterHttp(data1, data2);
+    },
+    exportTableOC() {
+      exportTable(
+        this.common.byAgeGroupTable.columns,
+        this.common.OCTableData.data
+      );
+    },
+    exportTableHC() {
+      exportTable(
+        this.common.byAgeGroupTable.columns,
+        this.common.HCTableData.data
+      );
     }
   }
 };

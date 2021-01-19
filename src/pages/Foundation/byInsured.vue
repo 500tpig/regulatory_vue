@@ -193,6 +193,21 @@
             :rows-per-page-options="[10, 20, 30, 50, 100]"
           >
             <template v-slot:top-right>
+              <q-btn
+                color="accent"
+                icon-right="archive"
+                no-caps
+                @click="exportTableOC"
+                class="q-mr-sm"
+              >
+                <q-tooltip
+                  transition-show="rotate"
+                  transition-hide="rotate"
+                  content-class="bg-white text-black shadow-4 text-weight-medium"
+                >
+                  导出csv
+                </q-tooltip>
+              </q-btn>
               <q-input
                 borderless
                 dense
@@ -222,6 +237,21 @@
             :rows-per-page-options="[10, 20, 30, 50, 100]"
           >
             <template v-slot:top-right>
+              <q-btn
+                color="accent"
+                icon-right="archive"
+                no-caps
+                @click="exportTableHC"
+                class="q-mr-sm"
+              >
+                <q-tooltip
+                  transition-show="rotate"
+                  transition-hide="rotate"
+                  content-class="bg-white text-black shadow-4 text-weight-medium"
+                >
+                  导出csv
+                </q-tooltip>
+              </q-btn>
               <q-input
                 borderless
                 dense
@@ -256,7 +286,8 @@ import pageBaseScroll from "components/utils/PageScroll";
 import {
   pickerOptions,
   shallowCopyObj,
-  formatDate
+  formatDate,
+  exportTable
 } from "assets/js/util/common";
 import specificTable from "components/utils/specificTable";
 import {
@@ -519,6 +550,18 @@ export default {
     },
     remove(index) {
       this.searchParam.personList.splice(index, 1);
+    },
+    exportTableOC() {
+      exportTable(
+        this.common.byInsuredTable.columns,
+        this.common.OCTableData.data
+      );
+    },
+    exportTableHC() {
+      exportTable(
+        this.common.byInsuredTable.columns,
+        this.common.HCTableData.data
+      );
     }
   }
 };

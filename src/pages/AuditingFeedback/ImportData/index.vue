@@ -157,6 +157,22 @@
                   bordered
                 >
                   <template v-slot:top-right>
+                    <q-btn
+                      color="accent"
+                      icon-right="archive"
+                      no-caps
+                      @click="exportTables"
+                      class="q-mr-sm"
+                    >
+                      <q-tooltip
+                        transition-show="rotate"
+                        transition-hide="rotate"
+                        content-class="bg-white text-black shadow-4 text-weight-medium"
+                      >
+                        导出csv
+                      </q-tooltip>
+                    </q-btn>
+
                     <q-input
                       borderless
                       dense
@@ -228,6 +244,7 @@
 <script>
 import pageBaseScroll from "components/utils/PageScroll";
 import XLSX from "xlsx";
+import { exportTable } from "assets/js/util/common";
 export default {
   components: { pageBaseScroll },
   data() {
@@ -343,6 +360,9 @@ export default {
     };
   },
   methods: {
+    exportTables() {
+      exportTable(this.table.columns, this.table.data);
+    },
     // 开始上传
     async simulateProgress() {
       let that = this;

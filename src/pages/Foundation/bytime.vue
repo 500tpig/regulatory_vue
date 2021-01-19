@@ -92,6 +92,21 @@
           :rows-per-page-options="[10, 20, 30, 50, 100]"
         >
           <template v-slot:top-right>
+            <q-btn
+              color="accent"
+              icon-right="archive"
+              no-caps
+              @click="exportTableOC"
+              class="q-mr-sm"
+            >
+              <q-tooltip
+                transition-show="rotate"
+                transition-hide="rotate"
+                content-class="bg-white text-black shadow-4 text-weight-medium"
+              >
+                导出csv
+              </q-tooltip>
+            </q-btn>
             <q-input
               borderless
               dense
@@ -118,6 +133,21 @@
           :rows-per-page-options="[10, 20, 30, 50, 100]"
         >
           <template v-slot:top-right>
+            <q-btn
+              color="accent"
+              icon-right="archive"
+              no-caps
+              @click="exportTableHC"
+              class="q-mr-sm"
+            >
+              <q-tooltip
+                transition-show="rotate"
+                transition-hide="rotate"
+                content-class="bg-white text-black shadow-4 text-weight-medium"
+              >
+                导出csv
+              </q-tooltip>
+            </q-btn>
             <q-input
               borderless
               dense
@@ -143,7 +173,8 @@ import { EleResize } from "assets/js/util/esresize";
 import {
   getMonthLastDay,
   formatDate,
-  pickerOptions
+  pickerOptions,
+  exportTable
 } from "assets/js/util/common";
 import {
   setbyTimeChartOption,
@@ -430,6 +461,12 @@ export default {
         })
         .catch(() => {});
       this.afterHttp(optionData, ringData);
+    },
+    exportTableOC() {
+      exportTable(this.byTimeTable.columns, this.OCTableData.data);
+    },
+    exportTableHC() {
+      exportTable(this.byTimeTable.columns, this.HCTableData.data);
     }
   },
   mounted() {
