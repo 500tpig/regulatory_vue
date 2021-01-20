@@ -74,6 +74,12 @@
                     <div class="el-upload__text">
                       将文件拖到此处，或<em>点击上传</em>
                     </div>
+                    <div class="el-upload__tip text-red" slot="tip">
+                      上传前，请先检查格式！
+                    </div>
+                    <div class="el-upload__tip" slot="tip">
+                      先选择类型，在上传文件，要更改类型请重新上传。
+                    </div>
                     <div class="el-upload__tip" slot="tip">
                       只能上传xls/xlsx文件，一次只处理一个文件。
                     </div>
