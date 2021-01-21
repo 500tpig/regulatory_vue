@@ -239,20 +239,20 @@ function setAgeGroupDoubleHistogramOption(
   searchParam
 ) {
   let title = "";
-  let typeTitle = "";
-  if (searchParam.type === "OC") {
-    typeTitle = "门诊";
-  } else if (searchParam.type === "HC") {
-    typeTitle = "住院";
-  } else {
-    typeTitle = "门诊住院";
-  }
+  // let typeTitle = "";
+  // if (searchParam.type === "OC") {
+  //   typeTitle = "门诊";
+  // } else if (searchParam.type === "HC") {
+  //   typeTitle = "住院";
+  // } else {
+  //   typeTitle = "门诊住院";
+  // }
   title +=
     formatDate(searchParam.chargingTime[0]) +
     " 至 " +
     formatDate(searchParam.chargingTime[1]) +
     " " +
-    typeTitle +
+    "门诊住院" +
     "年龄";
   if (type === "totalCost") {
     title += "总医疗费用";

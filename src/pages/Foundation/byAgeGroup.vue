@@ -190,7 +190,7 @@ export default {
     return {
       searchParam: {
         chargingTime: ["20160701", "20161231"],
-        type: "OC",
+        type: "OCAndHC",
         isDrillDown: "",
         ageGroup: ""
       },
@@ -315,24 +315,21 @@ export default {
       let that = this;
       if (this.common.isInitialize) {
         myChart.on("click", function(param) {
-          console.log(param);
           that.drillDown(param);
         });
-        if (this.resize) {
-          let histogramChart = this.$echarts.init(
-            document.getElementById("byAgeGroupHistogram")
-          );
-          let doubleHistogram = this.$echarts.init(
-            document.getElementById("byAgeGroupDoubleHistogram")
-          );
+        let histogramChart = this.$echarts.init(
+          document.getElementById("byAgeGroupHistogram")
+        );
+        let doubleHistogram = this.$echarts.init(
+          document.getElementById("byAgeGroupDoubleHistogram")
+        );
 
-          let linstener = function() {
-            histogramChart.resize();
-            doubleHistogram.resize();
-          };
-          EleResize.on(resizeDiv, linstener);
-          this.resize = false;
-        }
+        let linstener = function() {
+          histogramChart.resize();
+          doubleHistogram.resize();
+        };
+        EleResize.on(resizeDiv, linstener);
+        this.common.isInitialize = false;
       }
     },
     // 处理请求后的结果

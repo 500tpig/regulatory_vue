@@ -171,6 +171,7 @@
                         outlined
                         v-model="d3.search"
                         @input="searchNode"
+                        @clear="clearSearch"
                         clearable
                         dense
                       >
@@ -428,13 +429,13 @@ export default {
     // 创建svg视图
     setVis(containerWidth, containerHeight) {
       this.removeSVG();
-      if (this.d3.isShowTooltip) {
-        let tooltip = d3
-          .select("body")
-          .append("div")
-          .attr("class", "tooltip")
-          .style("opacity", 0.0);
-      }
+      // if (this.d3.isShowTooltip) {
+      //   let tooltip = d3
+      //     .select("body")
+      //     .append("div")
+      //     .attr("class", "tooltip")
+      //     .style("opacity", 0.0);
+      // }
 
       // 加500的原因是修复全屏模式画布大小不够的问题
       let svg_width = window.screen.width;
@@ -679,6 +680,7 @@ export default {
     // 鼠标移入
     mouseover(d) {
       let that = this;
+      this.isShowTooltip(this.d3.isShowTooltip);
       if (!this.d3.dragging) {
         const id = d.id;
         const svg = d3.select("#container").select("svg");
@@ -738,7 +740,12 @@ export default {
     },
     // 鼠标离开
     mouseout() {
-      if (!this.d3.dragging && this.d3.search == "") {
+      this.isShowTooltip(false);
+      let data = {};
+      let arr = Object.keys(data);
+
+      if (!this.d3.dragging && this.d3.search !== "") {
+      } else if (!this.d3.dragging && this.d3.search === "") {
         const svg = d3.select("#container").select("svg");
         svg.selectAll("text").attr("class", "");
         svg
@@ -749,8 +756,10 @@ export default {
           .selectAll("line")
           .selectAll("line")
           .attr("class", "");
-        let tooltip = d3.select(".tooltip");
-        tooltip.style("opacity", 0.0);
+        // let tooltip = d3.select(".tooltip");
+        // tooltip.style("opacity", 0.0);
+      } else if (!this.d3.dragging && arr.length == 0) {
+        console.log(110);
       }
     },
     // 双击实现
@@ -876,8 +885,7 @@ export default {
     searchNode(node) {
       // 如果输入为空，全部显示出来
       const svg = d3.select("#container").select("svg");
-
-      if (node === "") {
+      if (node === "" || node === null) {
         svg.selectAll("text").attr("class", "");
         svg
           .selectAll(".nodes")
@@ -932,6 +940,9 @@ export default {
       } else {
         d3.select(".tooltip").remove();
       }
+    },
+    clearSearch() {
+      this.d3.search = "";
     }
   }
 };
