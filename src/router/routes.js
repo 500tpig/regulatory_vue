@@ -69,6 +69,11 @@ const routes = [
         path: "/auditingFeedback/ImportData",
         meta: { requireAuth: true },
         component: () => import("pages/AuditingFeedback/ImportData")
+      },
+      {
+        path: "/auditingFeedback/Audit",
+        meta: { requireAuth: true },
+        component: () => import("pages/AuditingFeedback/Audit")
       }
     ]
   },

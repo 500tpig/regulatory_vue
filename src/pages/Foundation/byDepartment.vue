@@ -278,7 +278,6 @@ import {
   setDrillDownRingOption
 } from "assets/js/charts/byDepartmentOptions";
 import {
-  getMonthLastDay,
   formatDate,
   pickerOptions,
   shallowCopyObj,

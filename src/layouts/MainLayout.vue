@@ -314,18 +314,6 @@ export default {
   data() {
     return {
       currentTab: "/home",
-      // tabs: [
-      //   {
-      //     name: "/home",
-      //     icon: "home",
-      //     label: "首页"
-      //   },
-      //   {
-      //     name: "/foundation/by_time",
-      //     icon: "icon-rili",
-      //     label: "按时间分析"
-      //   }
-      // ],
       leftDrawerOpen: true,
       expanded: [false, false],
       drawers: {
@@ -342,6 +330,12 @@ export default {
             url: "/auditingFeedback/ImportData",
             select: false,
             icon: "icon-shangchuan2"
+          },
+          {
+            text: "审核处理",
+            url: "/auditingFeedback/Audit",
+            select: false,
+            icon: "icon-wj-djjl"
           }
         ],
         fundUseDrawer: [
