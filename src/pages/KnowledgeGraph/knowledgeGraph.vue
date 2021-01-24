@@ -4,6 +4,15 @@
       <div class="row ">
         <!-- 就医轨迹卡 -->
         <q-card class="col-8 q-mr-md" id="container" ref="containerRef">
+          <button @click="showFull" style="position: fixed;z-index: 999;">
+            全屏
+          </button>
+          <button
+            @click="delFull"
+            style="position: fixed;left: 50px;z-index: 999;"
+          >
+            退出全屏
+          </button>
           <div class="svg-container"></div>
         </q-card>
         <!-- 设置卡 -->
@@ -315,6 +324,8 @@ export default {
         isShowTooltip: true
       },
       common: {
+        originalWidth: 0,
+        originalHeight: 0,
         dialog: {
           showDialog: false,
           columns: [
@@ -438,9 +449,6 @@ export default {
       // }
 
       // 加500的原因是修复全屏模式画布大小不够的问题
-      let svg_width = window.screen.width;
-      let svg_height = window.screen.height;
-
       let svg = d3
         .select("#container")
         .append("svg:svg")
@@ -943,6 +951,44 @@ export default {
     },
     clearSearch() {
       this.d3.search = "";
+    },
+    // 全屏按钮
+    showFull() {
+      const full = document.getElementById("container");
+      let svg_width = window.screen.width;
+      let svg_height = window.screen.height;
+      d3.select(".svg-content-responsive")
+        .attr("width", svg_width)
+        .attr("height", svg_height);
+      this.launchIntoFullscreen(full);
+    },
+    // 退出全屏按钮
+    delFull() {
+      this.exitFullscreen();
+      this.query();
+    },
+    // 全屏方法封装
+    launchIntoFullscreen(element) {
+      if (element.requestFullscreen) {
+        element.requestFullscreen();
+      } else if (element.mozRequestFullScreen) {
+        element.mozRequestFullScreen();
+      } else if (element.webkitRequestFullscreen) {
+        element.webkitRequestFullscreen();
+      } else if (element.msRequestFullscreen) {
+        element.msRequestFullscreen();
+      }
+    },
+
+    // 退出全屏方法封装
+    exitFullscreen() {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      }
     }
   }
 };
