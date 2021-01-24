@@ -412,7 +412,6 @@ export default {
           return;
         }
       }
-      console.log(this.uploadParam);
       await this.$http
         .post("/auditingFeedback/insertRecord", this.uploadParam)
         .then(res => {
