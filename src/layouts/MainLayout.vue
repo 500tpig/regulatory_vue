@@ -248,7 +248,7 @@
           </q-expansion-item>
           <!--  -->
           <!-- 审核反馈 -->
-          <div class="q-mt-md">
+          <!-- <div class="q-mt-md">
             <div class="flex flex-center q-gutter-xs">
               <a
                 class="GNL__drawer-footer-link"
@@ -271,7 +271,7 @@
                 >About Us</a
               >
             </div>
-          </div>
+          </div> -->
         </q-list>
       </q-scroll-area>
     </q-drawer>

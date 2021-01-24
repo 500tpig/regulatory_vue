@@ -619,7 +619,7 @@ export default {
     }
   },
   mounted() {
-    this.initialize();
+    // this.initialize();
   }
 };
 </script>
