@@ -253,7 +253,8 @@ import specificTable from "components/utils/specificTable";
 import {
   generateR,
   generateColor,
-  generateTooltip
+  generateTooltip,
+  generateTitle
 } from "assets/js/util/knowledgeGraph";
 const leng = [
   { group: "Person" },
@@ -420,6 +421,9 @@ export default {
       let containerWidth = this.$refs.containerRef.$el.offsetWidth;
       let containerHeight = this.$refs.containerRef.$el.offsetHeight;
 
+      this.common.originalWidth = containerWidth;
+      this.common.originalHeight = containerHeight;
+
       let nodes = graphData.nodes;
       let links = graphData.edges;
 
@@ -440,13 +444,6 @@ export default {
     // 创建svg视图
     setVis(containerWidth, containerHeight) {
       this.removeSVG();
-      // if (this.d3.isShowTooltip) {
-      //   let tooltip = d3
-      //     .select("body")
-      //     .append("div")
-      //     .attr("class", "tooltip")
-      //     .style("opacity", 0.0);
-      // }
 
       // 加500的原因是修复全屏模式画布大小不够的问题
       let svg = d3
@@ -473,8 +470,8 @@ export default {
       const g = svg
         .append("g")
         .attr("class", "all")
-        .attr("data-width", 1000)
-        .attr("data-height", 1000);
+        .attr("data-width", containerWidth)
+        .attr("data-height", containerHeight);
 
       let defs = d3
         .select("#container")
@@ -553,7 +550,6 @@ export default {
     removeSVG() {
       d3.selectAll("svg > *").remove();
       d3.select("#J_SvgView").remove();
-      d3.select(".tooltip").remove();
     },
     // 力导向图布局
     // https://blog.csdn.net/weixin_34236869/article/details/91432941
@@ -608,7 +604,6 @@ export default {
     },
     // 绘制节点
     generateNodes(nodes, g) {
-      let tooltip = d3.select(".tooltip");
       this.d3.nodes = g
         .selectAll(".circleText")
         .data(nodes)
@@ -628,6 +623,7 @@ export default {
             .on("drag", this.dragged)
             .on("end", this.ended)
         );
+      this.d3.nodes.append("title").text(d => generateTitle(d));
       this.d3.nodes
         .append("svg:circle")
         .attr("class", "node-bg")
@@ -638,13 +634,6 @@ export default {
         .attr("group", d => d.group)
         .attr("name", d => d.id)
         .on("mouseover", this.mouseover)
-        .on("mousemove", function(d) {
-          /* 鼠标移动时，更改样式 left 和 top 来改变提示框的位置 */
-
-          tooltip
-            .style("left", d3.event.pageX + "px")
-            .style("top", d3.event.pageY + 20 + "px");
-        })
         .on("mouseout", this.mouseout)
         .on("dblclick", this.dbclickHandler);
     },
@@ -729,20 +718,6 @@ export default {
             return "inactive";
           }
         });
-
-        //添加提示框的div
-        let tooltip = d3.select(".tooltip");
-        let htmlStr = "";
-        for (let key in d.properties) {
-          htmlStr += key + " : ";
-          htmlStr += d.properties[key] + "<br/>";
-        }
-        tooltip
-          .html(htmlStr)
-          .style("left", d3.event.pageX + "px")
-          .style("top", d3.event.pageY + 20 + "px")
-          .style("opacity", 1.0);
-
         this.d3.tooltipData = generateTooltip(d);
       }
     },
@@ -764,10 +739,7 @@ export default {
           .selectAll("line")
           .selectAll("line")
           .attr("class", "");
-        // let tooltip = d3.select(".tooltip");
-        // tooltip.style("opacity", 0.0);
       } else if (!this.d3.dragging && arr.length == 0) {
-        console.log(110);
       }
     },
     // 双击实现
@@ -901,8 +873,6 @@ export default {
           .attr("class", "");
         svg.selectAll("line").attr("class", "");
       } else {
-        // 筛选，判断这三个东西里的元素是否包含输入的东西
-        //筛选然后设置class，样式在/knowledgeGraph/css/medicalTrack.css
         svg
           .selectAll(".nodes")
           .selectAll("circle")
@@ -920,33 +890,15 @@ export default {
             } else {
               return "inactive";
             }
-            // if (d.properties.AAC001 !== null && (d.properties.AAC001 + '').indexOf(name.toLowerCase()) >= 0) {
-            //     return '';
-            // } else if (d.properties.aac001 !== null && (d.properties.aac001 + '').indexOf(name.toLowerCase()) >= 0) {
-            //     return '';
-            // } else if (d.properties.date !== null && (d.properties.date + '').indexOf(name.toLowerCase()) >= 0) {
-            //     return '';
-            // } else if (d.properties.AAC003 !== null && (d.properties.AAC003 + '').indexOf(name.toLowerCase()) >= 0) {
-            //     return '';
-            // } else if (d.properties.AAZ107 !== null && (d.properties.AAZ107 + '').indexOf(name.toLowerCase()) >= 0) {
-            //     return '';
-            // } else {
-            //     return 'inactive';
-            // }
           });
         svg.selectAll("line").attr("class", "inactive");
-        // d3.select("#svg1 .linetexts").selectAll('text').attr('fill-opacity', 0);
       }
     },
     isShowTooltip(bool) {
       if (bool) {
-        let tooltip = d3
-          .select("body")
-          .append("div")
-          .attr("class", "tooltip")
-          .style("opacity", 0.0);
+        this.d3.nodes.append("title").text(d => generateTitle(d));
       } else {
-        d3.select(".tooltip").remove();
+        d3.selectAll("title").remove();
       }
     },
     clearSearch() {
@@ -965,7 +917,10 @@ export default {
     // 退出全屏按钮
     delFull() {
       this.exitFullscreen();
-      this.query();
+      d3.select(".svg-content-responsive")
+        .attr("width", this.common.originalWidth)
+        .attr("height", this.common.originalHeight);
+      // this.query();
     },
     // 全屏方法封装
     launchIntoFullscreen(element) {
@@ -1039,16 +994,39 @@ line.active {
   fill-opacity: 0.2;
   stroke-width: 0;
 }
-.tooltip {
+/*默认显示所有的圆圈，进入模式切换之后才会显示text*/
+text {
+  display: none;
+}
+text:hover {
+  cursor: pointer;
+}
+text.inactive {
+  display: none !important;
+  /*fill-opacity: 0.1;*/
+}
+
+/*indicator的样式*/
+#indicator {
   position: absolute;
-  width: auto;
-  height: auto;
-  font-family: simsun;
-  font-size: 14px;
-  text-align: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
-  background-color: white;
-  border-radius: 5px;
-  padding: 10px;
+  left: 30px;
+  bottom: 90px;
+  text-align: left;
+  color: #f2f2f2;
+  font-size: 16px;
+}
+
+/*indicator中每一个小的div/色块/图例的样式*/
+#indicator > div {
+  margin-bottom: 10px;
+}
+
+#indicator span {
+  display: inline-block;
+  width: 35px;
+  height: 20px;
+  position: relative;
+  top: 2px;
+  margin-right: 8px;
 }
 </style>

@@ -11,6 +11,67 @@ var colorList = [
   "#ffc454",
   "#8dcc93"
 ];
+function generateTitle(d) {
+  switch (d.group) {
+    case "Person": {
+      return (
+        `节点类型:参保人\n` +
+        `病人ID:${d.properties.id}\n` +
+        `姓名:${d.properties.name}\n` +
+        `性别:${d.properties.sex === 1 ? "男" : "女"}\n` +
+        `出生日期:${d.properties.birthday}`
+      );
+    }
+    case "DiagnosticEventsOC": {
+      return (
+        `节点类型:门诊就诊事件\n` +
+        `医院ID:${d.properties.hospitalID}\n` +
+        `参保人ID:${d.properties.personId}\n` +
+        `科室:${d.properties.department}\n` +
+        `单据流水号:${d.properties.documentSerialNumber}\n` +
+        `门诊流水号:${d.properties.serialNumber}\n` +
+        `费用日期:${d.properties.date}`
+      );
+    }
+    case "DiagnosticEventsHC": {
+      return (
+        `节点类型:住院就诊事件\n` +
+        `医院ID:${d.properties.hospitalID}\n` +
+        `参保人ID:${d.properties.personId}\n` +
+        `科室:${d.properties.department}\n` +
+        `单据流水号:${d.properties.documentSerialNumber}\n` +
+        `住院流水号:${d.properties.serialNumber}\n` +
+        `费用日期:${d.properties.date}`
+      );
+    }
+    case "knowledgeGraphDrug": {
+      return (
+        `节点类型:药品\n` +
+        `药品ID:${d.properties.drugId}\n` +
+        `处方ID:${d.properties.prescriptionId}\n` +
+        `药品名称:${d.properties.drug}\n` +
+        `取药数量:${d.properties.drugNum}\n` +
+        `药物费用:${d.properties.drugCost}\n` +
+        `医保项目:${d.properties.isMP}`
+      );
+    }
+    case "knowledgeGraphMoney": {
+      return (
+        `节点类型:费用详情\n` +
+        `个人支付:${d.properties.individualPay}\n` +
+        `医保支付:${d.properties.medicarePay}\n` +
+        `医疗总费用:${d.properties.totalCost}\n` +
+        `药品费用:${d.properties.drugCost}`
+      );
+    }
+    case "Date": {
+      return `节点类型:日期\n` + `日期:${d.properties.date}`;
+    }
+    default: {
+      return `id:${d.id}`;
+    }
+  }
+}
 
 // 根据节点类型返回节点半径
 function generateR(d) {
@@ -174,4 +235,4 @@ function generateColor(d) {
   }
 }
 
-export { generateR, generateColor, generateTooltip };
+export { generateR, generateColor, generateTooltip, generateTitle };
