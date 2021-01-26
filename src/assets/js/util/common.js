@@ -382,9 +382,9 @@ function wrapCsvValue(val, formatFn) {
   return `"${formatted}"`;
 }
 
-function exportTable(columns, data) {
+function exportTable(columns, data, title) {
   // naive encoding to csv format
-  const content = [columns.map(col => wrapCsvValue(col.label))]
+  let content = [columns.map(col => wrapCsvValue(col.label))]
     .concat(
       data.map(row =>
         columns
@@ -400,7 +400,11 @@ function exportTable(columns, data) {
       )
     )
     .join("\r\n");
-  const status = exportFile("table-export.csv", content, "text/csv");
+  if (title === "" || title === null) {
+    title = "table-export";
+  }
+  content = "\uFEFF" + content; // 解决编码问题
+  const status = exportFile(title + ".csv", content, "text/csv");
   if (status !== true) {
     this.$q.notify({
       message: "Browser denied file download...",
