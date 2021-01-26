@@ -413,13 +413,15 @@ export default {
     exportTableOC() {
       exportTable(
         this.common.byAgeGroupTable.columns,
-        this.common.OCTableData.data
+        this.common.OCTableData.data,
+        "门诊年龄费用"
       );
     },
     exportTableHC() {
       exportTable(
         this.common.byAgeGroupTable.columns,
-        this.common.HCTableData.data
+        this.common.HCTableData.data,
+        "住院年龄费用"
       );
     }
   }

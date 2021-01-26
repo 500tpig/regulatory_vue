@@ -33,15 +33,6 @@
               />
             </div>
           </div>
-          <!-- <div class="row items-center q-pb-sm">
-            <span class="">筛选:</span>
-            <q-toggle
-              color="pink"
-              v-model="param.selectAllType"
-              left-label
-              @input="toggleFun"
-            />
-          </div> -->
         </q-card>
         <div class="col auditTable-div">
           <q-table
@@ -337,7 +328,7 @@
               color="accent"
               icon-right="archive"
               no-caps
-              @click="exportTables"
+              @click="exportDetailTables"
               class="q-mr-sm"
             >
               <q-tooltip
@@ -819,12 +810,17 @@ export default {
       this.common.table.selected.push(resultData[0]);
     },
     exportTables() {
-      exportTable(this.common.table.columns, this.common.table.data);
+      exportTable(
+        this.common.table.columns,
+        this.common.table.data,
+        "审核单据"
+      );
     },
     exportDetailTables() {
       exportTable(
         this.common.tableDetails.columns,
-        this.common.tableDetails.data
+        this.common.tableDetails.data,
+        "审核单据明细"
       );
     },
     async getInvoiceAuditingDetail(details) {

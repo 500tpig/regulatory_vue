@@ -677,13 +677,15 @@ export default {
     exportTableOC() {
       exportTable(
         this.common.byDepartmentTable.columns,
-        this.common.OCTableData.data
+        this.common.OCTableData.data,
+        "门诊科室费用"
       );
     },
     exportTableHC() {
       exportTable(
         this.common.byDepartmentTable.columns,
-        this.common.HCTableData.data
+        this.common.HCTableData.data,
+        "住院科室费用"
       );
     }
   }

@@ -554,13 +554,15 @@ export default {
     exportTableOC() {
       exportTable(
         this.common.byInsuredTable.columns,
-        this.common.OCTableData.data
+        this.common.OCTableData.data,
+        "门诊参保人费用"
       );
     },
     exportTableHC() {
       exportTable(
         this.common.byInsuredTable.columns,
-        this.common.HCTableData.data
+        this.common.HCTableData.data,
+        "住院参保人费用"
       );
     }
   }

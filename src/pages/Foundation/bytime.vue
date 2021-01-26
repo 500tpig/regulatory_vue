@@ -463,10 +463,26 @@ export default {
       this.afterHttp(optionData, ringData);
     },
     exportTableOC() {
-      exportTable(this.byTimeTable.columns, this.OCTableData.data);
+      exportTable(
+        this.byTimeTable.columns,
+        this.OCTableData.data,
+        "门诊" +
+          formatDate(this.searchParam.chargingTime[0]) +
+          "至" +
+          formatDate(this.searchParam.chargingTime[1]) +
+          "费用"
+      );
     },
     exportTableHC() {
-      exportTable(this.byTimeTable.columns, this.HCTableData.data);
+      exportTable(
+        this.byTimeTable.columns,
+        this.HCTableData.data,
+        "住院" +
+          formatDate(this.searchParam.chargingTime[0]) +
+          "至" +
+          formatDate(this.searchParam.chargingTime[1]) +
+          "费用"
+      );
     }
   },
   mounted() {

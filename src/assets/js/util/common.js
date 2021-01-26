@@ -403,8 +403,9 @@ function exportTable(columns, data, title) {
   if (title === "" || title === null) {
     title = "table-export";
   }
+  let date = formatDateTime(new Date(), "yyyy-MM-dd");
   content = "\uFEFF" + content; // 解决编码问题
-  const status = exportFile(title + ".csv", content, "text/csv");
+  const status = exportFile(title + "_" + date + ".csv", content, "text/csv");
   if (status !== true) {
     this.$q.notify({
       message: "Browser denied file download...",
