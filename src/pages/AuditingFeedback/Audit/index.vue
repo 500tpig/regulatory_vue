@@ -57,7 +57,8 @@
             :rows-per-page-options="[10, 20, 30, 50, 100]"
             selection="single"
             :selected.sync="common.table.selected"
-            :filter-method="test"
+            :filter-method="searchFilter"
+            @selection="getInvoiceAuditingDetail"
           >
             <template v-slot:top="props">
               <q-btn
@@ -68,8 +69,8 @@
                 class="q-mr-sm"
               >
                 <q-tooltip
-                  transition-show="rotate"
-                  transition-hide="rotate"
+                  transition-show="scale"
+                  transition-hide="scale"
                   content-class="bg-white text-black shadow-4 text-weight-medium"
                 >
                   导出csv
@@ -85,8 +86,8 @@
                 class="q-ml-md"
               >
                 <q-tooltip
-                  transition-show="rotate"
-                  transition-hide="rotate"
+                  transition-show="scale"
+                  transition-hide="scale"
                   content-class="bg-white text-black shadow-4 text-weight-medium"
                 >
                   全屏
@@ -110,12 +111,12 @@
         </div>
       </div>
     </div>
-    <div class="col-6 row q-pl-md">
-      <div style="height:100%;width:100%;">
-        <q-card class=" q-pa-md documentsInfo">
+    <div class="col-6 q-pl-md">
+      <div class="audit-right">
+        <q-card class="q-pa-md documentsInfo">
           <div v-if="common.table.selected.length > 0">
             <div class="row">
-              <div class="col-5 hideText">
+              <div class="col-6 hideText">
                 <span class="instructions">单据主键: </span>
                 <span
                   >{{ common.table.selected[0].id }}
@@ -319,6 +320,66 @@
             </div>
           </div>
         </q-card>
+        <q-table
+          class="auditTableDetails tableClass"
+          :data="common.tableDetails.data"
+          :columns="common.tableDetails.columns"
+          row-key="id"
+          flat
+          bordered
+          virtual-scroll
+          :filter="common.tableDetails.filter"
+          :rows-per-page-options="[10, 20, 30, 50, 100]"
+          :filter-method="searchFilter"
+        >
+          <template v-slot:top="props">
+            <q-btn
+              color="accent"
+              icon-right="archive"
+              no-caps
+              @click="exportTables"
+              class="q-mr-sm"
+            >
+              <q-tooltip
+                transition-show="scale"
+                transition-hide="scale"
+                content-class="bg-white text-black shadow-4 text-weight-medium"
+              >
+                导出csv
+              </q-tooltip>
+            </q-btn>
+            <q-btn
+              flat
+              round
+              dense
+              color="primary"
+              :icon="props.inFullscreen ? 'fullscreen_exit' : 'fullscreen'"
+              @click="props.toggleFullscreen"
+              class="q-ml-md"
+            >
+              <q-tooltip
+                transition-show="scale"
+                transition-hide="scale"
+                content-class="bg-white text-black shadow-4 text-weight-medium"
+              >
+                全屏
+              </q-tooltip>
+            </q-btn>
+            <q-space />
+            <q-input
+              dense
+              debounce="300"
+              v-model="common.tableDetails.filter"
+              placeholder="Search"
+              :input-style="{ padding: '8px' }"
+              bg-color="white"
+            >
+              <template v-slot:append>
+                <q-icon name="search" />
+              </template>
+            </q-input>
+          </template>
+        </q-table>
       </div>
     </div>
   </q-page>
@@ -564,6 +625,173 @@ export default {
               sortable: true
             }
           ]
+        },
+        tableDetails: {
+          filter: "",
+          data: [],
+          columns: [
+            {
+              name: "id",
+              label: "id",
+              align: "center",
+              sortable: true,
+              field: "id"
+            },
+            {
+              name: "documentId",
+              label: "单据编号",
+              align: "center",
+              sortable: true,
+              field: "documentId"
+            },
+            {
+              name: "itemNumber",
+              label: "项目编号",
+              align: "center",
+              sortable: true,
+              field: "itemNumber"
+            },
+            {
+              name: "hospitalProjectName",
+              label: "医院项目名称",
+              align: "center",
+              sortable: true,
+              field: "hospitalProjectName"
+            },
+            {
+              name: "abnormalAmount",
+              label: "异常金额",
+              align: "center",
+              sortable: true,
+              field: "abnormalAmount"
+            },
+            {
+              name: "unitPrice",
+              label: "单价",
+              align: "center",
+              sortable: true,
+              field: "unitPrice"
+            },
+            {
+              name: "quantity",
+              label: "数量",
+              align: "center",
+              sortable: true,
+              field: "quantity"
+            },
+            {
+              name: "medicalAmount",
+              label: "医疗金额",
+              align: "center",
+              sortable: true,
+              field: "medicalAmount"
+            },
+            {
+              name: "medicareAmount",
+              label: "医保金额",
+              align: "center",
+              sortable: true,
+              field: "medicareAmount"
+            },
+            {
+              name: "dosageForm",
+              label: "剂型",
+              align: "center",
+              sortable: true,
+              field: "dosageForm"
+            },
+            {
+              name: "specification",
+              label: "规格",
+              align: "center",
+              sortable: true,
+              field: "specification"
+            },
+            {
+              name: "invoiceItem",
+              label: "发票项目",
+              align: "center",
+              sortable: true,
+              field: "invoiceItem"
+            },
+            {
+              name: "accountingDate",
+              label: "记账日期",
+              align: "center",
+              sortable: true,
+              field: "accountingDate"
+            },
+            {
+              name: "medicalProjectName",
+              label: "医保项目名称",
+              align: "center",
+              sortable: true,
+              field: "medicalProjectName"
+            },
+            {
+              name: "unit",
+              label: "单位",
+              align: "center",
+              sortable: true,
+              field: "unit"
+            },
+            {
+              name: "totalMedicineTaken",
+              label: "取药总量",
+              align: "center",
+              sortable: true,
+              field: "totalMedicineTaken"
+            },
+            {
+              name: "totalUnit",
+              label: "总量单位",
+              align: "center",
+              sortable: true,
+              field: "totalUnit"
+            },
+            {
+              name: "singleDose",
+              label: "单次用量",
+              align: "center",
+              sortable: true,
+              field: "singleDose"
+            },
+            {
+              name: "singleDosageUnit",
+              label: "单次用量单位",
+              align: "center",
+              sortable: true,
+              field: "singleDosageUnit"
+            },
+            {
+              name: "frequencyOfTaking",
+              label: "服用频次",
+              align: "center",
+              sortable: true,
+              field: "frequencyOfTaking"
+            },
+            {
+              name: "medicationDays",
+              label: "用药天数",
+              align: "center",
+              sortable: true,
+              field: "medicationDays"
+            },
+            {
+              name: "routeOfAdministration",
+              label: "给药途径",
+              align: "center",
+              sortable: true,
+              field: "routeOfAdministration"
+            },
+            {
+              name: "importTime",
+              label: "导入日期",
+              align: "center",
+              sortable: true,
+              field: "importTime"
+            }
+          ]
         }
       }
     };
@@ -589,12 +817,32 @@ export default {
         .catch(e => {});
       this.common.table.data = resultData;
       this.common.table.selected.push(resultData[0]);
-      console.log(resultData);
     },
     exportTables() {
       exportTable(this.common.table.columns, this.common.table.data);
     },
-    test(rows, terms, cols, getCellValue) {
+    exportDetailTables() {
+      exportTable(
+        this.common.tableDetails.columns,
+        this.common.tableDetails.data
+      );
+    },
+    async getInvoiceAuditingDetail(details) {
+      let resultData = [];
+      let param = {
+        documentId: details.keys[0]
+      };
+      await this.$http
+        .post("/auditingFeedback/getByDocumentId", param)
+        .then(res => {
+          if (res.status === 200) {
+            resultData = res.data.data;
+          }
+        })
+        .catch(e => {});
+      this.common.tableDetails.data = resultData;
+    },
+    searchFilter(rows, terms, cols, getCellValue) {
       let result = [];
       for (let index = 0; index < rows.length; index++) {
         const element = rows[index];
@@ -632,39 +880,69 @@ export default {
     white-space: nowrap;
     text-overflow: ellipsis;
   }
-  .documentsInfo {
-    .instructions {
-      padding: 0 8px 0 0;
-    }
-    background: #640064;
-    color: #ffffff;
-    background-image: -webkit-linear-gradient(
-      60deg,
-      #00cfe8,
-      rgba(0, 207, 232, 0.5)
-    );
-    background-image: -moz-linear-gradient(
-      60deg,
-      #00cfe8,
-      rgba(0, 207, 232, 0.5)
-    );
-    background-image: -o-linear-gradient(
-      60deg,
-      #00cfe8,
-      rgba(0, 207, 232, 0.5)
-    );
-    background-image: linear-gradient(30deg, #00cfe8, rgba(0, 207, 232, 0.5));
-    background-repeat: repeat-x;
+  .audit-right {
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
     position: relative;
-    .documentsInfo-button {
+    .documentsInfo {
+      .instructions {
+        padding: 0 8px 0 0;
+      }
+      background: #640064;
+      color: #ffffff;
+      background-image: -webkit-linear-gradient(
+        60deg,
+        #00cfe8,
+        rgba(0, 207, 232, 0.5)
+      );
+      background-image: -moz-linear-gradient(
+        60deg,
+        #00cfe8,
+        rgba(0, 207, 232, 0.5)
+      );
+      background-image: -o-linear-gradient(
+        60deg,
+        #00cfe8,
+        rgba(0, 207, 232, 0.5)
+      );
+      background-image: linear-gradient(30deg, #00cfe8, rgba(0, 207, 232, 0.5));
+      background-repeat: repeat-x;
+      position: relative;
+      .documentsInfo-button {
+        position: absolute;
+        top: 6%;
+        right: 4%;
+      }
+    }
+    .auditTableDetails {
+      width: 100%;
       position: absolute;
-      top: 6%;
-      right: 4%;
+      top: 263px;
+      bottom: 0px;
+      left: 0px;
     }
   }
 }
 </style>
 <style lang="sass">
+.tableClass
+  .q-table__top,
+    thead tr:first-child th
+      /* bg color is important for th; just specify one */
+      background-color: #FFFFFF
+      // color: #FFFFFF
+      font-size: 14px
+    thead tr th
+      position: sticky
+      z-index: 1
+    thead tr:first-child th
+      top: 0
+
+    /* this is when the loading indicator appears */
+    &.q-table--loading thead tr:last-child th
+      /* height of all previous header rows */
+      top: 48px
 .auditTable-div
   position: relative
   width: 100%
@@ -674,12 +952,6 @@ export default {
     top: 16px
     bottom: 0px
     left: 0px
-
-    // height: 810px !important
-    /* height or max-height is important */
-
-    // .q-table__middle
-
     .q-table__top,
     thead tr:first-child th
       /* bg color is important for th; just specify one */

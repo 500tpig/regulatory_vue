@@ -400,9 +400,7 @@ function exportTable(columns, data) {
       )
     )
     .join("\r\n");
-
   const status = exportFile("table-export.csv", content, "text/csv");
-
   if (status !== true) {
     this.$q.notify({
       message: "Browser denied file download...",
