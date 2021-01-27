@@ -103,8 +103,8 @@
       </div>
     </div>
     <div class="col-6 q-pl-md">
-      <div class="audit-right">
-        <q-card class="q-pa-md documentsInfo">
+      <div class="audit-right column">
+        <q-card class="q-pa-md documentsInfo col-auto">
           <div v-if="common.table.selected.length > 0">
             <div class="row">
               <div class="col-6 hideText">
@@ -283,7 +283,12 @@
               </div>
             </div>
             <div class="documentsInfo-button">
-              <q-btn class="bg-accent" round icon="icon-bianji" />
+              <q-btn
+                @click="common.isShowDialog = true"
+                class="bg-accent"
+                round
+                icon="icon-bianji"
+              />
             </div>
             <div class="hideText" style="width:80%;">
               <span>剔除说明: </span>
@@ -311,79 +316,84 @@
             </div>
           </div>
         </q-card>
-        <q-table
-          class="auditTableDetails tableClass"
-          :data="common.tableDetails.data"
-          :columns="common.tableDetails.columns"
-          row-key="id"
-          flat
-          bordered
-          virtual-scroll
-          :filter="common.tableDetails.filter"
-          :rows-per-page-options="[10, 20, 30, 50, 100]"
-          :filter-method="searchFilter"
-        >
-          <template v-slot:top="props">
-            <q-btn
-              color="accent"
-              icon-right="archive"
-              no-caps
-              @click="exportDetailTables"
-              class="q-mr-sm"
-            >
-              <q-tooltip
-                transition-show="scale"
-                transition-hide="scale"
-                content-class="bg-white text-black shadow-4 text-weight-medium"
+        <div class="auditTableDetails-div col">
+          <q-table
+            class="auditTableDetails tableClass"
+            :data="common.tableDetails.data"
+            :columns="common.tableDetails.columns"
+            row-key="id"
+            flat
+            bordered
+            virtual-scroll
+            :filter="common.tableDetails.filter"
+            :rows-per-page-options="[10, 20, 30, 50, 100]"
+            :filter-method="searchFilter"
+          >
+            <template v-slot:top="props">
+              <q-btn
+                color="accent"
+                icon-right="archive"
+                no-caps
+                @click="exportDetailTables"
+                class="q-mr-sm"
               >
-                导出csv
-              </q-tooltip>
-            </q-btn>
-            <q-btn
-              flat
-              round
-              dense
-              color="primary"
-              :icon="props.inFullscreen ? 'fullscreen_exit' : 'fullscreen'"
-              @click="props.toggleFullscreen"
-              class="q-ml-md"
-            >
-              <q-tooltip
-                transition-show="scale"
-                transition-hide="scale"
-                content-class="bg-white text-black shadow-4 text-weight-medium"
+                <q-tooltip
+                  transition-show="scale"
+                  transition-hide="scale"
+                  content-class="bg-white text-black shadow-4 text-weight-medium"
+                >
+                  导出csv
+                </q-tooltip>
+              </q-btn>
+              <q-btn
+                flat
+                round
+                dense
+                color="primary"
+                :icon="props.inFullscreen ? 'fullscreen_exit' : 'fullscreen'"
+                @click="props.toggleFullscreen"
+                class="q-ml-md"
               >
-                全屏
-              </q-tooltip>
-            </q-btn>
-            <q-space />
-            <q-input
-              dense
-              debounce="300"
-              v-model="common.tableDetails.filter"
-              placeholder="Search"
-              :input-style="{ padding: '8px' }"
-              bg-color="white"
-            >
-              <template v-slot:append>
-                <q-icon name="search" />
-              </template>
-            </q-input>
-          </template>
-        </q-table>
+                <q-tooltip
+                  transition-show="scale"
+                  transition-hide="scale"
+                  content-class="bg-white text-black shadow-4 text-weight-medium"
+                >
+                  全屏
+                </q-tooltip>
+              </q-btn>
+              <q-space />
+              <q-input
+                dense
+                debounce="300"
+                v-model="common.tableDetails.filter"
+                placeholder="Search"
+                :input-style="{ padding: '8px' }"
+                bg-color="white"
+              >
+                <template v-slot:append>
+                  <q-icon name="search" />
+                </template>
+              </q-input>
+            </template>
+          </q-table>
+        </div>
       </div>
     </div>
+    <q-dialog
+      v-model="common.isShowDialog"
+      transition-show="scale"
+      transition-hide="scale"
+      ><dialogInfo :row="common.table.selected[0]"></dialogInfo>
+    </q-dialog>
   </q-page>
 </template>
 
 <script>
-import {
-  formatDate,
-  shallowCopyObj,
-  accAdd,
-  exportTable
-} from "assets/js/util/common";
+import { exportTable } from "assets/js/util/common";
+import dialogInfo from "./dialog";
 export default {
+  components: { dialogInfo },
   data() {
     return {
       param: {
@@ -392,6 +402,7 @@ export default {
         selectAllType: false
       },
       common: {
+        isShowDialog: false,
         pickerOptions: {
           shortcuts: [
             {
@@ -882,6 +893,7 @@ export default {
     box-sizing: border-box;
     position: relative;
     .documentsInfo {
+      width: 100%;
       .instructions {
         padding: 0 8px 0 0;
       }
@@ -911,12 +923,16 @@ export default {
         right: 4%;
       }
     }
-    .auditTableDetails {
+    .auditTableDetails-div {
+      position: relative;
       width: 100%;
-      position: absolute;
-      top: 263px;
-      bottom: 0px;
-      left: 0px;
+      .auditTableDetails {
+        width: 100%;
+        position: absolute;
+        top: 16px;
+        bottom: 0px;
+        left: 0px;
+      }
     }
   }
 }
