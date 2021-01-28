@@ -43,6 +43,25 @@ function formatDate(strDate) {
   if (strDate.length === 6) return year + "-" + month;
   else return year + "-" + month + "-" + day;
 }
+// 深拷贝
+function deepClone(obj) {
+  let objClone = Array.isArray(obj) ? [] : {};
+  if (obj && typeof obj === "object") {
+    for (let key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        //判断ojb子元素是否为对象，如果是，递归复制
+        if (obj[key] && typeof obj[key] === "object") {
+          objClone[key] = deepClone(obj[key]);
+        } else {
+          //如果不是，简单复制
+          objClone[key] = obj[key];
+        }
+      }
+    }
+  }
+  return objClone;
+}
+// 浅拷贝
 function shallowCopyObj(originalObj, targetObj) {
   for (let key in originalObj) {
     targetObj[key] = originalObj[key];
@@ -429,5 +448,6 @@ export {
   quick,
   getLastDay,
   isObjArr,
-  exportTable
+  exportTable,
+  deepClone
 };
