@@ -235,7 +235,7 @@
           </div>
         </div>
         <div class="row q-my-md">
-          <div class="col-6">
+          <div class="col-6 q-pr-sm">
             <span class="instructions">剔除说明: </span
             ><span>
               {{ row.eliminateInstructions }}
@@ -249,7 +249,7 @@
           </div>
         </div>
         <div class="row q-my-md">
-          <div class="col-6">
+          <div class="col-6 q-pr-sm">
             <span class="instructions">智能审核规则: </span
             ><span>
               {{ row.smartAuditRules }}
@@ -263,7 +263,7 @@
           </div>
         </div>
         <div class="row q-mt-md">
-          <div class="col-6">
+          <div class="col-6 q-pr-sm">
             <span class="instructions">智能审核规则描述: </span
             ><span>
               {{ row.descriptionSmartAuditRules }}
@@ -276,26 +276,48 @@
             </span>
           </div>
         </div>
-        <div class="row q-mt-sm items-center">
+        <div class="row q-my-sm items-center">
+          <div class="col-3 hideText">
+            <span class="instructions">导入日期: </span
+            ><span>
+              {{ row.importTime }}
+            </span>
+          </div>
           <div class="col-3">
-            <span class="instructions">反馈状态:</span>
+            <span class="instructions">反馈结束日期: </span
+            ><span>
+              {{ row.feedbackEndDate }}
+            </span>
+          </div>
+          <div class="col-3">
+            <span class="instructions">剩余天数: </span>
             <q-chip
               square
               color="red-6"
               text-color="white"
-              icon="warning"
-              v-if="row.feedbackStatus === '未处理'"
-              :label="row.feedbackStatus"
+              v-if="row.remainingNumberOfDays < 7"
+              :label="row.remainingNumberOfDays"
+            />
+            <q-chip
+              square
+              color="amber-8"
+              text-color="white"
+              v-if="
+                row.remainingNumberOfDays >= 7 &&
+                  row.remainingNumberOfDays <= 14
+              "
+              :label="row.remainingNumberOfDays"
             />
             <q-chip
               square
               color="positive"
               text-color="white"
-              icon="check"
-              v-if="row.feedbackStatus === '已处理'"
-              :label="row.feedbackStatus"
+              v-if="row.remainingNumberOfDays > 14"
+              :label="row.remainingNumberOfDays"
             />
           </div>
+        </div>
+        <div class="row items-center">
           <div class="col-3">
             <span class="instructions">剔除金额:</span>
             <q-chip
@@ -308,10 +330,129 @@
             />
           </div>
           <div class="col-3">
-            <span class="instructions">导入日期: </span
-            ><span>
-              {{ row.importTime }}
-            </span>
+            <span class="instructions">反馈状态:</span>
+            <q-chip
+              square
+              color="red-6"
+              text-color="white"
+              icon="warning"
+              v-if="row.feedbackStatus === '未处理'"
+              :label="row.feedbackStatus"
+              clickable
+            >
+              <q-popup-edit
+                buttons
+                title="反馈状态"
+                v-model="row.feedbackStatus"
+              >
+                <q-select
+                  filled
+                  v-model="row.feedbackStatus"
+                  :options="options"
+                />
+              </q-popup-edit>
+            </q-chip>
+            <q-chip
+              square
+              color="positive"
+              text-color="white"
+              icon="check"
+              v-if="row.feedbackStatus === '已处理'"
+              :label="row.feedbackStatus"
+              clickable
+              ><q-popup-edit
+                buttons
+                title="反馈状态"
+                v-model="row.feedbackStatus"
+              >
+                <q-select
+                  filled
+                  v-model="row.feedbackStatus"
+                  :options="options"
+                /> </q-popup-edit
+            ></q-chip>
+            <q-chip
+              square
+              color="amber-8"
+              text-color="white"
+              icon="icon-daibandengdaishenhe"
+              v-if="row.feedbackStatus === '处理中'"
+              :label="row.feedbackStatus"
+              clickable
+              ><q-popup-edit
+                buttons
+                title="反馈状态"
+                v-model="row.feedbackStatus"
+              >
+                <q-select
+                  filled
+                  v-model="row.feedbackStatus"
+                  :options="options"
+                /> </q-popup-edit
+            ></q-chip>
+          </div>
+          <div class="col-3">
+            <span class="instructions">处理结果:</span>
+
+            <q-chip
+              square
+              color="red-6"
+              text-color="white"
+              icon="warning"
+              v-if="row.treatmentResults === '未处理'"
+              :label="row.treatmentResults"
+              clickable
+            >
+              <q-popup-edit
+                buttons
+                title="处理结果"
+                v-model="row.treatmentResults"
+              >
+                <q-select
+                  filled
+                  v-model="row.treatmentResults"
+                  :options="options"
+                />
+              </q-popup-edit>
+            </q-chip>
+            <q-chip
+              square
+              color="positive"
+              text-color="white"
+              icon="check"
+              v-if="row.treatmentResults === '已处理'"
+              :label="row.treatmentResults"
+              clickable
+              ><q-popup-edit
+                buttons
+                title="处理结果"
+                v-model="row.treatmentResults"
+              >
+                <q-select
+                  filled
+                  v-model="row.treatmentResults"
+                  :options="options"
+                /> </q-popup-edit
+            ></q-chip>
+            <q-chip
+              square
+              color="amber-8"
+              text-color="white"
+              icon="icon-daibandengdaishenhe"
+              v-if="row.treatmentResults === '处理中'"
+              :label="row.treatmentResults"
+              clickable
+              ><q-popup-edit
+                buttons
+                title="处理结果"
+                v-model="row.treatmentResults"
+              >
+                <q-select
+                  filled
+                  v-model="row.treatmentResults"
+                  :options="options"
+                /> </q-popup-edit
+            ></q-chip>
           </div>
         </div>
         <div class="row q-mt-sm">
@@ -319,25 +460,75 @@
             <span class="instructions">反馈说明: </span
             ><span>
               {{ row.feedbackDescription }}
+              <q-popup-edit
+                buttons
+                title="反馈说明"
+                persistent
+                v-model="row.feedbackDescription"
+              >
+                <q-input
+                  type="textarea"
+                  v-model="row.feedbackDescription"
+                  autofocus
+                  counter
+                  @keyup.enter.stop
+                />
+              </q-popup-edit>
             </span>
           </div>
         </div>
       </q-card-section>
 
       <q-card-actions align="right">
-        <q-btn flat label="提交" color="white" v-close-popup />
+        <q-btn
+          label="更新"
+          class="bg-accent"
+          style="color: white;"
+          @click="updateInvoiceAuditing"
+        />
       </q-card-actions>
     </q-card>
   </div>
 </template>
 
 <script>
+import { deepClone } from "assets/js/util/common";
 export default {
   props: {
     row: Object
   },
   data() {
-    return {};
+    return {
+      options: ["未处理", "已处理", "处理中"]
+    };
+  },
+  methods: {
+    async updateInvoiceAuditing() {
+      let param = deepClone(this.row);
+      let resultData = [];
+      await this.$http
+        .post("/auditingFeedback/updateByDocumentId", param)
+        .then(res => {
+          if (res.status === 200) {
+            resultData = res.data.data;
+          }
+        })
+        .catch(e => {});
+      if (resultData === 1) {
+        this.$q.notify({
+          icon: "done",
+          color: "positive",
+          message: "更新成功"
+        });
+      } else {
+        this.$q.notify({
+          icon: "error",
+          color: "negative",
+          message: "更新失败"
+        });
+      }
+      this.$emit("initialize");
+    }
   }
 };
 </script>
@@ -347,6 +538,7 @@ export default {
   width: 60vw;
   max-width: 70vw;
   font-size: 16px;
+
   .hideText {
     overflow: hidden;
     white-space: nowrap;
@@ -373,7 +565,7 @@ export default {
     background-image: linear-gradient(30deg, #00cfe8, rgba(0, 207, 232, 0.5));
     background-repeat: repeat-x;
     .instructions {
-      color: #431d87;
+      // color: #431d87;
       padding: 0 8px 0 0;
       font-weight: 600;
     }

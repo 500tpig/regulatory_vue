@@ -105,6 +105,12 @@
     <div class="col-6 q-pl-md">
       <div class="audit-right column">
         <q-card class="q-pa-md documentsInfo col-auto">
+          <div
+            v-if="common.table.selected.length <= 0"
+            class="row justify-center"
+          >
+            <div class="text-h6">暂无数据</div>
+          </div>
           <div v-if="common.table.selected.length > 0">
             <div class="row">
               <div class="col-6 hideText">
@@ -140,6 +146,15 @@
                   icon="warning"
                   v-if="common.table.selected[0].feedbackStatus === '未处理'"
                   :label="common.table.selected[0].feedbackStatus"
+                />
+                <q-chip
+                  square
+                  color="amber-8"
+                  text-color="white"
+                  icon="icon-daibandengdaishenhe"
+                  v-if="common.table.selected[0].feedbackStatus === '处理中'"
+                  :label="common.table.selected[0].feedbackStatus"
+                  clickable
                 />
                 <q-chip
                   square
@@ -284,7 +299,7 @@
             </div>
             <div class="documentsInfo-button">
               <q-btn
-                @click="common.isShowDialog = true"
+                @click="openDialog"
                 class="bg-accent"
                 round
                 icon="icon-bianji"
@@ -318,6 +333,8 @@
         </q-card>
         <div class="auditTableDetails-div col">
           <q-table
+            selection="single"
+            :selected.sync="common.tableDetails.selected"
             class="auditTableDetails tableClass"
             :data="common.tableDetails.data"
             :columns="common.tableDetails.columns"
@@ -376,6 +393,9 @@
                 </template>
               </q-input>
             </template>
+            <template v-slot:body-selection="scope">
+              <q-toggle v-model="scope.selected" />
+            </template>
           </q-table>
         </div>
       </div>
@@ -384,13 +404,16 @@
       v-model="common.isShowDialog"
       transition-show="scale"
       transition-hide="scale"
-      ><dialogInfo :row="common.table.selected[0]"></dialogInfo>
+      ><dialogInfo
+        :row="common.dialogData"
+        @initialize="initialize"
+      ></dialogInfo>
     </q-dialog>
   </q-page>
 </template>
 
 <script>
-import { exportTable } from "assets/js/util/common";
+import { exportTable, deepClone } from "assets/js/util/common";
 import dialogInfo from "./dialog";
 export default {
   components: { dialogInfo },
@@ -402,6 +425,7 @@ export default {
         selectAllType: false
       },
       common: {
+        dialogData: {},
         isShowDialog: false,
         pickerOptions: {
           shortcuts: [
@@ -814,11 +838,48 @@ export default {
         .then(res => {
           if (res.status === 200) {
             resultData = res.data.data;
+            for (let index = 0; index < resultData.length; index++) {
+              let element = resultData[index];
+              element.remainingNumberOfDays = this.getDaysBetween(
+                element.feedbackEndDate
+              );
+            }
           }
         })
         .catch(e => {});
-      this.common.table.data = resultData;
-      this.common.table.selected.push(resultData[0]);
+      if (resultData.length > 0) {
+        this.common.table.data = resultData;
+        this.common.table.selected = [];
+        this.common.table.selected.push(resultData[0]);
+        this.getInvoiceAuditingDetail(resultData[0].documentId, true);
+      } else {
+        this.common.table.data = [];
+        this.common.tableDetails.data = [];
+        this.common.table.selected = [];
+      }
+    },
+    /**
+     * 计算两个日期之间的天数
+     * @param dateString1  开始日期 yyyy-MM-dd
+     * @param dateString2  结束日期 yyyy-MM-dd
+     * @returns {number} 如果日期相同 返回一天 开始日期大于结束日期，返回0
+     */
+    getDaysBetween(dateString2) {
+      // var startDate = Date.parse(dateString1);
+      let startDate = new Date();
+      let endDate = Date.parse(dateString2);
+      if (startDate > endDate) {
+        return 0;
+      }
+      if (startDate == endDate) {
+        return 1;
+      }
+      let days = (endDate - startDate) / (1 * 24 * 60 * 60 * 1000);
+      return days;
+    },
+    openDialog() {
+      this.common.dialogData = deepClone(this.common.table.selected[0]);
+      this.common.isShowDialog = true;
     },
     exportTables() {
       exportTable(
@@ -834,11 +895,14 @@ export default {
         "审核单据明细"
       );
     },
-    async getInvoiceAuditingDetail(details) {
+    async getInvoiceAuditingDetail(details, initialize) {
       let resultData = [];
-      let param = {
-        documentId: details.keys[0]
-      };
+      let param = {};
+      if (initialize === true) {
+        param.documentId = details;
+      } else {
+        param.documentId = details.keys[0];
+      }
       await this.$http
         .post("/auditingFeedback/getByDocumentId", param)
         .then(res => {
