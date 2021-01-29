@@ -64,7 +64,7 @@
                   transition-hide="scale"
                   content-class="bg-white text-black shadow-4 text-weight-medium"
                 >
-                  导出csv
+                  导出完整表格的csv
                 </q-tooltip>
               </q-btn>
               <q-btn
@@ -359,7 +359,7 @@
                   transition-hide="scale"
                   content-class="bg-white text-black shadow-4 text-weight-medium"
                 >
-                  导出csv
+                  导出完整表格的csv
                 </q-tooltip>
               </q-btn>
               <q-btn

@@ -444,8 +444,6 @@ export default {
     // 创建svg视图
     setVis(containerWidth, containerHeight) {
       this.removeSVG();
-
-      // 加500的原因是修复全屏模式画布大小不够的问题
       let svg = d3
         .select("#container")
         .append("svg:svg")
@@ -907,8 +905,8 @@ export default {
     // 全屏按钮
     showFull() {
       const full = document.getElementById("container");
-      let svg_width = window.screen.width;
-      let svg_height = window.screen.height;
+      let svg_width = window.screen.width + 500;
+      let svg_height = window.screen.height + 500;
       d3.select(".svg-content-responsive")
         .attr("width", svg_width)
         .attr("height", svg_height);
