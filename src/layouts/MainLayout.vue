@@ -23,7 +23,9 @@
           class="row items-center no-wrap"
           style="padding:0 0 0 8px;"
         >
-          <span class="text-primary text-weight-bolder">医保基金监管系统</span>
+          <span class="text-primary text-weight-bolder"
+            >医保大数据分析与检测系统</span
+          >
         </q-toolbar-title>
         <!-- 头部标题 -->
         <!-- 面包屑 -->
@@ -112,6 +114,7 @@
             v-model="expanded[0]"
             icon="icon-neibujijin"
             label="基金使用概况"
+            :content-inset-level="0.2"
           >
             <q-item
               class="GNL__drawer-item"
@@ -220,6 +223,7 @@
             v-model="expanded[1]"
             icon="icon-jiaohusuijichaxun"
             label="审核反馈"
+            :content-inset-level="0.2"
           >
             <q-item
               class="GNL__drawer-item"
@@ -558,7 +562,6 @@ export default {
 </style>
 <style lang="sass">
 .GNL
-
   &__drawer-item
     line-height: 24px
     // border-radius: 0 24px 24px 0

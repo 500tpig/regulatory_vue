@@ -141,7 +141,7 @@ module.exports = function(ctx) {
       workboxPluginMode: "GenerateSW", // 'GenerateSW' or 'InjectManifest'
       workboxOptions: {}, // only for GenerateSW
       manifest: {
-        name: `医保基金监管系统`,
+        name: `医保大数据分析与检测系统`,
         short_name: `Quasar App`,
         description: `A Quasar Framework app`,
         display: "standalone",
