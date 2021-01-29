@@ -501,6 +501,9 @@ export default {
     },
     // 图表下钻
     async drillDown(chartParam) {
+      this.$echarts
+        .init(document.getElementById("byDepartmentHistogram"))
+        .dispose();
       let department = chartParam.name;
       this.searchParam.isDrillDown = true;
       let param = {};

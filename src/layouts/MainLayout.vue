@@ -23,7 +23,7 @@
           class="row items-center no-wrap"
           style="padding:0 0 0 8px;"
         >
-          <span class="text-primary text-weight-bolder"
+          <span class="text-primary text-weight-bolder" style="font-size:18px"
             >医保大数据分析与检测系统</span
           >
         </q-toolbar-title>

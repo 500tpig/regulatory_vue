@@ -190,6 +190,7 @@ export default {
       chartTitle: {
         histogram: ""
       },
+      isDrillDown: true,
       reduction: "reduction",
       isShowReduction: false,
       searchParam: {
@@ -293,15 +294,18 @@ export default {
       // 基于准备好的dom，初始化echarts实例
       let myChart = this.$echarts.init(document.getElementById(id));
       let resizeDiv = document.getElementById(id);
+      let that = this;
+      if (id === "byTimeHistogram") {
+        if (this.isDrillDown) {
+          this.isDrillDown = !this.isDrillDown;
+          myChart.on("click", function(param) {
+            that.drillDown(param.name);
+          });
+        }
+      }
       // 指定图表的配置项和数据
       // 使用刚指定的配置项和数据显示图表。
       myChart.setOption(option, true);
-      let that = this;
-      if (id === "byTimeHistogram") {
-        myChart.on("click", function(param) {
-          that.drillDown(param.name);
-        });
-      }
       if (this.isInitialize) {
         let histogram = this.$echarts.init(
           document.getElementById("byTimeHistogram")
@@ -325,6 +329,7 @@ export default {
 
     // 图表下钻
     async drillDown(month) {
+      this.$echarts.init(document.getElementById("byTimeHistogram")).dispose();
       this.isShowReduction = true;
       let param = {};
       param.startDate = (month + "01").replace("-", "");

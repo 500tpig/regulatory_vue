@@ -388,6 +388,9 @@ export default {
       this.common.HCTableData.title = tempTitle + "住院" + "费用详情表";
     },
     async drillDown(chartParam) {
+      this.$echarts
+        .init(document.getElementById("byAgeGroupHistogram"))
+        .dispose();
       let param = {};
       param = shallowCopyObj(this.searchParam, param);
       param.startDate = this.searchParam.chargingTime[0];
