@@ -25,11 +25,35 @@
               <q-radio v-model="param.type" val="已处理" label="已处理" />
               <q-radio v-model="param.type" val="all" label="全选" />
             </div>
+          </div>
+          <div class="row items-center q-pb-sm">
+            <span class="q-mr-md">自动审核:</span>
+            <div class="subText">
+              <q-radio
+                v-model="param.isAutomaticAudit"
+                val="已完成"
+                label="已完成"
+              />
+              <q-radio
+                v-model="param.isAutomaticAudit"
+                val="未审核"
+                label="未审核"
+              />
+              <q-radio
+                v-model="param.isAutomaticAudit"
+                val="全选"
+                label="全选"
+              />
+            </div>
             <div class="col">
               <q-btn
                 style="background: #018DA7; color: white;float:right;"
                 label="确认"
                 @click="initialize"
+              />
+              <q-btn
+                style="background: #26A69A; color: white;float:right;margin-right:16px;"
+                label="自动审核"
               />
             </div>
           </div>
@@ -422,7 +446,8 @@ export default {
       param: {
         importTime: ["2021-01-17 11:11:47", "2021-01-24 11:11:47"],
         type: "未处理",
-        selectAllType: false
+        selectAllType: false,
+        isAutomaticAudit: "全选"
       },
       common: {
         dialogData: {},
