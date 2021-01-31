@@ -1,6 +1,6 @@
 <template>
   <q-page class="home">
-    <page-base-scroll content_class="text-black">
+    <page-base-scroll content_class="text-black q-pb-lg">
       <div class="row q-pa-md">
         <div class="col-4 row q-pr-sm">
           <q-card class="col-12" id="fourRing"></q-card>
@@ -52,23 +52,38 @@
           </q-btn>
         </div>
       </div>
-    </page-base-scroll>
-  </q-page>
-  <!-- <q-page class="row">
-    <div class="col-12 column">
-      <div class="col-4 row q-pa-md">
-        <div class="col-4 row q-pr-sm">
-          <q-card class="col-12" id="fourRing"></q-card>
+      <div class="row q-px-md">
+        <div class="col-6 q-pr-sm">
+          <q-card class="q-pa-sm">
+            <div class="row items-center q-pl-md">
+              <span class="q-mr-sm text-weight-medium" style="font-size:15px;"
+                >类型:</span
+              >
+              <q-radio v-model="param.type" val="department" label="科室" />
+              <q-radio
+                v-model="param.type"
+                val="drugInspection"
+                label="药品检查"
+              />
+              <q-radio v-model="param.type" val="doctor" label="医生" />
+              <q-radio v-model="param.type" val="insured" label="参保人" />
+              <div class="col row justify-end q-pr-md">
+                <q-btn color="secondary" class="q-ml-md" @click="getCostDetails"
+                  >确认</q-btn
+                >
+              </div>
+            </div>
+          </q-card>
+          <div class="histogram-div q-pt-md">
+            <q-card id="histogram"> </q-card>
+          </div>
         </div>
-        <div class="col-4 row q-px-sm">
-          <q-card class="col-12"></q-card>
-        </div>
-        <div class="col-4 row q-pl-sm">
+        <div class="col-6 row q-pl-sm">
           <q-card class="col-12"></q-card>
         </div>
       </div>
-    </div>
-  </q-page> -->
+    </page-base-scroll>
+  </q-page>
 </template>
 
 <script>
@@ -76,15 +91,26 @@ import pageBaseScroll from "components/utils/PageScroll";
 import {
   fourRingOption,
   healthCareAccountedOption,
-  dashboardOption
+  dashboardOption,
+  costDetailsOption
 } from "assets/js/charts/homeChartOptions";
 import { EleResize } from "assets/js/util/esresize";
-import { pickerOptions, isObjArr, formatDateTime } from "assets/js/util/common";
+import {
+  pickerOptions,
+  isObjArr,
+  formatDateTime,
+  deepClone
+} from "assets/js/util/common";
 export default {
   components: { pageBaseScroll },
   data() {
     return {
-      param: { chargingTime: [] },
+      param: {
+        chargingTime: [],
+        type: "department",
+        sort: "DESC",
+        showNum: 20
+      },
       common: {
         isInitialize: true,
         pickerOptions: pickerOptions,
@@ -105,7 +131,37 @@ export default {
   },
   methods: {
     async initialize() {
-      this.afterHttp();
+      let fourRingData = [];
+      await this.$http
+        .post("/home/getAmount", this.param)
+        .then(res => {
+          if (res.status === 200) {
+            fourRingData = res.data.data;
+          }
+        })
+        .catch(e => {});
+
+      let countUntreated = [];
+      await this.$http
+        .post("/home/countUntreated", this.param)
+        .then(res => {
+          if (res.status === 200) {
+            countUntreated = res.data.data;
+          }
+        })
+        .catch(e => {});
+
+      let costDetailsData = [];
+      await this.$http
+        .post("/home/costDetails", this.param)
+        .then(res => {
+          if (res.status === 200) {
+            costDetailsData = res.data.data;
+          }
+        })
+        .catch(e => {});
+
+      this.afterHttp(fourRingData, countUntreated, costDetailsData);
     },
     // 画图表
     drawChart(option, id, chartData) {
@@ -149,20 +205,25 @@ export default {
           let dashboard = this.$echarts.init(
             document.getElementById("dashboard")
           );
+          let histogram = this.$echarts.init(
+            document.getElementById("histogram")
+          );
           let linstener = function() {
             fourRing.resize();
             healthCareAccounted.resize();
             dashboard.resize();
+            histogram.resize();
           };
           EleResize.on(resizeDiv, linstener);
           this.common.isInitialize = false;
         }
       }
     },
-    drawHealthCareAccounted() {
+    // 画医保占比动画饼图
+    drawHealthCareAccounted(fourRingData) {
       this.common.angle = this.common.angle + 3;
       let healthCareAccounted = healthCareAccountedOption(
-        [0],
+        fourRingData,
         this.common.angle
       );
       let myChart = this.$echarts.init(
@@ -170,16 +231,32 @@ export default {
       );
       myChart.setOption(healthCareAccounted, true);
     },
-    afterHttp() {
+    afterHttp(fourRingData, countUntreated, costDetailsData) {
       let that = this;
-      let fourRing = fourRingOption();
-      this.drawChart(fourRing, "fourRing", [1, 2, 3, 4]);
+      let fourRing = fourRingOption(fourRingData);
+      this.drawChart(fourRing, "fourRing", fourRingData);
       this.common.timerId = setInterval(function() {
         //用setInterval做动画感觉有问题
-        that.drawHealthCareAccounted();
+        that.drawHealthCareAccounted(fourRingData);
       }, 100);
-      let dashboard = dashboardOption();
-      this.drawChart(dashboard, "dashboard", [1, 2, 3, 4]);
+      let dashboard = dashboardOption(countUntreated);
+      this.drawChart(dashboard, "dashboard", countUntreated);
+
+      let costDetails = costDetailsOption(costDetailsData, this.param);
+      this.drawChart(costDetails, "histogram", costDetailsData);
+    },
+    async getCostDetails() {
+      let costDetailsData = [];
+      await this.$http
+        .post("/home/costDetails", this.param)
+        .then(res => {
+          if (res.status === 200) {
+            costDetailsData = res.data.data;
+          }
+        })
+        .catch(e => {});
+      let costDetails = costDetailsOption(costDetailsData, this.param);
+      this.drawChart(costDetails, "histogram", costDetailsData);
     }
   },
   destroyed() {
@@ -196,6 +273,12 @@ export default {
   }
   #dashboard {
     background: #333333;
+  }
+  .histogram-div {
+    #histogram {
+      height: calc(60vh);
+      background: #0e2147;
+    }
   }
   .health-care-accounted-div {
     position: relative;
