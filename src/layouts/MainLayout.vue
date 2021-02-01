@@ -482,6 +482,12 @@ export default {
   },
   watch: {
     $route(to, from) {
+      this.breadcrumbs = [
+        {
+          label: "Home",
+          icon: "home"
+        }
+      ];
       for (let key in this.drawers) {
         this.drawers[key].map(item => {
           item.select = false;
