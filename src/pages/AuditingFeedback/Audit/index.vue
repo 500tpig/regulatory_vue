@@ -45,16 +45,29 @@
                 label="全选"
               />
             </div>
-            <div class="col">
-              <q-btn
-                style="background: #018DA7; color: white;float:right;"
-                label="确认"
-                @click="initialize"
-              />
-              <q-btn
-                style="background: #26A69A; color: white;float:right;margin-right:16px;"
-                label="自动审核"
-              />
+            <div class="col row">
+              <div class="col-12 row justify-end">
+                <q-btn
+                  class="q-mr-md"
+                  style="background: #018DA7; color: white;"
+                  label="确认"
+                  @click="initialize"
+                />
+                <el-upload
+                  accept="xls,xlsx"
+                  :auto-upload="false"
+                  action=""
+                  ref="upload"
+                  :multiple="false"
+                  :on-change="automaticAudit"
+                  :show-file-list="false"
+                >
+                  <q-btn
+                    style="background: #26A69A; color: white;margin-right:16px;"
+                    label="自动审核"
+                  />
+                </el-upload>
+              </div>
             </div>
           </div>
         </q-card>
@@ -439,6 +452,7 @@
 <script>
 import { exportTable, deepClone } from "assets/js/util/common";
 import dialogInfo from "./dialog";
+import XLSX from "xlsx";
 export default {
   components: { dialogInfo },
   data() {
@@ -447,9 +461,11 @@ export default {
         importTime: ["2020-11-02 11:27:42", "2021-01-31 11:27:42"],
         type: "未处理",
         selectAllType: false,
-        isAutomaticAudit: "全选"
+        isAutomaticAudit: "全选",
+        fileData: []
       },
       common: {
+        file: "",
         dialogData: {},
         isShowDialog: false,
         pickerOptions: {
@@ -882,6 +898,60 @@ export default {
         this.common.tableDetails.data = [];
         this.common.table.selected = [];
       }
+    },
+    automaticAudit(file, fileList) {
+      let files = { 0: file.raw };
+      this.common.file = files;
+      this.readExcel(files);
+    },
+    // 处理文件
+    readExcel(files) {
+      //表格导入
+      let that = this;
+      if (files.length <= 0) {
+        //如果没有文件名
+        return false;
+      } else if (!/\.(xls|xlsx)$/.test(files[0].name.toLowerCase())) {
+        this.$q.notify({
+          icon: "error",
+          color: "negative",
+          message: "上传格式不正确，请上传xls或者xlsx格式"
+        });
+        return false;
+      }
+      const fileReader = new FileReader();
+      fileReader.onload = ev => {
+        try {
+          const data = ev.target.result;
+          const workbook = XLSX.read(data, {
+            type: "binary"
+          });
+          let documentsIndex = -1;
+          for (let index = 0; index < workbook.SheetNames.length; index++) {
+            const element = workbook.SheetNames[index];
+            if (element === "单据明细汇总") {
+              documentsIndex = index;
+            }
+          }
+          if (documentsIndex === -1) {
+            that.$q.notify({
+              icon: "error",
+              color: "negative",
+              message: "上传文件找不到单据明细汇总"
+            });
+            that.$refs["upload"].clearFiles();
+            return false;
+          }
+          const wsname1 = workbook.SheetNames[documentsIndex]; //取第n张表
+          const ws1 = XLSX.utils.sheet_to_json(workbook.Sheets[wsname1]); //生成表的json表格内容
+          that.param.fileData = ws1;
+          console.log(that.param.fileData);
+        } catch (e) {
+          return false;
+        }
+      };
+      fileReader.readAsBinaryString(files[0]);
+      return true;
     },
     /**
      * 计算两个日期之间的天数
