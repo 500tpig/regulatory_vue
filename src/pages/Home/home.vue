@@ -104,7 +104,8 @@ import {
   dashboardOption,
   costDetailsOption,
   numberOfPenaltyOption,
-  roseChartOption
+  roseChartOption,
+  violationOfNumberOption
 } from "assets/js/charts/homeChartOptions";
 import { EleResize } from "assets/js/util/esresize";
 import {
@@ -242,6 +243,10 @@ export default {
           let roseChart = this.$echarts.init(
             document.getElementById("roseChart")
           );
+          let violationOfNumber = this.$echarts.init(
+            document.getElementById("violationOfNumber")
+          );
+
           let linstener = function() {
             fourRing.resize();
             healthCareAccounted.resize();
@@ -249,6 +254,7 @@ export default {
             histogram.resize();
             numberOfPenalty.resize();
             roseChart.resize();
+            violationOfNumber.resize();
           };
           EleResize.on(resizeDiv, linstener);
           this.common.isInitialize = false;
@@ -294,6 +300,9 @@ export default {
 
       let roseChart = roseChartOption(this.param);
       this.drawChart(roseChart, "roseChart", [1]);
+
+      let violationOfNumber = violationOfNumberOption(this.param);
+      this.drawChart(violationOfNumber, "violationOfNumber", [1]);
     },
     async getCostDetails() {
       let costDetailsData = [];
@@ -352,7 +361,8 @@ export default {
   }
   .violationOfNumber-div {
     #violationOfNumber {
-      height: calc(60vh);
+      background: #01004c;
+      height: calc(65vh);
     }
   }
   .health-care-accounted-div {

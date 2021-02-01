@@ -1688,28 +1688,99 @@ function roseChartOption(param) {
   };
   return option;
 }
-function violationOfNumberOption() {
-  option = {
-    backgroundColor: "#01004C",
-    title: {},
+function violationOfNumberOption(param) {
+  let option = {
+    // backgroundColor: "#01004C",
+    title: {
+      left: "8%",
+      top: "1%",
+      textStyle: {
+        color: "#fff",
+        fontSize: "22"
+      },
+      text:
+        param.chargingTime[0] + " 至 " + param.chargingTime[1] + " 违规类型次数"
+    },
+    dataZoom: [
+      {
+        show: true,
+        height: 30,
+        xAxisIndex: [0],
+        bottom: 30,
+        start: 0,
+        end: 100,
+        handleIcon:
+          "path://M306.1,413c0,2.2-1.8,4-4,4h-59.8c-2.2,0-4-1.8-4-4V200.8c0-2.2,1.8-4,4-4h59.8c2.2,0,4,1.8,4,4V413z",
+        handleSize: "110%",
+        handleStyle: {
+          color: "#5B3AAE"
+        },
+        textStyle: {
+          color: "#FFFFFF"
+        },
+        fillerColor: "rgba(67,55,160,0.4)",
+        borderColor: "rgba(204,187,225,0.5)"
+      },
+      {
+        type: "inside",
+        show: true,
+        height: 15,
+        start: 1,
+        end: 35
+      }
+    ],
     tooltip: {
       trigger: "axis"
     },
-    legend: {
-      data: ["信息科技", "大消费"],
-      textStyle: {
-        color: "#fff"
-      }
-    },
+    // legend: {
+    //   data: ["信息科技", "大消费"],
+    //   textStyle: {
+    //     color: "#fff"
+    //   }
+    // },
     toolbox: {
       show: true,
+      iconStyle: {
+        normal: {
+          borderColor: "#ffffff"
+        }
+      },
       feature: {
         mark: {
           show: true
         },
         dataView: {
+          //数据视图
           show: true,
-          readOnly: false
+          readOnly: true,
+          optionToContent: function(opt) {
+            let axisData = opt.xAxis[0].data;
+            let series = opt.series;
+            let tdHeaders = "<td>日期</td>"; //表头
+            series.forEach(function(item) {
+              tdHeaders += "<td>" + item.name + "</td>"; //组装表头
+            });
+            let table =
+              '<div class="table-responsive"><table class="table table-bordered table-striped table-hover" style="text-align:center;color:#222831;"><tbody><tr>' +
+              tdHeaders +
+              "</tr>";
+            let tdBodys = ""; //数据
+            for (let i = 0, l = axisData.length; i < l; i++) {
+              for (let j = 0; j < series.length; j++) {
+                tdBodys += "<td>" + series[j].data[i] + "元</td>"; //组装表数据
+              }
+              table +=
+                '<tr><td style="padding: 0 10px">' +
+                axisData[i] +
+                "</td>" +
+                tdBodys +
+                "</tr>";
+              tdBodys = "";
+            }
+
+            table += "</tbody></table></div>";
+            return table;
+          }
         },
         magicType: {
           show: true,
@@ -1723,13 +1794,34 @@ function violationOfNumberOption() {
         }
       }
     },
+    grid: {
+      top: "10%",
+      containLabel: true
+    },
     calculable: true,
     xAxis: [
       {
         type: "category",
-        boundaryGap: false,
-        data: ["一月份", "二月份", "三月份", "四月份", "五月份", "六月份"],
+
+        data: [
+          "智能审核人工导入",
+          "住院限制支付药品",
+          "诊疗项目限儿童使用",
+          "人工剔除",
+          "超医保诊疗项目范围收费",
+          "医用材料使用与项目不匹配",
+          "重复用药",
+          "仪器辅助操作与手术重复收费",
+          "中药饮片单味出现时不支付",
+          "",
+          "中医辨证论治不匹配",
+          "超时间收费,项目超限次",
+          "项目超限次（单次住院）",
+          "限工伤保险支付",
+          "第二麻醉半价收费"
+        ],
         axisLabel: {
+          rotate: 30,
           show: true,
           textStyle: {
             color: "#ffffff", //X轴文字颜色
@@ -1758,9 +1850,9 @@ function violationOfNumberOption() {
     ],
     series: [
       {
-        name: "信息科技",
+        name: "违规类型的次数",
         type: "line",
-        data: [1, 4, 2, 5, 1, 2, 1],
+        data: [136, 111, 40, 31, 15, 14, 10, 5, 2, 2, 2, 1, 1, 1, 1],
         lineStyle: {
           normal: {
             width: 8,
@@ -1806,6 +1898,7 @@ function violationOfNumberOption() {
       }
     ]
   };
+  return option;
 }
 export {
   fourRingOption,
