@@ -40,7 +40,10 @@
         </div>
         <div class="col-4 column q-pl-sm dashboard-div">
           <q-card class="col-12" id="dashboard"></q-card>
-          <q-btn color="secondary" class="q-ml-md dashboard-div-button"
+          <q-btn
+            color="secondary"
+            class="q-ml-md dashboard-div-button"
+            @click="toAudit"
             >处理
             <q-tooltip
               content-class="bg-white text-black shadow-4 text-weight-medium"
@@ -331,6 +334,9 @@ export default {
         this.param
       );
       this.drawChart(numberOfPenalty, "numberOfPenalty", numberOfPenaltyData);
+    },
+    toAudit() {
+      this.$router.replace("/auditingFeedback/Audit");
     }
   },
   destroyed() {

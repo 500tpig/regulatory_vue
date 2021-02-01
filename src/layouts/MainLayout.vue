@@ -480,6 +480,73 @@ export default {
       });
     }
   },
+  watch: {
+    $route(to, from) {
+      for (let key in this.drawers) {
+        this.drawers[key].map(item => {
+          item.select = false;
+        });
+      }
+      let currentPath = this.$route.path;
+      let that = this;
+      if (currentPath === "/home") {
+        this.drawers.homeDrawer[0].select = true;
+      }
+      if (currentPath === "/portrait") {
+        this.breadcrumbs.push({
+          label: "参保人画像",
+          icon: "icon-huaxiangduibifenxi"
+        });
+        this.drawers.portrait[0].select = true;
+      }
+      if (currentPath === "/timeLine") {
+        this.breadcrumbs.push({
+          label: "就医时间轴",
+          icon: "icon-shijianzhou"
+        });
+        this.drawers.timeLine[0].select = true;
+      }
+      if (currentPath === "/knowledgeGraph") {
+        this.breadcrumbs.push({
+          label: "就医轨迹",
+          icon: "icon-guanxitu"
+        });
+        this.drawers.knowledgeGraph[0].select = true;
+      }
+      if (currentPath.startsWith("/foundation")) {
+        this.expanded[0] = true;
+        this.drawers.fundUseDrawer.map(item => {
+          if (currentPath === item.url) {
+            item.select = true;
+            that.breadcrumbs.push({
+              label: "基金使用概况",
+              icon: "icon-jiaohusuijichaxun"
+            });
+            that.breadcrumbs.push({
+              label: item.text,
+              icon: item.icon
+            });
+          }
+        });
+      }
+      if (currentPath.startsWith("/auditingFeedback")) {
+        this.expanded[1] = true;
+        this.drawers.auditingFeedbackDrawer.map(item => {
+          if (currentPath === item.url) {
+            item.select = true;
+            that.breadcrumbs.push({
+              label: "审核反馈",
+              icon: "icon-jiaohusuijichaxun"
+            });
+            that.breadcrumbs.push({
+              label: item.text,
+              icon: item.icon
+            });
+          }
+        });
+      }
+    }
+  },
   methods: {
     toHome() {
       let currentUrl = this.$route.path;

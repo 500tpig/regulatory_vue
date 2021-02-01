@@ -1644,7 +1644,6 @@ function roseChartOption(param) {
               },
               //formatter:'{b} \n{@abnormalAmount}例 \n死亡{@proportion}',//注意这里大小写敏感哦
               formatter: function(params) {
-                console.log("参数列表", params);
                 if (params.data[1] > 9000) {
                   return (
                     params.data[0] +
