@@ -42,7 +42,7 @@
           <el-date-picker
             v-if="calendarParam.showType === 'byYear'"
             align="center"
-            style="width:30%;"
+            style="width:40%;"
             value-format="yyyyMMdd"
             v-model="calendarParam.chargingTime"
             type="monthrange"

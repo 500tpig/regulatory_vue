@@ -69,6 +69,7 @@ main {
   }
   .el-input__inner {
     border: 1px solid rgba(0, 0, 0, 0.24);
+    text-align: center;
   }
 }
 </style>

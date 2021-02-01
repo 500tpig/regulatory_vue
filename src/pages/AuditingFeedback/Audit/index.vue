@@ -4,7 +4,26 @@
       <div class="column" style="height:100%;">
         <q-card class="col-auto q-px-md q-pt-md q-pb-sm">
           <div class="q-pb-sm">
-            <span class="q-mr-md">导入时间:</span>
+            <span class="q-mr-md">开始日期:</span>
+            <el-date-picker
+              v-model="param.importTime[0]"
+              value-format="yyyy-MM-dd HH:mm:ss"
+              clearable
+              align="center"
+              type="datetime"
+              placeholder="选择日期时间"
+            >
+            </el-date-picker>
+            <span class="q-mx-md">结束日期:</span>
+            <el-date-picker
+              v-model="param.importTime[1]"
+              value-format="yyyy-MM-dd HH:mm:ss"
+              clearable
+              type="datetime"
+              placeholder="选择日期时间"
+            >
+            </el-date-picker>
+            <!-- <span class="q-mr-md">导入时间:</span>
             <el-date-picker
               class="subText"
               v-model="param.importTime"
@@ -16,7 +35,7 @@
               end-placeholder="结束日期"
               align="center"
             >
-            </el-date-picker>
+            </el-date-picker> -->
           </div>
           <div class="row items-center q-pb-sm">
             <span class="q-mr-md">反馈情况:</span>
