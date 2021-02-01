@@ -26,7 +26,7 @@
                   label="全选"
                 />
               </div>
-              <div>
+              <!-- <div>
                 <span class="q-ml-lg q-mr-md">日期选择:</span>
                 <el-date-picker
                   align="center"
@@ -41,7 +41,33 @@
                   style="width:60%;"
                 >
                 </el-date-picker>
-              </div>
+              </div> -->
+            </q-card-section>
+            <q-card-section
+              horizontal
+              class="row items-center q-pl-xl"
+              style="font-size:16px;font-weight:500;"
+            >
+              <span class="q-mr-md">开始日期:</span>
+              <el-date-picker
+                v-model="searchParam.chargingTime[0]"
+                value-format="yyyyMMdd"
+                clearable
+                type="month"
+                align="center"
+                placeholder="选择月"
+              >
+              </el-date-picker>
+              <span class="q-mx-md">结束日期:</span>
+              <el-date-picker
+                v-model="searchParam.chargingTime[1]"
+                value-format="yyyyMMdd"
+                clearable
+                type="month"
+                align="center"
+                placeholder="选择月"
+              >
+              </el-date-picker>
             </q-card-section>
             <q-card-section
               horizontal

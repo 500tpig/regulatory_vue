@@ -2,7 +2,7 @@
   <div class="comparison">
     <div class="row">
       <q-expansion-item
-        class="shadow-1 overflow-hidden col-9"
+        class="shadow-1 overflow-hidden col-10"
         style="border-radius: 30px"
         icon="icon-icon_shaixuan"
         label="筛选条件"
@@ -71,7 +71,7 @@
               inline
               class="subText"
             />
-            <span class="q-ml-lg q-mr-md text-weight-medium">日期选择:</span>
+            <!-- <span class="q-ml-lg q-mr-md text-weight-medium">日期选择:</span>
             <el-date-picker
               align="center"
               value-format="yyyyMMdd"
@@ -82,6 +82,26 @@
               start-placeholder="开始月份"
               end-placeholder="结束月份"
               :picker-options="common.pickerOptions"
+            >
+            </el-date-picker> -->
+            <span class="q-mx-md">开始日期:</span>
+            <el-date-picker
+              v-model="comparisonParam.chargingTime[0]"
+              value-format="yyyyMMdd"
+              clearable
+              type="month"
+              align="center"
+              placeholder="选择月"
+            >
+            </el-date-picker>
+            <span class="q-mx-md">结束日期:</span>
+            <el-date-picker
+              v-model="comparisonParam.chargingTime[1]"
+              value-format="yyyyMMdd"
+              clearable
+              type="month"
+              align="center"
+              placeholder="选择月"
             >
             </el-date-picker>
           </q-card-section>

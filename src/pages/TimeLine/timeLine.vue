@@ -132,7 +132,27 @@
             <div class="col-7">
               <div class="timeLine-select q-py-md q-px-lg" style="width:90%;">
                 <div class="row items-center">
-                  <span class="q-mr-md text-weight-medium">日期选择:</span>
+                  <span class="q-mr-md">开始日期:</span>
+                  <el-date-picker
+                    v-model="searchParam.chargingTime[0]"
+                    value-format="yyyyMMdd"
+                    clearable
+                    type="month"
+                    align="center"
+                    placeholder="选择月"
+                  >
+                  </el-date-picker>
+                  <span class="q-mx-md">结束日期:</span>
+                  <el-date-picker
+                    v-model="searchParam.chargingTime[1]"
+                    value-format="yyyyMMdd"
+                    clearable
+                    type="month"
+                    align="center"
+                    placeholder="选择月"
+                  >
+                  </el-date-picker>
+                  <!-- <span class="q-mr-md text-weight-medium">日期选择:</span>
                   <el-date-picker
                     align="center"
                     style="width:30%;"
@@ -145,12 +165,12 @@
                     end-placeholder="结束月份"
                     :picker-options="common.pickerOptions"
                   >
-                  </el-date-picker>
+                  </el-date-picker> -->
+                </div>
+                <div class="row items-center">
                   <div class="row items-center justify-between">
                     <div class="row items-center">
-                      <span class="q-ml-lg q-mr-sm text-weight-medium"
-                        >类型:</span
-                      >
+                      <span class="q-mr-sm text-weight-medium">类型:</span>
                       <q-option-group
                         v-model="searchParam.type"
                         :options="common.typeOptions"
