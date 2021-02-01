@@ -79,7 +79,17 @@
           </div>
         </div>
         <div class="col-6 row q-pl-sm">
-          <q-card class="col-12"></q-card>
+          <q-card class="col-12 q-pa-sm" id="numberOfPenalty"></q-card>
+        </div>
+      </div>
+      <div class="row q-pa-md">
+        <div class="col-12 roseChart-div">
+          <q-card class="q-pa-sm" id="roseChart"> </q-card>
+        </div>
+      </div>
+      <div class="row q-px-md">
+        <div class="col-12 violationOfNumber-div">
+          <q-card class="q-pa-sm" id="violationOfNumber"> </q-card>
         </div>
       </div>
     </page-base-scroll>
@@ -92,7 +102,9 @@ import {
   fourRingOption,
   healthCareAccountedOption,
   dashboardOption,
-  costDetailsOption
+  costDetailsOption,
+  numberOfPenaltyOption,
+  roseChartOption
 } from "assets/js/charts/homeChartOptions";
 import { EleResize } from "assets/js/util/esresize";
 import {
@@ -161,7 +173,21 @@ export default {
         })
         .catch(e => {});
 
-      this.afterHttp(fourRingData, countUntreated, costDetailsData);
+      let numberOfPenaltyData = [];
+      await this.$http
+        .post("/home/numberOfPenalty", this.param)
+        .then(res => {
+          if (res.status === 200) {
+            numberOfPenaltyData = res.data.data;
+          }
+        })
+        .catch(e => {});
+      this.afterHttp(
+        fourRingData,
+        countUntreated,
+        costDetailsData,
+        numberOfPenaltyData
+      );
     },
     // 画图表
     drawChart(option, id, chartData) {
@@ -208,11 +234,21 @@ export default {
           let histogram = this.$echarts.init(
             document.getElementById("histogram")
           );
+
+          let numberOfPenalty = this.$echarts.init(
+            document.getElementById("numberOfPenalty")
+          );
+
+          let roseChart = this.$echarts.init(
+            document.getElementById("roseChart")
+          );
           let linstener = function() {
             fourRing.resize();
             healthCareAccounted.resize();
             dashboard.resize();
             histogram.resize();
+            numberOfPenalty.resize();
+            roseChart.resize();
           };
           EleResize.on(resizeDiv, linstener);
           this.common.isInitialize = false;
@@ -231,7 +267,12 @@ export default {
       );
       myChart.setOption(healthCareAccounted, true);
     },
-    afterHttp(fourRingData, countUntreated, costDetailsData) {
+    afterHttp(
+      fourRingData,
+      countUntreated,
+      costDetailsData,
+      numberOfPenaltyData
+    ) {
       let that = this;
       let fourRing = fourRingOption(fourRingData);
       this.drawChart(fourRing, "fourRing", fourRingData);
@@ -244,6 +285,15 @@ export default {
 
       let costDetails = costDetailsOption(costDetailsData, this.param);
       this.drawChart(costDetails, "histogram", costDetailsData);
+
+      let numberOfPenalty = numberOfPenaltyOption(
+        numberOfPenaltyData,
+        this.param
+      );
+      this.drawChart(numberOfPenalty, "numberOfPenalty", numberOfPenaltyData);
+
+      let roseChart = roseChartOption(this.param);
+      this.drawChart(roseChart, "roseChart", [1]);
     },
     async getCostDetails() {
       let costDetailsData = [];
@@ -255,8 +305,23 @@ export default {
           }
         })
         .catch(e => {});
+      let numberOfPenaltyData = [];
+      await this.$http
+        .post("/home/numberOfPenalty", this.param)
+        .then(res => {
+          if (res.status === 200) {
+            numberOfPenaltyData = res.data.data;
+          }
+        })
+        .catch(e => {});
       let costDetails = costDetailsOption(costDetailsData, this.param);
       this.drawChart(costDetails, "histogram", costDetailsData);
+
+      let numberOfPenalty = numberOfPenaltyOption(
+        numberOfPenaltyData,
+        this.param
+      );
+      this.drawChart(numberOfPenalty, "numberOfPenalty", numberOfPenaltyData);
     }
   },
   destroyed() {
@@ -278,6 +343,16 @@ export default {
     #histogram {
       height: calc(60vh);
       background: #0e2147;
+    }
+  }
+  .roseChart-div {
+    #roseChart {
+      height: calc(66vh);
+    }
+  }
+  .violationOfNumber-div {
+    #violationOfNumber {
+      height: calc(60vh);
     }
   }
   .health-care-accounted-div {

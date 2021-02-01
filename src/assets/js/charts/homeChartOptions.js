@@ -895,6 +895,41 @@ function costDetailsOption(costDetails, param) {
         }
       },
       feature: {
+        dataView: {
+          //数据视图
+          show: true,
+          readOnly: true,
+          optionToContent: function(opt) {
+            let axisData = opt.xAxis[0].data;
+            let series = opt.series;
+            let tdHeaders = "<td>日期</td>"; //表头
+            series.forEach(function(item) {
+              if (item.name === "滑行的光点") {
+              } else {
+                tdHeaders += "<td>" + item.name + "</td>"; //组装表头
+              }
+            });
+            let table =
+              '<div class="table-responsive"><table class="table table-bordered table-striped table-hover" style="text-align:center;color:#222831;"><tbody><tr>' +
+              tdHeaders +
+              "</tr>";
+            let tdBodys = ""; //数据
+            for (let i = 0, l = axisData.length; i < l; i++) {
+              for (let j = 0; j < 1; j++) {
+                tdBodys += "<td>" + series[j].data[i] + "元</td>"; //组装表数据
+              }
+              table +=
+                '<tr><td style="padding: 0 10px">' +
+                axisData[i] +
+                "</td>" +
+                tdBodys +
+                "</tr>";
+              tdBodys = "";
+            }
+            table += "</tbody></table></div>";
+            return table;
+          }
+        },
         restore: {
           //重置
           show: true
@@ -1096,9 +1131,688 @@ function costDetailsOption(costDetails, param) {
   };
   return option;
 }
+function numberOfPenaltyOption(chartData, param) {
+  function contains(arr, dst) {
+    let i = arr.length;
+    while ((i -= 1)) {
+      if (arr[i] == dst) {
+        return i;
+      }
+    }
+    return false;
+  }
+  let times = [];
+  let departments = [];
+  chartData.map(item => {
+    times.push(item.times);
+    departments.push(item[param.type]);
+  });
+  let attackSourcesColor = [
+    "#f36c6c",
+    "#e6cf4e",
+    "#20d180",
+    "#0093ff",
+    "#1089E7",
+    "#F57474",
+    "#56D0E3",
+    "#1089E7",
+    "#F57474",
+    "#1089E7",
+    "#F57474",
+    "#F57474"
+  ];
+
+  function attackSourcesDataFmt(sData) {
+    let sss = [];
+    sData.forEach(function(item, i) {
+      let itemStyle = {
+        color: i > 3 ? attackSourcesColor[3] : attackSourcesColor[i]
+      };
+      sss.push({
+        value: item,
+        itemStyle: itemStyle
+      });
+    });
+    return sss;
+  }
+  let title = "";
+  if (param.type === "department") {
+    title = "科室";
+  } else if (param.type === "drugInspection") {
+    title = "药品检查";
+  } else if (param.type === "doctor") {
+    title = "医生";
+  } else if (param.type === "insured") {
+    title = "参保人";
+  }
+  let option = {
+    toolbox: {
+      show: true,
+      feature: {
+        dataView: {
+          //数据视图
+          show: true,
+          readOnly: true,
+          optionToContent: function(opt) {
+            let axisData = opt.yAxis[0].data;
+            let series = opt.series[0].data;
+            let tdHeaders = "<td>科室</td>"; //表头
+            // series.forEach(function(item) {
+            //   tdHeaders += "<td>" + item.name + "</td>"; //组装表头
+            // });
+            let table =
+              '<div class="table-responsive"><table class="table table-bordered table-striped table-hover" style="text-align:center;color:#222831;"><tbody><tr>' +
+              tdHeaders +
+              "</tr>";
+            let tdBodys = ""; //数据
+            for (let index = 0; index < series.length; index++) {
+              const element = series[index];
+              tdBodys += "<td>" + series[index].value + "次</td>"; //组装表数据
+              table +=
+                '<tr><td style="padding: 0 10px">' +
+                axisData[index] +
+                "</td>" +
+                tdBodys +
+                "</tr>";
+              tdBodys = "";
+            }
+
+            table += "</tbody></table></div>";
+            return table;
+          }
+        },
+        restore: {},
+        saveAsImage: {
+          show: true,
+          excludeComponents: ["toolbox"],
+          pixelRatio: 2,
+          type: ["png"],
+          title: ["保存"]
+        }
+      }
+    },
+    tooltip: {
+      show: true,
+      backgroundColor: "rgba(21,52,93,1)", //背景颜色（此时为默认色）
+      textStyle: {
+        fontSize: 16
+      }
+      // trigger: 'axis',
+      // axisPointer: {
+      //    type: 'shadow'
+      // }
+    },
+    title: {
+      text: title + " 剔除次数",
+      // left: "3%",
+      top: "3%"
+    },
+    legend: {
+      show: false
+    },
+    grid: {
+      left: 140,
+      bottom: 30
+    },
+    dataZoom: [
+      {
+        type: "slider",
+        yAxisIndex: 0,
+        zoomLock: true,
+        width: 20,
+        handleSize: "100%",
+        showDetail: false,
+        start: 0,
+        end: 50,
+        handleIcon: "M0,0 v9.7h5 v-9.7h-5 Z",
+        handleStyle: {
+          /*手柄的样式*/
+          color: "#40bcf9",
+          borderColor: "#1fb2fb"
+        },
+        backgroundColor: "#e2f3ff" /*背景 */,
+        dataBackground: {
+          /*数据背景*/
+          lineStyle: {
+            color: "#ff2e63",
+            width: 2
+          },
+          areaStyle: {
+            color: "#d4d9dd"
+          }
+        },
+        fillerColor: "rgba(31,178,251,0.2)" /*被start和end遮住的背景*/
+      },
+      {
+        type: "inside",
+        id: "insideY",
+        yAxisIndex: 0,
+        start: 0,
+        end: 50,
+        zoomOnMouseWheel: false,
+        moveOnMouseMove: true,
+        moveOnMouseWheel: true
+      }
+    ],
+    xAxis: {
+      type: "value",
+
+      splitLine: {
+        show: false
+      },
+      axisLabel: {
+        show: false
+      },
+      axisTick: {
+        show: false
+      },
+      axisLine: {
+        show: false
+      }
+    },
+    yAxis: {
+      type: "category",
+      inverse: true,
+      axisLine: {
+        show: false
+      },
+      axisTick: {
+        show: false
+      },
+      axisPointer: {
+        label: {
+          show: true,
+          margin: 30
+        }
+      },
+      data: departments,
+      axisLabel: {
+        margin: 140,
+        fontSize: 14,
+        align: "left",
+        color: "#333",
+        rich: {
+          nt1: {
+            color: "#fff",
+            backgroundColor: attackSourcesColor[0],
+            width: 25,
+            height: 25,
+            align: "center",
+            borderRadius: 100
+          },
+          nt2: {
+            color: "#fff",
+            backgroundColor: attackSourcesColor[1],
+            width: 25,
+            height: 25,
+            align: "center",
+            borderRadius: 100
+          },
+          nt3: {
+            color: "#fff",
+            backgroundColor: attackSourcesColor[2],
+            width: 25,
+            height: 25,
+            align: "center",
+            borderRadius: 100
+          },
+          nt: {
+            color: "#fff",
+            backgroundColor: attackSourcesColor[3],
+            width: 25,
+            height: 25,
+            align: "center",
+            borderRadius: 100
+          },
+          title1: {
+            backgroundColor: attackSourcesColor[0],
+            color: "#fff",
+            width: 90,
+            align: "left",
+            borderRadius: 5,
+            padding: 5
+          },
+          title2: {
+            backgroundColor: attackSourcesColor[1],
+            color: "#fff",
+            width: 90,
+            align: "left",
+            borderRadius: 5,
+            padding: 5
+          },
+          title3: {
+            backgroundColor: attackSourcesColor[2],
+            color: "#fff",
+            width: 90,
+            align: "left",
+            borderRadius: 5,
+            padding: 5
+          },
+          title: {
+            backgroundColor: attackSourcesColor[3],
+            color: "#fff",
+            width: 90,
+            align: "left",
+            borderRadius: 5,
+            padding: 5
+          }
+        },
+        formatter: function(value, index) {
+          index = contains(departments, value) + 1;
+          if (index - 1 < 3) {
+            return [
+              "{nt" +
+                index +
+                "|" +
+                index +
+                "}" +
+                "  {title" +
+                index +
+                "|" +
+                value +
+                "}"
+            ].join("\n");
+          } else {
+            return ["{nt|" + index + "}" + "  {title|" + value + "}"].join(
+              "\n"
+            );
+          }
+        }
+      }
+    },
+    series: [
+      {
+        z: 2,
+        //name: 'value',
+        type: "bar",
+        barWidth: "25px",
+        animationDuration: 1500,
+        data: attackSourcesDataFmt(times),
+        /**
+             * es写法
+             attackSourcesData.map((item, i) => {
+                itemStyle = {
+                    color: i > 3 ? colorList[3] : colorList[i]
+                }
+                return {
+                    value: item,
+                    itemStyle: itemStyle
+                };
+            }),
+            */
+        itemStyle: {
+          normal: {
+            color: function(params) {
+              return attackSourcesColor[
+                params.dataIndex > 3 ? 3 : params.dataIndex
+              ];
+            },
+            barBorderRadius: 5
+          }
+        },
+        label: {
+          show: true,
+          formatter: function(a) {
+            return a.value + "次";
+          },
+          position: "right",
+          color: "#838098",
+          fontWeight: 500,
+          fontSize: 14,
+          offset: [5, 0]
+        }
+      }
+    ]
+  };
+  return option;
+}
+// https://www.makeapie.com/editor.html?c=x06vA7qS2X
+function roseChartOption(param) {
+  let legenddata = [
+    { name: "智能审核人工导入", abnormalAmount: 85840, proportion: "35%" },
+    { name: "住院限制支付药品", abnormalAmount: 80589, proportion: "9%" },
+    { name: "诊疗项目限儿童使用", abnormalAmount: 57786, proportion: "3%" },
+    { name: "人工剔除", abnormalAmount: 43938, proportion: "35%" },
+    {
+      name: "超医保诊疗项目范围收费",
+      abnormalAmount: 29566,
+      proportion: "0.7%"
+    },
+    {
+      name: "医用材料使用与项目不匹配",
+      abnormalAmount: 29406,
+      proportion: "9%"
+    },
+    { name: "重复用药", abnormalAmount: 29406, proportion: "1%" },
+    {
+      name: "仪器辅助操作与手术重复收费",
+      abnormalAmount: 11812,
+      proportion: "6%"
+    },
+    {
+      name: "中药饮片单味出现时不支付",
+      abnormalAmount: 11811,
+      proportion: "0.023%"
+    },
+    { name: "中医辨证论治不匹配", abnormalAmount: 9332, proportion: "0.015%" },
+    {
+      name: "超时间收费,项目超限次",
+      abnormalAmount: 7469,
+      proportion: "1%"
+    },
+    {
+      name: "项目超限次（单次住院）",
+      abnormalAmount: 6909,
+      proportion: "0.03%"
+    },
+    { name: "限工伤保险支付", abnormalAmount: 6235, proportion: "0.37%" },
+    { name: "第二麻醉半价收费", abnormalAmount: 4046, proportion: "0.02%" }
+  ];
+  let option = {
+    dataset: {
+      source: [
+        ["Country", "abnormalAmount", "SQRT", "proportion"],
+        ["智能审核人工导入", 85840, 292.9846412, "35%"],
+        ["住院限制支付药品", 80589, 283.8820177, "9%"],
+        ["诊疗项目限儿童使用", 57786, 240.3871877, "3%"],
+        ["人工剔除", 43938, 209.6139308, "35%"],
+        ["超医保诊疗项目范围收费", 29566, 171.9476665, "0.7%"],
+        ["医用材料使用与项目不匹配", 29566, 171.5476665, "9%"],
+        ["重复用药", 29406, 171.4817775, "1%"],
+        ["仪器辅助操作与手术重复收费", 11812, 108.6830254, "6%"],
+        ["中药饮片单味出现时不支付", 11811, 108.6784247, "0.023%"],
+        ["中医辨证论治不匹配", 9332, 96.60227741, "0.015%"],
+        ["超时间收费,项目超限次", 7469, 86.42337647, "1%"],
+        ["项目超限次（单次住院）", 6909, 83.12039461, "0.03%"],
+        ["限工伤保险支付", 6235, 78.96201618, "0.37%"],
+        ["第二麻醉半价收费", 4046, 63.60817558, "0.02%"]
+      ]
+    },
+    toolbox: {
+      show: true, //false则不显示工具栏
+      feature: {
+        saveAsImage: { show: true, type: "jpeg" }
+      }
+    },
+    title: {
+      text: "违规名称的金额和占比",
+      subtext: param.chargingTime[0] + " 至 " + param.chargingTime[1],
+      x: "60%",
+      y: "150",
+      textStyle: {
+        fontSize: 22,
+        fontWeight: "bold",
+        fontFamily: "Microsoft YaHei",
+        color: "#000"
+      },
+      subtextStyle: {
+        fontStyle: "italic",
+        fontSize: 14
+      }
+    },
+    legend: {
+      itemGap: 20,
+      x: "52%", //水平位置，【left\center\right\数字】
+      y: "240", //垂直位置，【top\center\bottom\数字】
+      align: "left", //字在图例的左边或右边【left/right】
+      orient: "vertical", //图例方向【horizontal/vertical】
+      icon: "circle", //图例形状【circle\rect\roundRect\triangle\diamond\pin\arrow\none】
+      //图例文字
+      textStyle: {
+        fontFamily: "微软雅黑",
+        color: "#000"
+      },
+      data: [
+        "智能审核人工导入",
+        "住院限制支付药品",
+        "诊疗项目限儿童使用",
+        "人工剔除",
+        "超医保诊疗项目范围收费",
+        "医用材料使用与项目不匹配",
+        "重复用药",
+        "仪器辅助操作与手术重复收费",
+        "中药饮片单味出现时不支付",
+        "",
+        "中医辨证论治不匹配",
+        "超时间收费,项目超限次",
+        "项目超限次（单次住院）",
+        "限工伤保险支付",
+        "第二麻醉半价收费"
+      ],
+      formatter: function(params) {
+        for (var i = 0; i < legenddata.length; i++) {
+          if (legenddata[i].name == params) {
+            return (
+              params +
+              "\t异常金额:" +
+              legenddata[i].abnormalAmount +
+              "\t占比:" +
+              legenddata[i].proportion
+            );
+          }
+        }
+      }
+    },
+
+    calculable: true,
+    series: [
+      {
+        name: "半径模式",
+        type: "pie",
+        clockWise: false,
+        radius: [20, 400],
+        center: ["35%", "62%"],
+        roseType: "area",
+        encode: {
+          itemName: "Country",
+          value: "SQRT"
+        },
+        itemStyle: {
+          normal: {
+            color: function(params) {
+              var colorList = [
+                "#a71a4f",
+                "#bc1540",
+                "#c71b1b",
+                "#d93824",
+                "#ce4018",
+                "#d15122",
+                "#e7741b",
+                "#e58b3d",
+                "#e59524",
+                "#dc9e31",
+                "#da9c2d",
+                "#d2b130",
+                "#bbd337",
+                "#8cc13f",
+                "#67b52d",
+                "#53b440",
+                "#48af54",
+                "#479c7f",
+                "#48a698",
+                "#57868c"
+              ];
+              return colorList[params.dataIndex];
+            },
+            label: {
+              position: "inside",
+              textStyle: {
+                fontWeight: "bold",
+                fontFamily: "Microsoft YaHei",
+                color: "#FAFAFA",
+                fontSize: 10
+              },
+              //formatter:'{b} \n{@abnormalAmount}例 \n死亡{@proportion}',//注意这里大小写敏感哦
+              formatter: function(params) {
+                console.log("参数列表", params);
+                if (params.data[1] > 9000) {
+                  return (
+                    params.data[0] +
+                    "\n" +
+                    params.data[1] +
+                    "元" +
+                    "\n" +
+                    "占比" +
+                    params.data[3] +
+                    ""
+                  );
+                } else {
+                  return "";
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        name: "透明圆圈",
+        type: "pie",
+        radius: [10, 27],
+        center: ["35%", "62%"],
+        itemStyle: {
+          color: "rgba(250, 250, 250, 0.3)"
+        },
+        data: [{ value: 10, name: "" }]
+      },
+      {
+        name: "透明圆圈",
+        type: "pie",
+        radius: [10, 35],
+        center: ["35%", "62%"],
+        itemStyle: {
+          color: "rgba(250, 250, 250, 0.3)"
+        },
+        data: [{ value: 10, name: "" }]
+      }
+    ]
+  };
+  return option;
+}
+function violationOfNumberOption() {
+  option = {
+    backgroundColor: "#01004C",
+    title: {},
+    tooltip: {
+      trigger: "axis"
+    },
+    legend: {
+      data: ["信息科技", "大消费"],
+      textStyle: {
+        color: "#fff"
+      }
+    },
+    toolbox: {
+      show: true,
+      feature: {
+        mark: {
+          show: true
+        },
+        dataView: {
+          show: true,
+          readOnly: false
+        },
+        magicType: {
+          show: true,
+          type: ["line", "bar"]
+        },
+        restore: {
+          show: true
+        },
+        saveAsImage: {
+          show: true
+        }
+      }
+    },
+    calculable: true,
+    xAxis: [
+      {
+        type: "category",
+        boundaryGap: false,
+        data: ["一月份", "二月份", "三月份", "四月份", "五月份", "六月份"],
+        axisLabel: {
+          show: true,
+          textStyle: {
+            color: "#ffffff", //X轴文字颜色
+            fontSize: 16
+          }
+        }
+      }
+    ],
+    yAxis: [
+      {
+        type: "value",
+        axisLabel: {
+          formatter: "{value} ",
+          color: "#ffffff",
+          textStyle: {
+            fontSize: 16
+          }
+        },
+        axisLine: {
+          show: true,
+          lineStyle: {
+            color: "#ccc"
+          }
+        }
+      }
+    ],
+    series: [
+      {
+        name: "信息科技",
+        type: "line",
+        data: [1, 4, 2, 5, 1, 2, 1],
+        lineStyle: {
+          normal: {
+            width: 8,
+            color: {
+              type: "linear",
+
+              colorStops: [
+                {
+                  offset: 0,
+                  color: "#57BD9F" // 0% 处的颜色
+                },
+                {
+                  offset: 1,
+                  color: "#19BC8C" // 100% 处的颜色
+                }
+              ],
+              globalCoord: false // 缺省为 false
+            },
+            shadowColor: "rgba(72,216,191, 0.3)",
+            shadowBlur: 6,
+            shadowOffsetY: 10
+          }
+        },
+        itemStyle: {
+          normal: {
+            color: "#57BD9F",
+            borderWidth: 10,
+            borderColor: "#57BD9F"
+          }
+        },
+        markPoint: {
+          data: [
+            {
+              type: "max",
+              name: "最大值"
+            },
+            {
+              type: "min",
+              name: "最小值"
+            }
+          ]
+        }
+      }
+    ]
+  };
+}
 export {
   fourRingOption,
   healthCareAccountedOption,
   dashboardOption,
-  costDetailsOption
+  costDetailsOption,
+  numberOfPenaltyOption,
+  roseChartOption,
+  violationOfNumberOption
 };
