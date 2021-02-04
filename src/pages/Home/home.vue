@@ -141,6 +141,7 @@ export default {
     this.param.chargingTime.push(startDate);
     this.param.chargingTime.push(endDate);
     this.initialize();
+    console.log();
   },
   methods: {
     async initialize() {
